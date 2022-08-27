@@ -2,6 +2,10 @@ package br.com.store24h.store24h.api;
 
 import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.model.Administrador;
+import br.com.store24h.store24h.model.User;
+import br.com.store24h.store24h.repository.UserDbRepository;
+import net.minidev.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +16,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/stubs/handler_api")
 public class ApiKey {
 
-    @GetMapping("/criarChaveApi")
-    public ResponseEntity<String> chaveApi(Authentication authentication) {
-        String keyApi = Funcionalidades.gerarKeyApi(authentication);
+    @Autowired
+    private UserDbRepository userDbRepository;
 
-        return ResponseEntity.ok(keyApi);
+    @GetMapping("/criarChaveApi")
+    public ResponseEntity chaveApi(Authentication authentication) {
+        JSONObject myJson = new JSONObject();
+        User user = Funcionalidades.userLogado(authentication);
+
+        if (user.getApiKey() == null) {
+            try {
+                String apiKey = Funcionalidades.gerarKeyApi(authentication);
+                user.setApiKey(apiKey);
+                userDbRepository.save(user);
+                myJson.put("apiKey", apiKey);
+
+                return ResponseEntity.ok().body(myJson);
+            } catch (Exception e) {
+
+                return ResponseEntity.badRequest().body("Ops aconteceu um erro, apiKey não criada!");
+            }
+        } else {
+
+            return ResponseEntity.badRequest().body("Você não pode ter mais de uma ApiKey");
+        }
     }
 }

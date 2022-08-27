@@ -18,21 +18,16 @@ public class User implements UserDetails {
     private String email;
     private String perfil;
     private String nome;
+    private String cpf;
     private String senha;
     private String apiKey;
     private int saldo;
-    private String operator;
-    private String country;
 
     public User() {
     }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getEmail() {
@@ -53,6 +48,14 @@ public class User implements UserDetails {
 
     public void setPerfil(String perfil) {
         this.perfil = perfil;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
     public void setNome(String nome) {
@@ -82,24 +85,6 @@ public class User implements UserDetails {
     public void setSaldo(int saldo) {
         this.saldo = saldo;
     }
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -26,16 +26,16 @@ public class AutenticacaoService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> jogador = userDbRepository.findByEmail(username);
+        Optional<User> user = userDbRepository.findByEmail(username);
         Optional<Administrador> adm = admRepository.findByEmail(username);
 
-        if (jogador.isPresent()) {
-            User jogadorLogado = jogador.get();
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(jogadorLogado.getPerfil());
+        if (user.isPresent()) {
+            User userLogado = user.get();
+            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userLogado.getPerfil());
             Set<GrantedAuthority> authorities = new HashSet<>();
             authorities.add(authority);
 
-            return jogadorLogado;
+            return userLogado;
 
         } else if (adm.isPresent()) {
             Administrador administrador = adm.get();

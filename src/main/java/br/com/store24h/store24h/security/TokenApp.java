@@ -37,7 +37,7 @@ public class TokenApp {
         return Jwts.builder()
                 .setIssuer("User do store24h")
                 .setSubject(user.getEmail())
-                .signWith(SignatureAlgorithm.ES512, "logado")
+                .signWith(SignatureAlgorithm.HS512, "logado")
                 .setExpiration(new Date(System.currentTimeMillis() + 5 * 60 * 100000))
                 .compact();
     }

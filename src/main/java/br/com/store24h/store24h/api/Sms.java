@@ -1,8 +1,7 @@
 package br.com.store24h.store24h.api;
 
+import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.dto.Balance;
-import br.com.store24h.store24h.dto.NumberStatus;
-import br.com.store24h.store24h.model.Administrador;
 import br.com.store24h.store24h.model.PaisOperadoras;
 import br.com.store24h.store24h.model.Servicos;
 import br.com.store24h.store24h.model.User;
@@ -11,13 +10,12 @@ import br.com.store24h.store24h.repository.PaisOperadorasDbRepository;
 import br.com.store24h.store24h.repository.ServicosDbRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
 import com.nimbusds.jose.shaded.json.JSONObject;
-import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -40,9 +38,9 @@ public class Sms {
     @GetMapping("/getNumberStatus")
     public ResponseEntity<?> numberStatus(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("country") String country, @RequestParam("operator") String operator) {
         JSONObject myJson = new JSONObject();
-
+        System.out.println(api_key);
         // POSSÍVEIS ERROS
-        if(verificaKeyApi(api_key)) { // BAD_KEY
+        if(!isValidKeyApi(api_key)) { // BAD_KEY
             myJson.put("BAD_KEY", "Chave de API inválida");
             return ResponseEntity.badRequest().body(myJson);
         }
@@ -54,6 +52,18 @@ public class Sms {
             myJson.put("BAD_ACTION", "Consulta geral malformada");
             return ResponseEntity.badRequest().body(myJson);
         }
+
+        //RESPOSTA DO SERVIDOR
+        myJson.put("vk_0", 185);
+        myJson.put("ok_0", 131);
+        myJson.put("wa_0", 96);
+        myJson.put("vi_0", 49);
+        myJson.put("tg_0", 118);
+        myJson.put("wb_0", 74);
+        myJson.put("go_0", 99);
+        myJson.put("fb_0", 128);
+        myJson.put("tw_0", 244);
+        myJson.put("av_0", 99);
 
         return ResponseEntity.ok().body(myJson);
     }
@@ -104,8 +114,11 @@ public class Sms {
     public ResponseEntity<?> balance(@RequestParam("api_key") String api_key, @RequestParam("action") String action) {
         JSONObject myJson = new JSONObject();
 
+        // Pergutnar mais tarde !!! importante!!
+
+
         // POSSÍVEIS ERROS
-        if(verificaKeyApi(api_key)) { // BAD_KEY
+        if(!isValidKeyApi(api_key)) { // BAD_KEY
             myJson.put("BAD_KEY", "Chave de API inválida");
             return ResponseEntity.badRequest().body(myJson);
         }
@@ -118,20 +131,36 @@ public class Sms {
             return ResponseEntity.badRequest().body(myJson);
         }
 
-        return ResponseEntity.ok().body(new Balance());
+        // RESPOSTA DO SERVIDOR
+        Optional<User> user = userDbRepository.findByApiKey(api_key);
+        int saldoUser = user.get().getSaldo();
+        myJson.put("ACCESS_BALANCE", saldoUser);
+
+        return ResponseEntity.ok().body(myJson);
     }
 
     @GetMapping("/getNumber")
     public ResponseEntity<?> number(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("service") String service, @RequestParam("operator") String operator, @RequestParam("country") String country ) {
 
         JSONObject myJson = new JSONObject();
-        myJson.put("api_key", api_key);
-        myJson.put("action", action);
-        myJson.put("service", service);
-        myJson.put("operator", operator);
-        myJson.put("country", country);
 
-
+        // POSSÍVEIS ERROS
+        if (!isValidKeyApi(api_key)) { // BAD_KEY
+            myJson.put("BAD_KEY", "Chave de API inválida");
+            return ResponseEntity.badRequest().body(myJson);
+        }
+        if (false) { // BAD_ACTION
+            myJson.put("BAD_ACTION", "Consulta geral malformada");
+            return ResponseEntity.badRequest().body(myJson);
+        }
+        if (false) { // SERVIÇO_RUIM
+            myJson.put("BAD_SERVICE", "nome de serviço incorreto");
+            return ResponseEntity.badRequest().body(myJson);
+        }
+        if (false) { // ERROR_SQL
+            myJson.put("ERROR_SQL", "Erro de banco de dados SQL Server");
+            return ResponseEntity.badRequest().body(myJson);
+        }
 
         // RESPOSTAS DO SERVIDOR
         if (false) { // NO_NUMBERS
@@ -146,24 +175,8 @@ public class Sms {
             myJson.put("WRONG_SERVICE", "Identificador de serviço inválido");
             return ResponseEntity.badRequest().body(myJson);
         }
-
-        // POSSÍVEIS ERROS
-        if (false) { // BAD_ACTION
-            myJson.put("BAD_ACTION", "Consulta geral malformada");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if (false) { // SERVIÇO_RUIM
-            myJson.put("BAD_SERVICE", "nome de serviço incorreto");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if (verificaKeyApi(api_key)) { // BAD_KEY
-            myJson.put("BAD_KEY", "Chave de API inválida");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if (false) { // ERROR_SQL
-            myJson.put("ERROR_SQL", "Erro de banco de dados SQL Server");
-            return ResponseEntity.badRequest().body(myJson);
-        }
+        String numeroDisponivel = Funcionalidades.getNumumeroDisponivel();
+        myJson.put("numero gerado", numeroDisponivel);
 
         return ResponseEntity.ok().body(myJson);
     }
@@ -174,7 +187,7 @@ public class Sms {
         JSONObject myJson = new JSONObject();
 
         // POSSÍVEIS ERROS
-        if(verificaKeyApi(api_key)) { // BAD_KEY
+        if(!isValidKeyApi(api_key)) { // BAD_KEY
             myJson.put("BAD_KEY", "Chave de API inválida");
             return ResponseEntity.badRequest().body(myJson);
         }
@@ -191,7 +204,9 @@ public class Sms {
             return ResponseEntity.badRequest().body(myJson);
         }
 
-        return ResponseEntity.ok("new Status()");
+        JSONObject stausCode = Funcionalidades.getNumeroStatus();
+
+        return ResponseEntity.ok().body(stausCode);
     }
 
     @PostMapping("/status")
@@ -199,7 +214,7 @@ public class Sms {
         JSONObject myJson = new JSONObject();
 
         // POSSÍVEIS ERROS
-        if(verificaKeyApi(api_key)) { // BAD_KEY
+        if(!isValidKeyApi(api_key)) { // BAD_KEY
             myJson.put("BAD_KEY", "Chave de API inválida");
             return ResponseEntity.badRequest().body(myJson);
         }
@@ -240,30 +255,44 @@ public class Sms {
     @GetMapping("/prices")
     public ResponseEntity<?> prices(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("service") String service, @RequestParam("country") String country) {
         JSONObject myJson = new JSONObject();
-        myJson.put("Country", "{Service: {Price: Quantity}}");
+        myJson.put("Price", "Quantity");
+        myJson.put("Service", myJson.get("Price"));
+        myJson.put(country, myJson.get("Service"));
+
 
         return ResponseEntity.ok().body(myJson);
     }
 
     @GetMapping("/listaDePaisesOperadoras/{nomePais}")
-    public ResponseEntity<PaisOperadoras> listaPaises(@PathVariable String nomePais) {
-        PaisOperadoras paisOperadoras = paisRepository.findByPais(nomePais).get();
+    public ResponseEntity<?> listPaises(@PathVariable String nomePais) {
 
-        return ResponseEntity.ok().body(paisOperadoras);
+        Optional<List<PaisOperadoras>> paisOperadoras = paisRepository.findByPais(nomePais);
+        if(paisOperadoras.isPresent()) {
+
+            return ResponseEntity.ok().body(paisOperadoras.get());
+        }
+
+        return ResponseEntity.badRequest().body("Pais não encontrado!");
     }
+
     @GetMapping("/listServicos")
-    public ResponseEntity<?> teste() {
+    public ResponseEntity<?> servicos() {
 
         List<Servicos> servicos = servicosRepository.findAll();
 
         return ResponseEntity.ok().body(servicos);
     }
 
-    public boolean verificaKeyApi(String api_key) {
+    public boolean isValidKeyApi(String api_key) {
         try {
-//            Optional<User> adm = userDbRepository.findByKeyAPi(api_key);
+            Optional<User> user = userDbRepository.findByApiKey(api_key);
 
-            return true;
+            if(user.isPresent()) {
+                return true;
+            }
+
+            return false;
+
         } catch (Exception e) {
             return false;
         }
