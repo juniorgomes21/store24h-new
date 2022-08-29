@@ -28,8 +28,8 @@ public class Funcionalidades {
         return adm;
     }
 
-    public static String gerarKeyApi(Authentication authentication) {
-        String userName = "Fernando";
+    public static String gerarKeyApi(String nomeUser) {
+        String userName = nomeUser;
         LocalDate dateObj = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String date = dateObj.format(formatter);
@@ -41,22 +41,14 @@ public class Funcionalidades {
         catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(e);
         }
-        String secretPhase = "geeks"; // exclusively to set for geeks
-//        System.out.println("Current Date : " + date);
-//        System.out.println("Login Id : " + userName);
-//        System.out.println("Secret Phase : " + secretPhase);
 
-        // By using the current date, userName(emailId) and
-        // the secretPhase , it is generated
+        String secretPhase = "geeks";
         byte[] hashResult = md.digest((date + userName + secretPhase).getBytes(UTF_8));
-        // convert the value to hex
         String password = bytesToHex(hashResult);
-//        System.out.println("Generated password.." + password);
 
         return password;
 
     }
-
     private static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {

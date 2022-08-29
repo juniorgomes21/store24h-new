@@ -1,5 +1,6 @@
 package br.com.store24h.store24h.Requisicoes;
 
+import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.model.Role;
 import br.com.store24h.store24h.model.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -100,6 +101,7 @@ public class RequisicaoNovoUser {
     public User toUser() {
         User user = new User();
         user.setNome(nome);
+        user.setApiKey(Funcionalidades.gerarKeyApi(this.nome));
         user.setCpf(cpf);
         user.setEmail(email);
         user.setPerfil(Role.USER.name());

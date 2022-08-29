@@ -26,7 +26,7 @@ public class ApiKey {
 
         if (user.getApiKey() == null) {
             try {
-                String apiKey = Funcionalidades.gerarKeyApi(authentication);
+                String apiKey = Funcionalidades.gerarKeyApi("null");
                 user.setApiKey(apiKey);
                 userDbRepository.save(user);
                 myJson.put("apiKey", apiKey);
