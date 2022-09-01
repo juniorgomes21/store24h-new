@@ -255,9 +255,9 @@ public class Sms {
     @GetMapping("/prices")
     public ResponseEntity<?> prices(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("service") String service, @RequestParam("country") String country) {
         JSONObject myJson = new JSONObject();
-        myJson.put("Price", "Quantity");
-        myJson.put("Service", myJson.get("Price"));
-        myJson.put(country, myJson.get("Service"));
+        myJson.put("Price", "15,50");
+        myJson.put("Service", "wa");
+        myJson.put("country", "Brasil");
 
 
         return ResponseEntity.ok().body(myJson);
