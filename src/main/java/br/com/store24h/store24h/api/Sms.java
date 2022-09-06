@@ -1,9 +1,8 @@
 package br.com.store24h.store24h.api;
 
 import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
-import br.com.store24h.store24h.dto.Balance;
 import br.com.store24h.store24h.model.PaisOperadoras;
-import br.com.store24h.store24h.model.Servicos;
+import br.com.store24h.store24h.model.Servico;
 import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.AdmDbRepository;
 import br.com.store24h.store24h.repository.PaisOperadorasDbRepository;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -72,6 +70,12 @@ public class Sms {
     public ResponseEntity<?> numberStatux() {
         JSONObject myJson = new JSONObject();
         // 55 xx 55555-4444
+
+        if (!isServiceOn()) {
+            myJson.put("DEV_MODE", "Tudo OK, mas a API está em mode desenvolvimento, conecte os outros serviços ...");
+            return ResponseEntity.badRequest().body(myJson);
+        }
+
         String[] fakeNumbers = new String[]{55+getDDD()+9+getFour()+getFour()};
         // POSSÍVEIS ERROS
 //        if(verificaKeyApi(api_key)) { // BAD_KEY
@@ -116,6 +120,10 @@ public class Sms {
 
         // Pergutnar mais tarde !!! importante!!
 
+        if (!isServiceOn()) {
+            myJson.put("DEV_MODE", "Tudo OK, mas a API está em mode desenvolvimento, conecte os outros serviços ...");
+            return ResponseEntity.badRequest().body(myJson);
+        }
 
         // POSSÍVEIS ERROS
         if(!isValidKeyApi(api_key)) { // BAD_KEY
@@ -143,6 +151,11 @@ public class Sms {
     public ResponseEntity<?> number(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("service") String service, @RequestParam("operator") String operator, @RequestParam("country") String country ) {
 
         JSONObject myJson = new JSONObject();
+
+        if (!isServiceOn()) {
+            myJson.put("DEV_MODE", "Tudo OK, mas a API está em mode desenvolvimento, conecte os outros serviços ...");
+            return ResponseEntity.badRequest().body(myJson);
+        }
 
         // POSSÍVEIS ERROS
         if (!isValidKeyApi(api_key)) { // BAD_KEY
@@ -186,6 +199,11 @@ public class Sms {
     public ResponseEntity<?> status(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam String id) {
         JSONObject myJson = new JSONObject();
 
+        if (!isServiceOn()) {
+            myJson.put("DEV_MODE", "Tudo OK, mas a API está em mode desenvolvimento, conecte os outros serviços ...");
+            return ResponseEntity.badRequest().body(myJson);
+        }
+
         // POSSÍVEIS ERROS
         if(!isValidKeyApi(api_key)) { // BAD_KEY
             myJson.put("BAD_KEY", "Chave de API inválida");
@@ -209,16 +227,31 @@ public class Sms {
         return ResponseEntity.ok().body(stausCode);
     }
 
-    @PostMapping("/status")
+    @GetMapping("/setStatus")
     public ResponseEntity<?> status(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("status") String status, @RequestParam String id) {
         JSONObject myJson = new JSONObject();
+
+        if (!isServiceOn()) {
+            myJson.put("DEV_MODE", "Tudo OK, mas a API está em mode desenvolvimento, conecte os outros serviços ...");
+            return ResponseEntity.badRequest().body(myJson);
+        }
+
+        if (!isServiceOn()) {
+            myJson.put("DEV_MODE", "Tudo OK, mas a API está em mode desenvolvimento, conecte os outros serviços ...");
+            return ResponseEntity.badRequest().body(myJson);
+        }
 
         // POSSÍVEIS ERROS
         if(!isValidKeyApi(api_key)) { // BAD_KEY
             myJson.put("BAD_KEY", "Chave de API inválida");
             return ResponseEntity.badRequest().body(myJson);
         }
+
         if(false) { // BAD_ACTION
+//            1 - Notify that SMS has been sent (optional)
+//            3 - Request another SMS
+//            6 - Confirm SMS code and complete activation
+//            8 - Cancel activation
             myJson.put("BAD_ACTION", "Consulta geral malformada");
             return ResponseEntity.badRequest().body(myJson);
         }
@@ -255,17 +288,22 @@ public class Sms {
     @GetMapping("/prices")
     public ResponseEntity<?> prices(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("service") String service, @RequestParam("country") String country) {
         JSONObject myJson = new JSONObject();
+
+        if (!isServiceOn()) {
+            myJson.put("DEV_MODE", "Tudo OK, mas a API está em mode desenvolvimento, conecte os outros serviços ...");
+            return ResponseEntity.badRequest().body(myJson);
+        }
+
         myJson.put("Price", "15,50");
         myJson.put("Service", service);
         myJson.put("country", country);
-
 
         return ResponseEntity.ok().body(myJson);
     }
 
     @GetMapping("/listaDePaisesOperadoras/{nomePais}")
     public ResponseEntity<?> listPaises(@PathVariable String nomePais) {
-
+        
         Optional<List<PaisOperadoras>> paisOperadoras = paisRepository.findByPais(nomePais);
         if(paisOperadoras.isPresent()) {
 
@@ -278,12 +316,12 @@ public class Sms {
     @GetMapping("/listServicos")
     public ResponseEntity<?> servicos() {
 
-        List<Servicos> servicos = servicosRepository.findAll();
+        List<Servico> servicos = servicosRepository.findAll();
 
         return ResponseEntity.ok().body(servicos);
     }
 
-    public boolean isValidKeyApi(String api_key) {
+    private boolean isValidKeyApi(String api_key) {
         try {
             Optional<User> user = userDbRepository.findByApiKey(api_key);
 
@@ -296,5 +334,9 @@ public class Sms {
         } catch (Exception e) {
             return false;
         }
+    }
+    private boolean isServiceOn(){
+        boolean SERVICE_IS_ON = false;
+        return SERVICE_IS_ON;
     }
 }
