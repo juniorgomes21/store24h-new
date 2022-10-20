@@ -1,16 +1,14 @@
 package br.com.store24h.store24h.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "servicos")
 public class Servico {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    private String servico;
+    private String codeServico;
 
     public Servico() {
     }
@@ -31,11 +29,11 @@ public class Servico {
         this.nome = nome;
     }
 
-    public String getServico() {
-        return servico;
+    public String getCodeServico() {
+        return codeServico;
     }
 
-    public void setServico(String servico) {
-        this.servico = servico;
+    public void setCodeServico(String codeServico) {
+        this.codeServico = codeServico;
     }
 }

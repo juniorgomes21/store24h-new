@@ -1,11 +1,20 @@
 package br.com.store24h.store24h.model;
 
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "ativacoes")
 public class Activation {
     private long id;
+    @OneToMany
     private Servico servico;
     private User user;
+    private Msg msg;
     private String tempNumber; // uma hora fica inválido e enquanto válido, segue abaixo.
     private String siteNumber; // numero usado pelo site
+    private int status = -1;
 //     significa que o cadastro começou e um codigo já chegou do site que o usuário final está querendo se cadastrar
 //            1 - Notify that SMS has been sent (optional)
 
@@ -19,7 +28,6 @@ public class Activation {
     // recebido primeiro código numérico = 7
     // recebida msg após chegada do primeiro codigo numerico, possível confirmação de inscrição concluída = 11
     // recebida msg maior que 2, serviço envia varias infos = 13
-    private int status = -1;
 
     public Activation() {
     }
