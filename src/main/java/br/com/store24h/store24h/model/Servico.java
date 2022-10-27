@@ -1,10 +1,11 @@
 package br.com.store24h.store24h.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "servicos")
-public class Servico {
+public class Servico implements Serializable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;

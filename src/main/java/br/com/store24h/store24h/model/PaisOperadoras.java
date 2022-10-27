@@ -1,11 +1,12 @@
 package br.com.store24h.store24h.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class PaisOperadoras {
+public class PaisOperadoras implements Serializable {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
