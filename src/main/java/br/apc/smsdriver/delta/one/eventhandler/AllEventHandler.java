@@ -6,48 +6,78 @@
 package br.apc.smsdriver.delta.one.eventhandler;
 
 import br.apc.smsdriver.delta.one.GsmModemSistemaControlador;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.swing.JFrame;
+import br.com.store24h.store24h.Store24hApplication;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
  * @author Archer
  */
 public class AllEventHandler implements SmsEventHandler {
-    private List<SmsEventHandler> eventHandlersAll = new ArrayList<>();
+//    private static final String PARTTEN_GARBAGE_MODEM =
+//        "(\\+ZUSIMR:){1,}(\\+ZMTime:){1,}(\\+ZEND:){1,}(\\+ZPASR:){1,}(\\++ZDONR:){1,}";
+    private static final String PARTTEN_GARBAGE_MODEM ="((\\+ZMTime)|(\\^DSFLOWRPT)|(\\+ZUSIMR)|(\\+ZEND:)|(\\+ZPASR:)|(\\+ZDONR:)){1,}";
+    private static final String PARTTEN_NETWORK_ARRIVE_MODEM = "\\+CMTI:";
+
+    public static final SmsEventHandler[]
+            eventHandlersLoader = new SmsEventHandler[]{
+            //other Handler,
+//            new NumberHandler(),
+//            new NoneEventHandler(),
+//            new NewMessageHandler(),
+//            new MetaModemHandler(),
+            new OperadoraHandler()
+    };
+
+    public AllEventHandler() {
+        eventHandlersAll.addAll(Arrays.asList(eventHandlersLoader));
+    }
+
+    /**
+     * Todos Os responsáveis por dá suporte a uma caracteristica
+     */
+    public static final Set<SmsEventHandler> eventHandlersAll = Collections.synchronizedSet(new HashSet<>());
+
+    /**
+     * A mensagem que o modem retorna aos comandos
+     */
     private String serialMessage = "";
 
+    /**
+     * Os modem mapeados de acordo com suas portas
+     */ //HashMap<>(49, .75f);
+    public static final Map<String, GsmModemSistemaControlador> drivers = new HashMap<>();
+
     public String getSerialMessage() {
-
         return serialMessage;
-
     }
 
-    public List<SmsEventHandler> getEventHandlersAll() {
-        return eventHandlersAll;
-    }
-
-    //    public static final Map<String, GsmModemSistemaControlador> map = new HashMap<>(49, .75f);
     @Override
     public boolean check(Map<String, GsmModemSistemaControlador> map, String serialMessage) {
-        Set<SmsEventHandler> eventHandlers = new HashSet<>();
+//        Set<SmsEventHandler> eventHandlers;
         NewMessageHandler newSms = new NewMessageHandler();
         SmsEventHandler[] lol = new SmsEventHandler[]{
                 //other Handler,
-                new NoneEventHandler(),
+//                new NoneEventHandler(),
                 newSms,
 //            new NumberHandler(),
 //            new OperadoraHandler()
         };
-        eventHandlersAll = Arrays.asList(lol);
-        eventHandlers = new HashSet<>(eventHandlersAll);
+//        eventHandlersAll.addAll(Arrays.asList(lol));
+        eventHandlersAll.addAll(List.of(
+                        //other Handler,
+//                new NoneEventHandler(),
+                        newSms
+//            new NumberHandler(),
+//            new OperadoraHandler()
+                )
+        );
+//        eventHandlers = new HashSet<>(eventHandlersAll);
 
-        for (SmsEventHandler eventHandler : eventHandlers) {
+        for (SmsEventHandler eventHandler : eventHandlersAll) {
             eventHandler.check(map, serialMessage);
         }
 
@@ -57,26 +87,43 @@ public class AllEventHandler implements SmsEventHandler {
     @Override
     public boolean check(GsmModemSistemaControlador gsmModemSistemaControlador, String serialMessage) {
         this.serialMessage = serialMessage;
-        Set<SmsEventHandler> eventHandlers;// = new HashSet<>();
-        System.err.println("***************************\n\n\n"+serialMessage);
-        NewMessageHandler newSms = new NewMessageHandler();
-        NewMessageHandler.msgs.get(gsmModemSistemaControlador.getPortName());
-        SmsEventHandler[] lol = new SmsEventHandler[]{
-                //other Handler,
-                new NumberHandler(),
-//            new NoneEventHandler(),
-                newSms,
-//            new OperadoraHandler()
-        };
+//        String PARTTEN_NETWORK_ARRIVE_MODEM = "\\+CMTI:";
 
-        eventHandlersAll = Arrays.asList(lol);
-        eventHandlers = new HashSet<>(eventHandlersAll);
-
-        for (SmsEventHandler eventHandler : eventHandlers) {
-            eventHandler.check(gsmModemSistemaControlador, serialMessage);
+        if (!detectWhen(AllEventHandler.PARTTEN_GARBAGE_MODEM, serialMessage)) {
+            //se detectar chegada de sms da rede, solicita a leitura do mesmo e interrompe o fluxo aqui neste momento
+            if (detectWhen(AllEventHandler.PARTTEN_NETWORK_ARRIVE_MODEM, serialMessage)) {
+                // TODO retirar askMessage e outros methods de Store24hApplication
+                Store24hApplication.askMessage(gsmModemSistemaControlador);
+                return true;
+            }
+//            System.err.println("***************************\n\n\n" + serialMessage);
+            // executa a sequencia strategy, inclusive de update da mensagem nova
+            for (SmsEventHandler eventHandler : eventHandlersAll) {
+                eventHandler.check(gsmModemSistemaControlador, serialMessage);
+            }
+        } else {
+            System.err.println("***************************\n\n\n" + serialMessage);
         }
 
         return true;
+    }
+
+    // TODO fazer as classes que implementam a mesma interface usar este method par reuse of code
+    public static boolean detectWhen(String reg, String serialMessage) {
+        Set<String> tokens = new HashSet<>();
+        Pattern pa = Pattern.compile(reg, Pattern.MULTILINE);
+        Matcher ma = pa.matcher(serialMessage);
+        while (ma.find()) {
+            tokens.add(ma.group());
+        }
+        //System.out.println(tokens);
+
+//        for (String s : tokens) {
+//            System.err.println("\n\n=============\n0: " + s + "\n*************\n");
+//        }
+
+//        final boolean rea = ma.find();
+        return tokens.size() > 0 ;
     }
 
 }

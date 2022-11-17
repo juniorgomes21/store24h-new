@@ -12,9 +12,9 @@ import java.util.Objects;
  * @author Archer
  */
 public class ChipModel {
+    private long id;
     private String operadora;
     private String number;
-    private boolean isFree = true;
 
     public ChipModel(String number) {
         this.number = number;
@@ -38,15 +38,7 @@ public class ChipModel {
 
     @Override
     public String toString() {
-        return "ChipModel{" + "operadora=" + operadora + ", number=" + number + ", isFree=" + isFree + '}';
-    }
-
-    public boolean isIsFree() {
-        return isFree;
-    }
-
-    public void setIsFree(boolean isFree) {
-        this.isFree = isFree;
+        return "ChipModel{" + "operadora=" + operadora + ", number=" + number + '}';
     }
 
     @Override

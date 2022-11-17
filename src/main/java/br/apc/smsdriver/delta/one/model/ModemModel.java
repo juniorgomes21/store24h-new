@@ -12,14 +12,34 @@ import java.util.Objects;
  * @author Archer
  */
 public class ModemModel {
+    private final String portName;
+    private long id;
     private String fabricante;
     private String modelo;
     private String modOpradora;
-    private String portaEmUso;
+    private long imei;
+    private String gcap;
     private ChipModel chip;
 
-    public ModemModel(String portaEmUso) {
-        this.portaEmUso = portaEmUso;
+    public ModemModel(String portName, String model, String manufacturer, long imei, String revision, String gcap) {
+        this.portName = portName;
+        this.modelo = model;
+        this.fabricante = manufacturer;
+        this.modOpradora = revision;
+        this.gcap = gcap;
+        this.imei = imei;
+    }
+
+    public String getPortName() {
+        return portName;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getFabricante() {
@@ -46,12 +66,20 @@ public class ModemModel {
         this.modOpradora = modOpradora;
     }
 
-    public String getPortaEmUso() {
-        return portaEmUso;
+    public long getImei() {
+        return imei;
     }
 
-    public void setPortaEmUso(String portaEmUso) {
-        this.portaEmUso = portaEmUso;
+    public void setImei(long imei) {
+        this.imei = imei;
+    }
+
+    public String getGcap() {
+        return gcap;
+    }
+
+    public void setGcap(String gcap) {
+        this.gcap = gcap;
     }
 
     public ChipModel getChip() {
@@ -63,34 +91,29 @@ public class ModemModel {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 47 * hash + Objects.hashCode(this.portaEmUso);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ModemModel other = (ModemModel) obj;
-        if (!Objects.equals(this.portaEmUso, other.portaEmUso)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public String toString() {
-        return "ModemModel{" + "portaEmUso=" + portaEmUso + ", chip=" + chip + '}';
+        return "ModemModel{" +
+                "portName='" + portName + '\'' +
+                ", id=" + id +
+                ", fabricante='" + fabricante + '\'' +
+                ", modelo='" + modelo + '\'' +
+                ", modOpradora='" + modOpradora + '\'' +
+                ", imei='" + imei + '\'' +
+                ", gcap='" + gcap + '\'' +
+                ", chip=" + chip +
+                '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ModemModel that = (ModemModel) o;
+        return id == that.id && imei == that.imei && portName.equals(that.portName);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(portName, id, imei);
+    }
 }

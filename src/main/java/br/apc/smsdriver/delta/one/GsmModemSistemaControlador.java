@@ -49,6 +49,7 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
     private static final String COMMAND_DELETE_READ_MESSAGES = "AT+CMGD=0[,1]";
 
     private static final String COMMAND_QUASTION_SET_UP_MEMORIES = "AT+CPMS?";
+    private static final String COMMAND_QUASTION_OPERADORA = "AT+COPS?";
 
     private static final String COMMAND_LIST_SUPPORTED_STORAGE_MODES = "AT+CPMS=?";
     private static final String COMMAND_QUASTION_SMS_MODE_TEXT_CHECK = "AT+CMGF=?";
@@ -66,24 +67,19 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
     private ModemModel modemModel;
     private int eventcount = 1;
 
-//    public void setjFrame(NewMessageHandlerJFrame jFrame) {
-//        this.jFrame = jFrame;
-//    }
-//
-//    public NewMessageHandlerJFrame getjFrame() {
-//        return jFrame;
-//    }
-
     public GsmModemSistemaControlador(String porta) {
         super(porta);
         port = porta;
-        modemModel = new ModemModel(porta);
+//        modemModel = new ModemModel(portName, porta);
 //        allEventHandler.getEventHandlersAll().get(porta);
         try {
 
             if (!isOpened()) {
-                System.out.println("Porta não está aberta, cheque o numero " );
+//                System.out.printf("Porta não está aberta, cheque o numero " );
                 boolean openPort = this.openPort();
+                if (!openPort) {
+                    throw new SerialPortException(porta, null, null);
+                }
             }
             //setParams já comando direto no modem, especificamente na porta serial do modem e não pode ser feito antes de abrir
             setParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
@@ -112,6 +108,7 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
 
     public final synchronized void startGsm() throws SerialPortException {
         doAT();
+        doATI();
         this.writeString(GsmModemSistemaControlador.COMMAND_SMS_MODE_TEXT + "\r\n");
 //        this.writeString(GsmModemSistemaControlador.COMMAND_REMISE_A_ZERO + "\r\n");
 //        this.writeString(GsmModemSistemaControlador.COMMAND_SET_DETAILED_ERRORS + "\r\n");
@@ -135,9 +132,24 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
 //        checkStatus();
 //        sendMessage(null);
     }
+    /**
+     *
+     * Retorna uma string onde há o numero do chip, não está tratada ainda
+     */
+    public synchronized void askOperadora() {
+        try {
+            //                Thread.sleep(50);
+            if (this.isOpened())
+                this.writeString(GsmModemSistemaControlador.COMMAND_QUASTION_OPERADORA + "\r\n");
+        } catch (SerialPortException exp) {
+            exp.printStackTrace();
+        }
+    }
+
     public synchronized void doAT(){
         try {
             this.writeString(GsmModemSistemaControlador.COMMAND_AT + "\r\n");
+//            this.writeString(GsmModemSistemaControlador.COMMAND_CHIP_NUMBER + "\r\n");
         } catch (SerialPortException ex) {
             Logger.getLogger(GsmModemSistemaControlador.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -166,11 +178,7 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
      */
     public synchronized void getChipNumber() {
         try {
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(GsmModemSistemaControlador.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            //                Thread.sleep(50);
             if (this.isOpened())
                 this.writeString(GsmModemSistemaControlador.COMMAND_CHIP_NUMBER + "\r\n");
         } catch (SerialPortException exp) {
@@ -212,11 +220,7 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
 
     public synchronized void readAllMessages() {
         try {
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(GsmModemSistemaControlador.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            //                Thread.sleep(50);
             boolean msg;
             System.out.println("Lendo");
 //                if (this.isOpened()){

@@ -22,9 +22,9 @@ public class NoneEventHandler implements SmsEventHandler{
 
     @Override
     public boolean check(GsmModemSistemaControlador gsmModemSistemaControlador, String serialMessage) {
-        System.out.println("====\n Abaixo esta a mensagem serial :");
-        System.err.println(serialMessage);
-        System.out.println("Da porta " + gsmModemSistemaControlador.getPortName()+"\n-------");
+//        System.out.println("====\n Abaixo esta a mensagem serial :");
+//        System.err.println(serialMessage);
+//        System.out.println("Da porta " + gsmModemSistemaControlador.getPortName()+"\n-------");
         return true;
 
     }

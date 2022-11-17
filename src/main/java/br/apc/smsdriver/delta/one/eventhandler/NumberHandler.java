@@ -6,10 +6,8 @@
 package br.apc.smsdriver.delta.one.eventhandler;
 
 import br.apc.smsdriver.delta.one.GsmModemSistemaControlador;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,7 +22,7 @@ public class NumberHandler implements SmsEventHandler{
     //    public NumberHandler() {
 //
 //    }
-    public static final List<String> numbers = Collections.synchronizedList(new ArrayList<>(49));
+    public static final Map<String, String> data = Collections.synchronizedMap(new HashMap<>());
     @Override
     public boolean check(Map<String, GsmModemSistemaControlador> map, String serialMessage) {
 
@@ -59,7 +57,7 @@ public class NumberHandler implements SmsEventHandler{
 
         if (rea == true && reb ==true) {
             System.err.println("Um numero de celular apareceu! \n\n" + mb.group(0));
-            this.numbers.add(mb.group());
+            this.data.put(gsmModemSistemaControlador.getPortName(), mb.group());
 //                gsmModemSistemaControlador.getModemModel().setChip(new ChipModel(m.group(2)));
 //                numbers.add(m.group(2));
             //re = re1;

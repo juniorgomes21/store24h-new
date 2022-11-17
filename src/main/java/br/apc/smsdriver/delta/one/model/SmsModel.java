@@ -13,6 +13,7 @@ import java.util.Objects;
  * @author Archer
  */
 public class SmsModel {
+    private long id;
     private String msg;
     private String emissor;
     private Date date;

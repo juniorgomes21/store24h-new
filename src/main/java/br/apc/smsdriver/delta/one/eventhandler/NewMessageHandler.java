@@ -8,7 +8,6 @@ package br.apc.smsdriver.delta.one.eventhandler;
 import br.apc.smsdriver.delta.one.GsmModemSistemaControlador;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,8 +17,7 @@ import java.util.regex.Pattern;
  * @author Archer
  */
 public class NewMessageHandler implements SmsEventHandler{
-    //    public final List<String> msgs = Collections.synchronizedList(new ArrayList<>(49));
-    public static final Map<String, List<String>> msgs = Collections.synchronizedMap(new HashMap<>(49));//p<String, new ArrayList<>>(49));
+    public static final Map<String, String> data = Collections.synchronizedMap(new HashMap<>());//p<String, new ArrayList<>>(49));
     private String serialMessage = "";
     static {}
     public String getSerialMessage() {
@@ -28,37 +26,38 @@ public class NewMessageHandler implements SmsEventHandler{
 
     @Override
     public boolean check(Map<String, GsmModemSistemaControlador> map, String serialMessage) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public boolean check(GsmModemSistemaControlador gsmModemSistemaControlador, String serialMessage) {
-        String st_sp = serialMessage;//"+CNUM: \"\",\"+5593981175747\",145\n\n\n OK\n\n\n";
-//            String reg1 = "(\\+CNUM: \"\",\"\\+)(\\d{11,13})";
-//            +CNUM: ,"+5581982620465",145
-//            String reg2 = "(\\+CNUM: ,\"\\+)(\\d{11,13})";
-//            String reg = "\\+CMGL: ";
+        String st_sp = serialMessage;
         String rega = "\\+CMGL: ";
         Pattern pa = Pattern.compile(rega);
         Matcher ma = pa.matcher(st_sp);
         final boolean rea = ma.find();
 
         if (rea == true) {
-//            jframe.setText(serialMessage);
-//            SwingUtilities.updateComponentTreeUI(jframe);
-//            jframe.invalidate();
-//            jframe.validate();
-//            jframe.repaint();
-            List<String> myal = NewMessageHandler.msgs.get(gsmModemSistemaControlador.getPortName());
-            boolean conq = myal.contains(serialMessage);
-//            if(!conq)
-            myal.add(serialMessage);
-//            JOptionPane.showMessageDialog(null, serialMessage);
-            this.serialMessage = serialMessage;
-            System.err.println("\n++++++++++++++++++++++++ \n\n\n\nINICIO da MSG\n Uma Mensagem apareceu! \n\n" + ma.group(0) +"\n++++++++++++||||++++++++++++ FIM da MSG");
-//                NewMsgJFrame jft = new NewMsgJFrame();
-//                jft.setText(serialMessage);
-//                jft.setVisible(true);
+            String myal = NewMessageHandler.data.get(gsmModemSistemaControlador.getPortName());
+            boolean conq = false;
+            if (myal != null && myal != "") {
+                conq = myal.contains(serialMessage);
+                if (!conq) {
+                    myal = NewMessageHandler.data.put(gsmModemSistemaControlador.getPortName(), myal.concat(serialMessage));
+//                    this.serialMessage = serialMessage;
+                }
+            }
+
+            if (myal == null){
+                NewMessageHandler.data.put(gsmModemSistemaControlador.getPortName(), serialMessage);
+            }
+
+            System.err.println("\n++++++++++++++++++++++++ \n\n\n\nINICIO da MSG\n "
+                    + NumberHandler.data.get(gsmModemSistemaControlador.getPortName())
+                    + "\nUma Mensagem apareceu! \n\n"
+                    + ma.group(0) +
+                    "\n++++++++++++||||++++++++++++ FIM da MSG"
+            );
         }
 
         return rea;
