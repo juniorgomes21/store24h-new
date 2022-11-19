@@ -25,4 +25,8 @@ public class SmsDto {
     public Date getDate() {
         return date;
     }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
 }

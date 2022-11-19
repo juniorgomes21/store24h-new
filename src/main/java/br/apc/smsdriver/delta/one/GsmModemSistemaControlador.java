@@ -5,15 +5,15 @@
  */
 package br.apc.smsdriver.delta.one;
 
+import br.apc.smsdriver.api.dtos.ModemDto;
+import br.apc.smsdriver.api.dtos.SmsDto;
 import br.apc.smsdriver.delta.one.eventhandler.AllEventHandler;
 import br.apc.smsdriver.delta.one.eventhandler.SmsEventHandler;
-import br.apc.smsdriver.delta.one.model.ModemModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import br.apc.smsdriver.delta.one.model.SmsModel;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
@@ -64,7 +64,7 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
     private String lastResponse = "";
     private String port = "";
     List<SmsEventHandler> handlers = new ArrayList<>();
-    private ModemModel modemModel;
+    private ModemDto modemModel;
     private int eventcount = 1;
 
     public GsmModemSistemaControlador(String porta) {
@@ -77,9 +77,7 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
             if (!isOpened()) {
 //                System.out.printf("Porta não está aberta, cheque o numero " );
                 boolean openPort = this.openPort();
-                if (!openPort) {
-                    throw new SerialPortException(porta, null, null);
-                }
+                if (!openPort) throw new SerialPortException(porta, null, null);
             }
             //setParams já comando direto no modem, especificamente na porta serial do modem e não pode ser feito antes de abrir
             setParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
@@ -94,7 +92,7 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
         }
     }
 
-    public ModemModel getModemModel() {
+    public ModemDto getModemModel() {
         return modemModel;
     }
 
@@ -186,7 +184,7 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
         }
     }
 
-    public synchronized void sendMessage(SmsModel sms) {
+    public synchronized void sendMessage(SmsDto sms) {
         try {
             if (this.isOpened()) {
 //                String str1 = GsmModemSistemaControlador.COMMAND_ENVOIE_SMS 
