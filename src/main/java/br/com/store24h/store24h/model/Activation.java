@@ -1,16 +1,16 @@
 package br.com.store24h.store24h.model;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "ativacoes")
 public class Activation {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToMany
+
     private Servico servico;
     private User user;
+
     private Msg msg;
     private String tempNumber; // uma hora fica inválido e enquanto válido, segue abaixo.
     private String siteNumber; // numero usado pelo site

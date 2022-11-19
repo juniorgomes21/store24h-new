@@ -33,8 +33,19 @@ public class Sms {
     @Autowired
     private ServicosDbRepository servicosRepository;
 
+    /***
+     * Todas as solicitações devem ter uma chave de API como parâmetro "api_key" "api_key"
+     * https://smshub.org/stubs/handler_api.php?api_key=APIKEY&action=getNumbersStatus&country=COUNTRY&operator=OPERATOR
+     * {"vk_0":146,"ok_0":133,"wa_0":118,"vi_0":153,"tg_0":108,"wb_0":186,"go_0":0,"av_0":101,"fb_0":3,"tw_0":43}
+     * @param api_key obrigatório
+     * @param action
+     * @param country
+     * @param operator
+     * @return
+     */
     @GetMapping("/getNumberStatus")
-    public ResponseEntity<?> numberStatus(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("country") String country, @RequestParam("operator") String operator) {
+    public ResponseEntity<?> numberStatus(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
+                                          @RequestParam("country") String country, @RequestParam("operator") String operator) {
         JSONObject myJson = new JSONObject();
         System.out.println(api_key);
         // POSSÍVEIS ERROS
@@ -114,6 +125,16 @@ public class Sms {
         return getDDD()+getDDD();
     }
 
+    /***
+     * Consulta de saldo
+     * https://smshub.org/stubs/handler_api.php?api_key=APIKEY&action=getBalance
+     * {
+     * 	"ACCESS_BALANCE": 270
+     * }
+     * @param api_key obrigatório
+     * @param action
+     * @return valor em R$
+     */
     @GetMapping("/getBalance")
     public ResponseEntity<?> balance(@RequestParam("api_key") String api_key, @RequestParam("action") String action) {
         JSONObject myJson = new JSONObject();
@@ -147,8 +168,24 @@ public class Sms {
         return ResponseEntity.ok().body(myJson);
     }
 
+    /***
+     * Número do pedido
+     * https://smshub.org/stubs/handler_api.php?api_key=APIKEY&action=getNumber&service=SERVICE&operator=OPERATOR&country=COUNTRY
+     * ACCESS_NUMBER:ID:NUMBER
+     * {
+     * 	"ACCESS_NUMBER" : "23424:5521983364786"
+     * }
+     * @param api_key obrigatório
+     * @param action
+     * @param service obrigatório
+     * @param operator
+     * @param country
+     * @return
+     */
     @GetMapping("/getNumber")
-    public ResponseEntity<?> number(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("service") String service, @RequestParam("operator") String operator, @RequestParam("country") String country ) {
+    public ResponseEntity<?> number(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
+                                    @RequestParam("service") String service, @RequestParam("operator") String operator,
+                                    @RequestParam("country") String country ) {
 
         JSONObject myJson = new JSONObject();
 
@@ -195,7 +232,15 @@ public class Sms {
     }
 
 
-    @GetMapping("/status")
+    /***
+     * Obter status
+     * https://smshub.org/stubs/handler_api.php?api_key=APIKEY&action=getStatus&id=ID
+     * @param api_key
+     * @param action
+     * @param id
+     * @return
+     */
+    @GetMapping("/getStatus")
     public ResponseEntity<?> status(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam String id) {
         JSONObject myJson = new JSONObject();
 
@@ -227,8 +272,21 @@ public class Sms {
         return ResponseEntity.ok().body(stausCode);
     }
 
+    /***
+     * Alterar estado
+     * https://smshub.org/stubs/handler_api.php?api_key=APIKEY&action=setStatus&status=STATUS&id=ID
+     * 1 - SMS enviado para o número,
+     * 3 - SMS precisa ser repetido,
+     * 6 - ativação concluída com sucesso,
+     * 8 - cancelar ativação
+     * @param api_key
+     * @param action
+     * @param id
+     * @return
+     */
     @GetMapping("/setStatus")
-    public ResponseEntity<?> status(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("status") String status, @RequestParam String id) {
+    public ResponseEntity<?> status(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
+                                    @RequestParam("status") String status, @RequestParam String id) {
         JSONObject myJson = new JSONObject();
 
         if (!isServiceOn()) {
@@ -285,8 +343,18 @@ public class Sms {
         return ResponseEntity.ok().body("new StatusPost()");
     }
 
+    /***
+     * Solicitar todos os preços
+     * https://smshub.org/stubs/handler_api.php?api_key=APIKEY&action=getPrices&service=SERVICE&country=COUNTRY
+     * @param api_key
+     * @param action
+     * @param service
+     * @param country
+     * @return
+     */
     @GetMapping("/prices")
-    public ResponseEntity<?> prices(@RequestParam("api_key") String api_key, @RequestParam("action") String action, @RequestParam("service") String service, @RequestParam("country") String country) {
+    public ResponseEntity<?> prices(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
+                                    @RequestParam("service") String service, @RequestParam("country") String country) {
         JSONObject myJson = new JSONObject();
 
         if (!isServiceOn()) {
