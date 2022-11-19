@@ -6,8 +6,6 @@
 package br.apc.smsdriver.delta.one.eventhandler;
 
 import br.apc.smsdriver.delta.one.GsmModemSistemaControlador;
-import br.apc.smsdriver.delta.one.model.ModemModel;
-import br.apc.smsdriver.delta.one.model.dao.ModemDAO;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -58,9 +56,10 @@ public class MetaModemHandler implements SmsEventHandler{
 
             // se quiser salvar no db
             //TODO restringir esta chamada para quando o modo de SUPORTE estiver ativo
-            new Thread(() ->
-                ModemDAO.configEntity(gsmModemSistemaControlador.getPortName())
-            );
+//            new Thread(() ->
+//
+//                //ModemDAO.configEntity(gsmModemSistemaControlador.getPortName())
+//            );
         }
         return rea;
     }
