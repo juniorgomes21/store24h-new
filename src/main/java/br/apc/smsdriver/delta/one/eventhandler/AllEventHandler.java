@@ -5,8 +5,9 @@
  */
 package br.apc.smsdriver.delta.one.eventhandler;
 
+import br.apc.smsdriver.Driver24hubApplication;
 import br.apc.smsdriver.delta.one.GsmModemSistemaControlador;
-import br.com.store24h.store24h.Store24hApplication;
+//import br.com.store24h.store24h.Store24hApplication;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -94,7 +95,7 @@ public class AllEventHandler implements SmsEventHandler {
             //se detectar chegada de sms da rede, solicita a leitura do mesmo e interrompe o fluxo aqui neste momento
             if (Utils.detectWhen(AllEventHandler.PARTTEN_NETWORK_ARRIVE_MODEM, serialMessage).size()> 0) {
                 // TODO retirar askMessage e outros methods de Store24hApplication
-                Store24hApplication.askMessage(gsmModemSistemaControlador);
+                Driver24hubApplication.askMessage(gsmModemSistemaControlador);
                 return true;
             }
 //            System.err.println("***************************\n\n\n" + serialMessage);
