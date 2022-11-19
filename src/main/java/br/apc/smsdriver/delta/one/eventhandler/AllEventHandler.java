@@ -28,6 +28,7 @@ public class AllEventHandler implements SmsEventHandler {
 //            new NumberHandler(),
 //            new NoneEventHandler(),
 //            new NewMessageHandler(),
+//              new NewMessageDtoHandler(),
 //            new MetaModemHandler(),
             new OperadoraHandler()
     };
@@ -66,15 +67,15 @@ public class AllEventHandler implements SmsEventHandler {
 //            new NumberHandler(),
 //            new OperadoraHandler()
         };
-//        eventHandlersAll.addAll(Arrays.asList(lol));
-        eventHandlersAll.addAll(List.of(
-                        //other Handler,
-//                new NoneEventHandler(),
-                        newSms
-//            new NumberHandler(),
-//            new OperadoraHandler()
-                )
-        );
+////        eventHandlersAll.addAll(Arrays.asList(lol));
+//        eventHandlersAll.addAll(List.of(
+//                        //other Handler,
+////                new NoneEventHandler(),
+//                        newSms
+////            new NumberHandler(),
+////            new OperadoraHandler()
+//                )
+//        );
 //        eventHandlers = new HashSet<>(eventHandlersAll);
 
         for (SmsEventHandler eventHandler : eventHandlersAll) {
@@ -89,9 +90,9 @@ public class AllEventHandler implements SmsEventHandler {
         this.serialMessage = serialMessage;
 //        String PARTTEN_NETWORK_ARRIVE_MODEM = "\\+CMTI:";
 
-        if (!detectWhen(AllEventHandler.PARTTEN_GARBAGE_MODEM, serialMessage)) {
+        if (!(Utils.detectWhen(AllEventHandler.PARTTEN_GARBAGE_MODEM, serialMessage).size() > 0)) {
             //se detectar chegada de sms da rede, solicita a leitura do mesmo e interrompe o fluxo aqui neste momento
-            if (detectWhen(AllEventHandler.PARTTEN_NETWORK_ARRIVE_MODEM, serialMessage)) {
+            if (Utils.detectWhen(AllEventHandler.PARTTEN_NETWORK_ARRIVE_MODEM, serialMessage).size()> 0) {
                 // TODO retirar askMessage e outros methods de Store24hApplication
                 Store24hApplication.askMessage(gsmModemSistemaControlador);
                 return true;
@@ -106,24 +107,6 @@ public class AllEventHandler implements SmsEventHandler {
         }
 
         return true;
-    }
-
-    // TODO fazer as classes que implementam a mesma interface usar este method par reuse of code
-    public static boolean detectWhen(String reg, String serialMessage) {
-        Set<String> tokens = new HashSet<>();
-        Pattern pa = Pattern.compile(reg, Pattern.MULTILINE);
-        Matcher ma = pa.matcher(serialMessage);
-        while (ma.find()) {
-            tokens.add(ma.group());
-        }
-        //System.out.println(tokens);
-
-//        for (String s : tokens) {
-//            System.err.println("\n\n=============\n0: " + s + "\n*************\n");
-//        }
-
-//        final boolean rea = ma.find();
-        return tokens.size() > 0 ;
     }
 
 }
