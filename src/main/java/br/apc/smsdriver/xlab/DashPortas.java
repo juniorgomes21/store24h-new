@@ -1,4 +1,4 @@
-package br.apc.smsdriver;
+package br.apc.smsdriver.xlab;
 
 import gnu.io.CommPortIdentifier;
 import java.util.Enumeration;

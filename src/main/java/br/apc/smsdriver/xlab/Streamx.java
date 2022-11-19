@@ -1,4 +1,4 @@
-package br.apc.smsdriver;
+package br.apc.smsdriver.xlab;
 
 import java.util.Arrays;
 

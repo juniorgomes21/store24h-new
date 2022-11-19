@@ -1,4 +1,4 @@
-package br.apc.smsdriver.delta.one;
+package br.apc.smsdriver.xlab;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -9,21 +9,38 @@ public class Pat {
 
     public static void main(String[] args) {
 
-        testATIExtractor();
-//        operadora();
+//        testATIExtractor();
+        operadora();
+//        testRuido();
     }
 
     private static void operadora() {
 //        final String STRMANUF = "((Manufacturer: .*)|(Revision: .*)|(Model: .*)|(IMEI: (\\d*))|(\\+GCAP: .*))+";
-        String st_sp =  "\n+COPS: 0,0,\"VIVO\",2\n\nOK\n";
-        final String STRCOPS = "\\+COPS";
+        String st_sp =  "\\n+COPS: 0,0,\"VIVO\",2\\n\\nOK\\n";
+        String st = "\n" +
+                "+COPS: 0,0,\"VIVO\",2\n" +
+                "\n" +
+                "OK\n";
+        String num = "\n" +
+                "+COPS: 0,2,\"72402\",2\n" +
+                "\n" +
+                "OK\n";
+//        String lol = """
+//                +COPS: 0,0,"VIVO",2
+//
+//                OK
+//                """;
+        final String STRCOPS = "((\\+COPS: [\\d,][\\d,][\"])|([A-Z]+))";
+        final String STRCOPS2 = "((\\+COPS: \\d,\\d,\")|(\\d){3,})";
 //        "\\+CNUM: ";/
+        Pattern.compile(STRCOPS2, Pattern.MULTILINE);
+        Collection<String> res = get(STRCOPS2, num);
         Pattern pa = Pattern.compile(STRCOPS, Pattern.MULTILINE);
         Matcher ma = pa.matcher(st_sp);
-        final boolean rea = ma.find();
+//        final boolean rea = ma.find();
 //        AT+COPS?
 //                +COPS: 0,0,"VIVO",2
-        Set<String> tokens = new HashSet<>();
+        List<String> tokens = new ArrayList<>(3);
         while (ma.find()) {
             tokens.add(ma.group());
         }
@@ -39,6 +56,7 @@ public class Pat {
         final String PATTERN_GARBAGE_MODEM ="((\\+ZMTime)|(\\+ZUSIMR)|(\\+ZEND:)|(\\+ZPASR:)|(\\+ZDONR:)){1,}";
         final String PATTERN_NETWORK_ARRIVE_MODEM = "\\+CMTI:";
         String serialMessage = "\n\n+ZUSIMR:2\n\n oi\\+ZEND: outra \n\n+ZMTime: coisa\n\n+ZUSIMR:3";
+        String st_sp =  "\\n+COPS: 0,0,\"VIVO\",2\\n\\nOK\\n";
         if (detectWhen(PATTERN_GARBAGE_MODEM, serialMessage) == false) {
             if (detectWhen(PATTERN_NETWORK_ARRIVE_MODEM, serialMessage) == true ) {
                 //                Store24hApplication.askMessage(gsmModemSistemaControlador);
@@ -119,7 +137,7 @@ public class Pat {
 
     }
 
-    private static boolean detectWhen(String reg, String serialMessage) {
+    public static boolean detectWhen(String reg, String serialMessage) {
         Pattern pa = Pattern.compile(reg, Pattern.MULTILINE);
         Matcher ma = pa.matcher(serialMessage);
 //        final boolean rea = ma.find();
@@ -140,6 +158,29 @@ public class Pat {
 //        System.out.println("\n\n=============\n2: " + ma.group(2) + "\n*************\n");
 //        System.out.println("\n\n=============\n3: " + ma.group(3) + "\n*************\n");
         return mKeys.size() > 0 ;
+    }
+
+    private static Collection<String> get(String reg, String serialMessage) {
+        Pattern pa = Pattern.compile(reg, Pattern.MULTILINE);
+        Matcher ma = pa.matcher(serialMessage);
+//        final boolean rea = ma.find();
+        Set<String> mKeys = new HashSet<>();
+
+        while (ma.find()) {
+            mKeys.add(ma.group());
+        }
+        //System.out.println(mKeys);
+        for (String s :
+                mKeys) {
+            System.err.println("\n\n=============\n0: " + s + "\n*************\n");
+        }
+//~~~~~~~~
+//        System.err.println("\n\n=============\n0: " + ma.group() + "\n*************\n");
+        ma.find();
+//        System.out.println("\n\n=============\n1: " + ma.group(1) + "\n*************\n");
+//        System.out.println("\n\n=============\n2: " + ma.group(2) + "\n*************\n");
+//        System.out.println("\n\n=============\n3: " + ma.group(3) + "\n*************\n");
+        return mKeys;
     }
 
 
