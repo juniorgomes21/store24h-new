@@ -38,6 +38,14 @@ public class SmsDto {
         return emissor;
     }
 
+    public int getSequencial() {
+        return sequencial;
+    }
+
+    public void setSequencial(int sequencial) {
+        this.sequencial = sequencial;
+    }
+
     public Date getDate() {
         return date;
     }

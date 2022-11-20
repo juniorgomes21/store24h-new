@@ -1,5 +1,6 @@
 package br.apc.smsdriver.delta.one.eventhandler;
 
+import br.apc.smsdriver.api.dtos.ChipDto;
 import br.apc.smsdriver.api.dtos.SmsDto;
 
 import java.text.DateFormat;
@@ -37,9 +38,11 @@ public class Utils {
 //        String xg7 = ma.group(7);
 //        String xg8 = ma.group(8);
 
-
+        ma = pa.matcher(serialMessage);
         while (ma.find()) {
-            tokens.add(ma.group());
+            String lol = ma.group(3);
+            if(lol != null && lol.equals("OK")) throw new RuntimeException("\n\n\n\n\n\n ERRROOOORRRRRRRRR ============== OK OK OK");
+            tokens.add(lol);
         }
 
         //System.out.println(tokens);
@@ -70,6 +73,38 @@ public class Utils {
                     Integer.parseInt(ma.group(2))
 
             ));
+        }
+        return smsdtos;
+    }
+
+    public static ChipDto detectWhenChipDto(String reg, String serialMessage, String port) {
+        ChipDto smsdtos = null;
+        Pattern pa = Pattern.compile(reg, Pattern.MULTILINE);
+        Matcher ma = pa.matcher(serialMessage);
+
+        boolean xlol = ma.find();
+        if (xlol){
+            String xg    = ma.group();
+            String xg0 = ma.group(0);
+            String xg1 = ma.group(1);
+            String xg2 = ma.group(2);
+            String xg3 = ma.group(3);
+//            String xg4 = ma.group(4);
+//            String xg5 = ma.group(5);
+//        String xg6 = ma.group(6);
+//        String xg7 = ma.group(7);
+//        String xg8 = ma.group(8);
+        }
+
+        ma = pa.matcher(serialMessage);
+        while (ma.find()) {
+
+            smsdtos = new ChipDto(
+                    ma.group(3), //operadora
+                    NumberHandler.data.get(port)
+//                    ma.group(4)  //numero
+
+            );
         }
         return smsdtos;
     }

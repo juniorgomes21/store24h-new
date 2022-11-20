@@ -27,11 +27,12 @@ public class AllEventHandler implements SmsEventHandler {
             eventHandlersLoader = new SmsEventHandler[]{
             //other Handler,
             new NumberHandler(),
-            new OperadoraHandler(),
-            new MetaModemHandler(),
+//            new OperadoraHandler(),
+            new OperadoraDtoHandler(),
+//            new MetaModemHandler(),
 //            new NoneEventHandler(),
 //            new NewMessageHandler(),
-            new NewMessageDtoHandler(),
+//            new NewMessageDtoHandler(),
     };
 
     public AllEventHandler() {

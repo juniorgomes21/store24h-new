@@ -106,7 +106,7 @@ public class GsmModemSistemaControlador extends SerialPort implements SerialPort
 
     public final synchronized void startGsm() throws SerialPortException {
         doAT();
-        doATI();
+//        doATI();
         this.writeString(GsmModemSistemaControlador.COMMAND_SMS_MODE_TEXT + "\r\n");
 //        this.writeString(GsmModemSistemaControlador.COMMAND_REMISE_A_ZERO + "\r\n");
 //        this.writeString(GsmModemSistemaControlador.COMMAND_SET_DETAILED_ERRORS + "\r\n");

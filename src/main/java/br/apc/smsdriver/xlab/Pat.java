@@ -13,9 +13,9 @@ public class Pat {
     public static void main(String[] args) {
 
 //        testATIExtractor();
-//        operadora();
+        operadora();
 //        testRuido();
-        all();
+//        all();
     }
 
     public static void all(){
@@ -37,6 +37,13 @@ public class Pat {
 
     private static void operadora() {
 //        final String STRMANUF = "((Manufacturer: .*)|(Revision: .*)|(Model: .*)|(IMEI: (\\d*))|(\\+GCAP: .*))+";
+        String st_errada = "AT\n" +
+                "\n" +
+                "OK\n" +
+                "AT+CMGF=1\n" +
+                "\n" +
+                "OK\n";
+
         String st_sp =  "\\n+COPS: 0,0,\"VIVO\",2\\n\\nOK\\n";
         String st = "\n" +
                 "+COPS: 0,0,\"VIVO\",2\n" +
@@ -51,11 +58,15 @@ public class Pat {
 //
 //                OK
 //                """;
+        final String STRCOPSX = "((\\+COPS: \\d,\\d,\")([\\d]+|[A-Z]+))";
+//        final String STRCOPSX = "((\\+COPS: [\\d,\"]+)([\\d]{3,}|[A-Z]+))";
+        Pattern.compile(STRCOPSX, Pattern.MULTILINE);
         final String STRCOPS = "((\\+COPS: [\\d,][\\d,][\"])|([A-Z]+))";
         Pattern.compile(STRCOPS, Pattern.MULTILINE);
         final String STRCOPS2 = "((\\+COPS: \\d,\\d,\")|(\\d){3,})";
         Pattern.compile(STRCOPS2, Pattern.MULTILINE);
-        Collection<String> tokens = Utils.detectWhen(STRCOPS2, num);
+        Collection<String> tokens = Utils.detectWhen(STRCOPSX, st_sp);
+        tokens.addAll(Utils.detectWhen(STRCOPSX, num));
 
         tokens.size();
 

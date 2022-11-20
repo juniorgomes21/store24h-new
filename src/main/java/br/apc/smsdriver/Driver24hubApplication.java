@@ -2,10 +2,7 @@ package br.apc.smsdriver;
 
 import br.apc.smsdriver.delta.one.GsmModemSistemaControlador;
 import br.apc.smsdriver.delta.one.SmsDriverTools;
-import br.apc.smsdriver.delta.one.eventhandler.AllEventHandler;
-import br.apc.smsdriver.delta.one.eventhandler.MetaModemHandler;
-import br.apc.smsdriver.delta.one.eventhandler.NewMessageHandler;
-import br.apc.smsdriver.delta.one.eventhandler.NumberHandler;
+import br.apc.smsdriver.delta.one.eventhandler.*;
 import jssc.SerialPortException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.SpringApplication;
@@ -13,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @EnableCaching
@@ -32,12 +30,14 @@ public class Driver24hubApplication {
 //
 		System.err.printf("%d: \n",1);
 		initConnections();
-//		askNumbers();
+		askNumbers();
 //		askManufactures();
 		askOperadoras();
+//		askOperadorasDto();
 //		askMessages();
 		System.err.printf("%s", "".length() == 0);
 		System.err.printf("\n%d: \n-=-=-=-=-=-=-=-=-=-=-\nALL SYSTEMS GO! LET´S GO FOX!\n-=-=-=-=-=-=-=-=-=-=-\n",2);
+		System.out.println(OperadoraDtoHandler.data);
 //		while (true){
 //			for (GsmModemSistemaControlador gsmModemSistemaControlador :
 //					AllEventHandler.drivers.values()) {
@@ -63,6 +63,7 @@ public class Driver24hubApplication {
 				Thread.sleep(20*numberOfPorts[0]);
 				AllEventHandler.drivers.put(modemCom, new GsmModemSistemaControlador(modemCom));
 				MetaModemHandler.data.put(modemCom, new HashMap<>());
+				NewMessageDtoHandler.data.put(modemCom, new ArrayList<>());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -151,6 +152,14 @@ public class Driver24hubApplication {
 		}
 	}
 
+	private static synchronized void askOperadorasDto() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		askOperadoras();
+	}
 	/**
 	 *
 	 * solicita aos modems os números nos chips. Pode levar até 2,5s para que todos respondam

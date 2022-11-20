@@ -4,6 +4,7 @@ import br.apc.smsdriver.api.dtos.ChipDto;
 import br.apc.smsdriver.api.repositories.ChipRepository;
 import br.apc.smsdriver.api.services.UniversalService;
 import br.apc.smsdriver.delta.one.eventhandler.NumberHandler;
+import br.apc.smsdriver.delta.one.eventhandler.OperadoraDtoHandler;
 import br.apc.smsdriver.delta.one.eventhandler.OperadoraHandler;
 import br.apc.smsdriver.entities.ChipModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,11 @@ public class ChipResource {
     @GetMapping(value = "/operadoras")
     public ResponseEntity<Map<String, String>> findOperadoras(){
         return ResponseEntity.ok().body(OperadoraHandler.data);
+    }
+
+    @GetMapping(value = "/operadorasdtos")
+    public ResponseEntity<Map<String, ChipDto>> findOperadorasDtos(){
+        return ResponseEntity.ok().body(OperadoraDtoHandler.data);
     }
 
     @GetMapping(value = "/{id}")
