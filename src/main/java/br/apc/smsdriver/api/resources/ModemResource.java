@@ -3,6 +3,7 @@ package br.apc.smsdriver.api.resources;
 import br.apc.smsdriver.api.dtos.ModemDto;
 import br.apc.smsdriver.api.repositories.ModemRepository;
 import br.apc.smsdriver.api.services.UniversalService;
+import br.apc.smsdriver.delta.one.eventhandler.MetaModemHandler;
 import br.apc.smsdriver.entities.ModemModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("modem")
@@ -21,6 +23,11 @@ public class ModemResource {
     @GetMapping
     public ResponseEntity<List<ModemModel>> findAll(){
         return ResponseEntity.ok().body(modemRepository.findAll());
+    }
+
+    @GetMapping(value = "/metamodems")
+    public ResponseEntity<Map<String, Map<String, String>>> findModems(){
+        return ResponseEntity.ok().body(MetaModemHandler.data);
     }
 
     @GetMapping(value = "/{id}")
