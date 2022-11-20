@@ -50,7 +50,7 @@ public class Utils {
         return tokens;
     }
 
-    public static List<SmsDto> detectWhenDto(String reg, String serialMessage) {
+    public static List<SmsDto> detectWhenSmsDto(String reg, String serialMessage) {
         List<SmsDto> smsdtos = new ArrayList<>();
         Pattern pa = Pattern.compile(reg, Pattern.MULTILINE);
         Matcher ma = pa.matcher(serialMessage);

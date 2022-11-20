@@ -12,8 +12,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -35,7 +33,7 @@ public class NewMessageDtoHandler implements SmsEventHandler {
     @Override
     public boolean check(GsmModemSistemaControlador gsmModemSistemaControlador, String serialMessage) {
         String rega = "[\\r\\n](\\+CMGL: ([\\d]+),\"REC (READ|UNREAD)\",\"[\\+]*([\\d\\w]+)\",,\"((\\d\\d/\\d\\d/\\d\\d),(\\d\\d:\\d\\d):\\d\\d-\\d\\d)\"[\\r\\n]+([\\+\\.]*.*))";
-        List<SmsDto> smses = Utils.detectWhenDto(rega, serialMessage);
+        List<SmsDto> smses = Utils.detectWhenSmsDto(rega, serialMessage);
 
         String port = gsmModemSistemaControlador.getPortName();
 
