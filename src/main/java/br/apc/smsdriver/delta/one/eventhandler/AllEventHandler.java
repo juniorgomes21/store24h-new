@@ -19,19 +19,19 @@ import java.util.regex.Pattern;
  */
 public class AllEventHandler implements SmsEventHandler {
 //    private static final String PARTTEN_GARBAGE_MODEM =
-//        "(\\+ZUSIMR:){1,}(\\+ZMTime:){1,}(\\+ZEND:){1,}(\\+ZPASR:){1,}(\\++ZDONR:){1,}";
-    private static final String PARTTEN_GARBAGE_MODEM ="((\\+ZMTime)|(\\^DSFLOWRPT)|(\\+ZUSIMR)|(\\+ZEND:)|(\\+ZPASR:)|(\\+ZDONR:)){1,}";
+//        "(\\+ZUSIMR:){1,}(\\+ZMTime:){1,}(\\+ZEND:){1,}(\\+ZPASR:){1,}(\\++ZDONR:){1,}";   |(\+ZEND:)|(\+ZPASR:)|(\+ZDONR:)
+    private static final String PARTTEN_GARBAGE_MODEM ="((\\^MODE:)|(\\^RSSI:)|(\\+ZDIST:)|(\\+ZMTime)|(\\^DSFLOWRPT)|(\\+ZUSIMR)){1,}";
     private static final String PARTTEN_NETWORK_ARRIVE_MODEM = "\\+CMTI:";
-
+    Pattern pa = Pattern.compile(PARTTEN_GARBAGE_MODEM, Pattern.MULTILINE);
     public static final SmsEventHandler[]
             eventHandlersLoader = new SmsEventHandler[]{
             //other Handler,
-//            new NumberHandler(),
+            new NumberHandler(),
+            new OperadoraHandler(),
+            new MetaModemHandler(),
 //            new NoneEventHandler(),
 //            new NewMessageHandler(),
-//              new NewMessageDtoHandler(),
-//            new MetaModemHandler(),
-            new OperadoraHandler()
+            new NewMessageDtoHandler(),
     };
 
     public AllEventHandler() {
@@ -104,7 +104,7 @@ public class AllEventHandler implements SmsEventHandler {
                 eventHandler.check(gsmModemSistemaControlador, serialMessage);
             }
         } else {
-            System.err.println("***************************\n\n\n" + serialMessage);
+            // System.err.println("***************************\n\n\n" + serialMessage);
         }
 
         return true;
