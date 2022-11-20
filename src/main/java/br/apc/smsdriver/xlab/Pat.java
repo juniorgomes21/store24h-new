@@ -1,17 +1,38 @@
 package br.apc.smsdriver.xlab;
 
+import br.apc.smsdriver.delta.one.eventhandler.Utils;
+
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static br.apc.smsdriver.xlab.PatStrings.*;
 
 public class Pat {
 
     public static void main(String[] args) {
 
 //        testATIExtractor();
-        operadora();
+//        operadora();
 //        testRuido();
+        all();
+    }
+
+    public static void all(){
+        final String REG =  "[\\r\\n]\\+COPS: 0,0,\"([A-Z]+)\",2[\\n\\n]+OK[\\r\\n]";
+        Pattern.compile(REG, Pattern.MULTILINE);
+
+//        List<String> lis = Utils.detectWhen(REG, st);
+//        final String REG2 =  "[\\r\\n]\\+COPS: [\\d,]+\"([\\d]{3,})\"[,\\d]+[\\n\\n]+OK[\\r\\n]";
+//        Pattern.compile(REG2, Pattern.MULTILINE);
+//        // Combinação das duas formas de sucesso
+//        final String REGFINAL =  "[\\r\\n]\\+COPS: [\\d,]+\"([\\d]{3,}|[A-Z]+)\"[,\\d]+[\\n\\n]+OK[\\r\\n]";
+//        Pattern.compile(REGFINAL, Pattern.MULTILINE);
+//        List<String> lis2 = Utils.detectWhen(REGFINAL, TIM);
+        final String REG3 =  "[\\r\\n](\\+CMGL: ([\\d]+),\"REC (READ|UNREAD)\",\"[\\+]*([\\d\\w]+)\",,\"((\\d\\d/\\d\\d/\\d\\d),(\\d\\d:\\d\\d):\\d\\d-\\d\\d)\"[\\r\\n]+([\\+\\.]*.*))";
+        Pattern.compile(REG3, Pattern.MULTILINE);
+        List<String> lis3 = Utils.detectWhen(REG3, MSGBIG);
+        System.out.println(lis3);
     }
 
     private static void operadora() {
@@ -31,19 +52,11 @@ public class Pat {
 //                OK
 //                """;
         final String STRCOPS = "((\\+COPS: [\\d,][\\d,][\"])|([A-Z]+))";
+        Pattern.compile(STRCOPS, Pattern.MULTILINE);
         final String STRCOPS2 = "((\\+COPS: \\d,\\d,\")|(\\d){3,})";
-//        "\\+CNUM: ";/
         Pattern.compile(STRCOPS2, Pattern.MULTILINE);
-        Collection<String> res = get(STRCOPS2, num);
-        Pattern pa = Pattern.compile(STRCOPS, Pattern.MULTILINE);
-        Matcher ma = pa.matcher(st_sp);
-//        final boolean rea = ma.find();
-//        AT+COPS?
-//                +COPS: 0,0,"VIVO",2
-        List<String> tokens = new ArrayList<>(3);
-        while (ma.find()) {
-            tokens.add(ma.group());
-        }
+        Collection<String> tokens = Utils.detectWhen(STRCOPS2, num);
+
         tokens.size();
 
     }
@@ -57,8 +70,8 @@ public class Pat {
         final String PATTERN_NETWORK_ARRIVE_MODEM = "\\+CMTI:";
         String serialMessage = "\n\n+ZUSIMR:2\n\n oi\\+ZEND: outra \n\n+ZMTime: coisa\n\n+ZUSIMR:3";
         String st_sp =  "\\n+COPS: 0,0,\"VIVO\",2\\n\\nOK\\n";
-        if (detectWhen(PATTERN_GARBAGE_MODEM, serialMessage) == false) {
-            if (detectWhen(PATTERN_NETWORK_ARRIVE_MODEM, serialMessage) == true ) {
+        if (!(Utils.detectWhen(PATTERN_GARBAGE_MODEM, serialMessage).size() > 0)) {
+            if ((Utils.detectWhen(PATTERN_NETWORK_ARRIVE_MODEM, serialMessage).size() > 0)) {
                 //                Store24hApplication.askMessage(gsmModemSistemaControlador);
                 //                return tru
                 System.out.println("***************************\n\n\n" + serialMessage);
@@ -78,13 +91,8 @@ public class Pat {
         String serialMessage =
             "OK\r\nAT+CMGF=1\r\nOK\r\nOK\r\nManufacturer: ONDA COMMUNICATION\r\nModel: MSA110UP\r\nRevision: MSA110UP.TIMBR.FW.B01\r\nIMEI: 864446003219904\r\n+GCAP: +CGSM,+DS,+ES";
         final String ATI = "((Manufacturer: .*)|(Revision: .*)|(Model: .*)|(IMEI: (\\d*))|(\\+GCAP: .*))+";
-
-        Pattern pa = Pattern.compile(ATI, Pattern.MULTILINE);
-        Matcher ma = pa.matcher(serialMessage);
-        Set<String> tokens = new HashSet<>();
-        while (ma.find()) {
-            tokens.add(ma.group(0));
-        }
+        Pattern.compile(ATI, Pattern.MULTILINE);
+        List<String> tokens = Utils.detectWhen(ATI, serialMessage);
         System.out.println(tokens);
         List<String[]> lol = tokens.stream().map(s -> s.split(": ")).collect(Collectors.toList());
         for(String[]tu: lol){
@@ -136,55 +144,5 @@ public class Pat {
         //System.out.println(lol.get(lol.size()-1));
 
     }
-
-    public static boolean detectWhen(String reg, String serialMessage) {
-        Pattern pa = Pattern.compile(reg, Pattern.MULTILINE);
-        Matcher ma = pa.matcher(serialMessage);
-//        final boolean rea = ma.find();
-        Set<String> mKeys = new HashSet<>();
-
-        while (ma.find()) {
-            mKeys.add(ma.group());
-        }
-        //System.out.println(mKeys);
-        for (String s :
-                mKeys) {
-            System.err.println("\n\n=============\n0: " + s + "\n*************\n");
-        }
-//~~~~~~~~
-//        System.err.println("\n\n=============\n0: " + ma.group() + "\n*************\n");
-        ma.find();
-//        System.out.println("\n\n=============\n1: " + ma.group(1) + "\n*************\n");
-//        System.out.println("\n\n=============\n2: " + ma.group(2) + "\n*************\n");
-//        System.out.println("\n\n=============\n3: " + ma.group(3) + "\n*************\n");
-        return mKeys.size() > 0 ;
-    }
-
-    private static Collection<String> get(String reg, String serialMessage) {
-        Pattern pa = Pattern.compile(reg, Pattern.MULTILINE);
-        Matcher ma = pa.matcher(serialMessage);
-//        final boolean rea = ma.find();
-        Set<String> mKeys = new HashSet<>();
-
-        while (ma.find()) {
-            mKeys.add(ma.group());
-        }
-        //System.out.println(mKeys);
-        for (String s :
-                mKeys) {
-            System.err.println("\n\n=============\n0: " + s + "\n*************\n");
-        }
-//~~~~~~~~
-//        System.err.println("\n\n=============\n0: " + ma.group() + "\n*************\n");
-        ma.find();
-//        System.out.println("\n\n=============\n1: " + ma.group(1) + "\n*************\n");
-//        System.out.println("\n\n=============\n2: " + ma.group(2) + "\n*************\n");
-//        System.out.println("\n\n=============\n3: " + ma.group(3) + "\n*************\n");
-        return mKeys;
-    }
-
-
-
-
 
 }
