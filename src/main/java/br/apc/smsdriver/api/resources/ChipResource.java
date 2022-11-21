@@ -1,6 +1,5 @@
 package br.apc.smsdriver.api.resources;
 
-import br.apc.smsdriver.api.dtos.ChipDto;
 import br.apc.smsdriver.api.repositories.ChipRepository;
 import br.apc.smsdriver.api.services.UniversalService;
 import br.apc.smsdriver.delta.one.eventhandler.NumberHandler;
@@ -40,7 +39,7 @@ public class ChipResource {
     }
 
     @GetMapping(value = "/operadorasdtos")
-    public ResponseEntity<Map<String, ChipDto>> findOperadorasDtos(){
+    public ResponseEntity<Map<String, br.apc.smsdriver.api.dtos.ChipDto>> findOperadorasDtos(){
         return ResponseEntity.ok().body(OperadoraDtoHandler.data);
     }
 
@@ -51,7 +50,7 @@ public class ChipResource {
     }
 
     @PostMapping
-    public ResponseEntity<ChipModel> create(@RequestBody @Valid ChipDto chipdto) {
+    public ResponseEntity<ChipModel> create(@RequestBody @Valid br.apc.smsdriver.api.dtos.ChipDto chipdto) {
         ChipModel chipModel = universalService.createChip(chipdto);
         return ResponseEntity.ok().body(chipModel);
     }

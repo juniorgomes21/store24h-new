@@ -1,6 +1,7 @@
 package br.apc.smsdriver.delta.one.eventhandler;
 
 import br.apc.smsdriver.api.dtos.ChipDto;
+import br.apc.smsdriver.api.dtos.ModemDto;
 import br.apc.smsdriver.api.dtos.SmsDto;
 
 import java.text.DateFormat;
@@ -104,6 +105,47 @@ public class Utils {
                     NumberHandler.data.get(port)
 //                    ma.group(4)  //numero
 
+            );
+        }
+        return smsdtos;
+    }
+
+    public static ModemDto detectWhenModemDto(String reg, String serialMessage, String port) {
+
+        Pattern pa = Pattern.compile(reg, Pattern.MULTILINE);
+        Matcher ma = pa.matcher(serialMessage);
+
+        boolean xlol = ma.find();
+        if (xlol){
+            String xg    = ma.group();
+            String xg0 = ma.group(0);
+            String xg1 = ma.group(1);
+            String xg2 = ma.group(2);
+            String xg3 = ma.group(3);
+            String xg4 = ma.group(4);
+            String xg5 = ma.group(5);
+            String xg6 = ma.group(6);
+            String xg7 = ma.group(7);
+            String xg8 = ma.group(8);
+            String xg9 = ma.group(9);
+//            String xg10 = ma.group(10);
+//            String xg11 = ma.group(11);
+            System.out.println(xlol);
+
+//            String xg8 = ma.group(8);
+        }
+//ModemDto(String fabricante, String modelo, String modOpradora, long imei, String gcap, String portName, ChipDto chip)
+        ma = pa.matcher(serialMessage);
+        ModemDto smsdtos = null;
+        while (ma.find()) {
+            smsdtos = new ModemDto(
+                    ma.group(3),
+                    ma.group(5),
+                    ma.group(7),
+                    Long.parseLong(ma.group(8)),
+                    ma.group(9),
+                    port,
+                    OperadoraDtoHandler.data.get(port)
             );
         }
         return smsdtos;

@@ -30,6 +30,7 @@ public class AllEventHandler implements SmsEventHandler {
 //            new OperadoraHandler(),
             new OperadoraDtoHandler(),
 //            new MetaModemHandler(),
+            new MetaModemDtoHandler()
 //            new NoneEventHandler(),
 //            new NewMessageHandler(),
 //            new NewMessageDtoHandler(),

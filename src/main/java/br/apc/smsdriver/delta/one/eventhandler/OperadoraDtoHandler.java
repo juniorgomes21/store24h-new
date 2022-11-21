@@ -24,8 +24,7 @@ public class OperadoraDtoHandler implements SmsEventHandler {
         final String STRCOPSX = "((\\+COPS: \\d,\\d,\")([\\d]+|[A-Z]+))";
         Pattern.compile(STRCOPSX, Pattern.MULTILINE);
         ChipDto lis = Utils.detectWhenChipDto(STRCOPSX, serialMessage, gsmModemSistemaControlador.getPortName());
-        data.put(gsmModemSistemaControlador.getPortName(), lis);
-
+        if (lis != null) data.put(gsmModemSistemaControlador.getPortName(), lis);
         return lis != null;
     }
 }

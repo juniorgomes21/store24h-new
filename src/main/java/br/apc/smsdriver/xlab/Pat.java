@@ -1,5 +1,6 @@
 package br.apc.smsdriver.xlab;
 
+import br.apc.smsdriver.api.dtos.ModemDto;
 import br.apc.smsdriver.delta.one.eventhandler.Utils;
 
 import java.util.*;
@@ -12,8 +13,8 @@ public class Pat {
 
     public static void main(String[] args) {
 
-//        testATIExtractor();
-        operadora();
+        testATIExtractor();
+//        operadora();
 //        testRuido();
 //        all();
     }
@@ -99,45 +100,101 @@ public class Pat {
      * O comando ATI trás varias informações e redus o ruido.
      */
     private static void testATIExtractor() {
+        String SBIG = "\n" +
+                "OK\n" +
+                "AT+CNUM\n" +
+                "\n" +
+                "+CNUM: ,\"+5531996265944\",145\n" +
+                "\n" +
+                "\n" +
+                "OK\n" +
+                "AT+COPS?\n" +
+                "\n" +
+                "+COPS: 0,0,\"VIVO\",2\n" +
+                "\n" +
+                "OK\n" +
+                "ATI\n" +
+                "\n" +
+                "Manufacturer: ONDA COMMUNICATION\n" +
+                "Model: MSA110UP\n" +
+                "Revision: MSA110UP.TIMBR.FW.B01\n" +
+                "IMEI: 864446003468394\n" +
+                "+GCAP: +CGSM,+DS,+ES\n" +
+                "\n" +
+                "OK\n";
+String xx = "\n" +
+        "OK\n" +
+        "AT+CNUM\n" +
+        "\n" +
+        "+CNUM: ,\"+5531996265944\",145\n" +
+        "\n" +
+        "\n" +
+        "OK\n" +
+        "AT+COPS?\n" +
+        "\n" +
+        "+COPS: 0,0,\"VIVO\",2\n" +
+        "\n" +
+        "OK\n" +
+        "ATI\n" +
+        "\n" +
+        "Manufacturer: ONDA COMMUNICATION\n" +
+        "Model: MSA110UP\n" +
+        "Revision: MSA110UP.TIMBR.FW.B01\n" +
+        "IMEI: 864446003468394\n" +
+        "+GCAP: +CGSM,+DS,+ES\n" +
+        "\n" +
+        "OK\n";
+        String mult =
+                "ATI\n" +
+                "\n" +
+                "Manufacturer: ONDA COMMUNICATION\n" +
+                "Model: MSA110UP\n" +
+                "Revision: MSA110UP.TIMBR.FW.B01\n" +
+                "IMEI: 864446003468394\n" +
+                "+GCAP: +CGSM,+DS,+ES\n" +
+                "\n" +
+                "OK\n";
         String serialMessage =
             "OK\r\nAT+CMGF=1\r\nOK\r\nOK\r\nManufacturer: ONDA COMMUNICATION\r\nModel: MSA110UP\r\nRevision: MSA110UP.TIMBR.FW.B01\r\nIMEI: 864446003219904\r\n+GCAP: +CGSM,+DS,+ES";
-        final String ATI = "((Manufacturer: .*)|(Revision: .*)|(Model: .*)|(IMEI: (\\d*))|(\\+GCAP: .*))+";
+        final String ATI = "(ATI[\\r\\n]+(Manufacturer: (.*))[\\r\\n]+(Model: (.*))[\\r\\n]+(Revision: (.*))[\\r\\n]+IMEI: (\\d*)[\\r\\n]+\\+GCAP: (.*)[\\r\\n]+OK[\\r\\n]+)";
         Pattern.compile(ATI, Pattern.MULTILINE);
-        List<String> tokens = Utils.detectWhen(ATI, serialMessage);
+        String port = "COMXX";
+        ModemDto tokens = Utils.detectWhenModemDto(ATI, xx, port);
         System.out.println(tokens);
-        List<String[]> lol = tokens.stream().map(s -> s.split(": ")).collect(Collectors.toList());
-        for(String[]tu: lol){
-            System.out.printf("====(%s, %s)====\n", tu[0], tu[1]);
-        }
-        Map<String, List<String>> result = tokens.stream().collect(
-                Collectors.groupingBy(strElem -> strElem.split(": ")[0])
-            );
-        System.out.println(result);
 
-        Optional<String> resultn = tokens.stream()
-//                .max(new Comparator<String>() {
-//                    @Override
-//                    public int compare(String o1, String o2) {
-//                        return o1.split(": ")[0].compareTo(o2.split(": ")[1]);
-//                    }
-//                });
-                .max(Comparator.comparing(e -> e.split(": ")[0]));
-                //.
-//                .collect(Collectors
-//                    .groupingBy(strElem -> String.valueOf(strElem.split(": ")[0].length()))
+//        List<String[]> lol = tokens.stream().map(s -> s.split(": ")).collect(Collectors.toList());
+//        for(String[]tu: lol){
+//            System.out.printf("====(%s, %s)====\n", tu[0], tu[1]);
+//        }
+//        Map<String, List<String>> result = tokens.stream().collect(
+//                Collectors.groupingBy(strElem -> strElem.split(": ")[0])
+//            );
+//        System.out.println(result);
+
+//        Optional<String> resultn = tokens.stream()
+////                .max(new Comparator<String>() {
+////                    @Override
+////                    public int compare(String o1, String o2) {
+////                        return o1.split(": ")[0].compareTo(o2.split(": ")[1]);
+////                    }
+////                });
+//                .max(Comparator.comparing(e -> e.split(": ")[0]));
+//                //.
+////                .collect(Collectors
+////                    .groupingBy(strElem -> String.valueOf(strElem.split(": ")[0].length()))
+////        );
+//        System.out.println(resultn);
+//
+//        HashMap<String, String> lolx =
+//
+//                tokens.stream().collect(
+//                // HashMap::new
+//                () -> new HashMap<>(), //m
+//                (m, e) -> m.put(e.split(": ")[0], e.split(": ")[1])
+//                , (m, l2) -> {}
+//
 //        );
-        System.out.println(resultn);
-
-        HashMap<String, String> lolx =
-
-                tokens.stream().collect(
-                // HashMap::new
-                () -> new HashMap<>(), //m
-                (m, e) -> m.put(e.split(": ")[0], e.split(": ")[1])
-                , (m, l2) -> {}
-
-        );
-        System.out.println(lolx);
+//        System.out.println(lolx);
 
 
 

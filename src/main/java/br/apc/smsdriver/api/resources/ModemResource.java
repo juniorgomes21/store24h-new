@@ -3,6 +3,7 @@ package br.apc.smsdriver.api.resources;
 import br.apc.smsdriver.api.dtos.ModemDto;
 import br.apc.smsdriver.api.repositories.ModemRepository;
 import br.apc.smsdriver.api.services.UniversalService;
+import br.apc.smsdriver.delta.one.eventhandler.MetaModemDtoHandler;
 import br.apc.smsdriver.delta.one.eventhandler.MetaModemHandler;
 import br.apc.smsdriver.entities.ModemModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,11 @@ public class ModemResource {
     @GetMapping(value = "/metamodems")
     public ResponseEntity<Map<String, Map<String, String>>> findModems(){
         return ResponseEntity.ok().body(MetaModemHandler.data);
+    }
+
+    @GetMapping(value = "/metamodemsdtos")
+    public ResponseEntity<Map<String, ModemDto>> findModemsDtos(){
+        return ResponseEntity.ok().body(MetaModemDtoHandler.data);
     }
 
     @GetMapping(value = "/{id}")

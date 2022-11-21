@@ -1,6 +1,9 @@
 package br.apc.smsdriver.api.dtos;
 
-public class ChipDto {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class ChipDto implements Serializable {
     private String operadora;
     private String number;
 
@@ -23,5 +26,26 @@ public class ChipDto {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    @Override
+    public String toString() {
+        return "ChipDto{" +
+                "operadora='" + operadora + '\'' +
+                ", number='" + number + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChipDto chipDto = (ChipDto) o;
+        return operadora.equals(chipDto.operadora) && number.equals(chipDto.number);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(operadora, number);
     }
 }

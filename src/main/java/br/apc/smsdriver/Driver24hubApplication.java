@@ -29,12 +29,14 @@ public class Driver24hubApplication {
 ////		});
 //
 		System.err.printf("%d: \n",1);
+		// esta ordem importa
 		initConnections();
 		askNumbers();
-//		askManufactures();
 		askOperadoras();
-//		askOperadorasDto();
+		askManufactures();
 //		askMessages();
+//		askOperadorasDto();
+
 		System.err.printf("%s", "".length() == 0);
 		System.err.printf("\n%d: \n-=-=-=-=-=-=-=-=-=-=-\nALL SYSTEMS GO! LET´S GO FOX!\n-=-=-=-=-=-=-=-=-=-=-\n",2);
 		System.out.println(OperadoraDtoHandler.data);
@@ -174,7 +176,7 @@ public class Driver24hubApplication {
 				gsmModemSistemaControlador.doATI(); //cmd
 				Thread.sleep(50*numberOfPorts[0]);
 				System.err.printf("\n\nInfos Manufacture Atualizadas em:\n%s\nNa porta %s\n"
-						,MetaModemHandler.data.get(gsmModemSistemaControlador.getPortName())
+						,MetaModemDtoHandler.data.get(gsmModemSistemaControlador.getPortName())
 						,gsmModemSistemaControlador.getPortName());
 			} catch (InterruptedException e) {
 				e.printStackTrace();

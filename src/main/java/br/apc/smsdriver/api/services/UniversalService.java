@@ -1,6 +1,5 @@
 package br.apc.smsdriver.api.services;
 
-import br.apc.smsdriver.api.dtos.ChipDto;
 import br.apc.smsdriver.api.dtos.ModemDto;
 import br.apc.smsdriver.api.dtos.SmsDto;
 import br.apc.smsdriver.api.repositories.ChipRepository;
@@ -26,7 +25,7 @@ public class UniversalService {
     private SmsRepository smsRepository;
 
     @Transactional
-    public ChipModel createChip(ChipDto dto) {
+    public ChipModel createChip(br.apc.smsdriver.api.dtos.ChipDto dto) {
 
         ChipModel chipModel = new ChipModel();
         BeanUtils.copyProperties(dto, chipModel);
