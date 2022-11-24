@@ -75,6 +75,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/stubs/handler_api/userDetails").hasAuthority(Role.USER.getNome())
                     .antMatchers("/stubs/handler_api/criarChaveApi").hasAuthority(Role.USER.getNome())
 
+                    .antMatchers("/stubs/handler_api/apiServicos/newService").permitAll()
+                    .antMatchers("/stubs/handler_api/apiServicos/loadService").permitAll()
                 //Padrão API CLIENTE
                     .antMatchers("/stubs/handler_api").permitAll()
                     .anyRequest().authenticated()

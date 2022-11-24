@@ -26,5 +26,4 @@ public class UserDetails {
 
         return ResponseEntity.ok(userDTO);
     }
-
 }

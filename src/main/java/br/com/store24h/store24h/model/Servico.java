@@ -2,37 +2,65 @@ package br.com.store24h.store24h.model;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Map;
 
 @Entity
 @Table(name = "servicos")
 public class Servico {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nome;
-    private String codeServico;
+    @Column(nullable = false)
+    private String name;
+    @Column(unique = true, nullable = false)
+    private String alias;
+    @Column(nullable = false)
     private BigDecimal price;
+    @Column(nullable = false)
+    private BigDecimal defaultPrice;
+    @Column(nullable = false)
+    private boolean defaultMaxPrice;
+    @Column(nullable = false)
+    private BigDecimal maxPrice;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Map<String, Integer> priceMap;
+    private boolean random;
+    private int quantityForMaxPrice;
+    private int totalQuantity;
+    private boolean canAuction;
+    private ArrayList<Object> auctionMap = new ArrayList<>();
+    private boolean work;
 
     public Servico() {
+    }
+
+    public Servico(String name, String alias, BigDecimal price) {
+        this.name = name;
+        this.alias = alias;
+        this.price = price;
+        this.defaultPrice = price;
+        this.maxPrice = price;
+        this.defaultMaxPrice = true;
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getName() {
+        return name;
     }
 
-    public String getNome() {
-        return nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public String getAlias() {
+        return alias;
     }
 
-    public String getCodeServico() {
-        return codeServico;
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public BigDecimal getPrice() {
@@ -43,7 +71,83 @@ public class Servico {
         this.price = price;
     }
 
-    public void setCodeServico(String codeServico) {
-        this.codeServico = codeServico;
+    public Map<String, Integer> getPriceMap() {
+        return priceMap;
+    }
+
+    public void setPriceMap(Map<String, Integer> priceMap) {
+        this.priceMap = priceMap;
+    }
+
+    public BigDecimal getMaxPrice() {
+        return maxPrice;
+    }
+
+    public void setMaxPrice(BigDecimal maxPrice) {
+        this.maxPrice = maxPrice;
+    }
+
+    public BigDecimal getDefaultPrice() {
+        return defaultPrice;
+    }
+
+    public void setDefaultPrice(BigDecimal defaultPrice) {
+        this.defaultPrice = defaultPrice;
+    }
+
+    public boolean isDefaultMaxPrice() {
+        return defaultMaxPrice;
+    }
+
+    public void setDefaultMaxPrice(boolean defaultMaxPrice) {
+        this.defaultMaxPrice = defaultMaxPrice;
+    }
+
+    public boolean isRandom() {
+        return random;
+    }
+
+    public void setRandom(boolean random) {
+        this.random = random;
+    }
+
+    public int getQuantityForMaxPrice() {
+        return quantityForMaxPrice;
+    }
+
+    public void setQuantityForMaxPrice(int quantityForMaxPrice) {
+        this.quantityForMaxPrice = quantityForMaxPrice;
+    }
+
+    public int getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(int totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public boolean isCanAuction() {
+        return canAuction;
+    }
+
+    public void setCanAuction(boolean canAuction) {
+        this.canAuction = canAuction;
+    }
+
+    public ArrayList<Object> getAuctionMap() {
+        return auctionMap;
+    }
+
+    public void setAuctionMap(ArrayList<Object> auctionMap) {
+        this.auctionMap = auctionMap;
+    }
+
+    public boolean isWork() {
+        return work;
+    }
+
+    public void setWork(boolean work) {
+        this.work = work;
     }
 }
