@@ -1,11 +1,12 @@
 package br.com.store24h.store24h.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "mensagens")
-public class Msg {
+public class Msg implements Serializable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int chipNumber;
     private LocalDateTime data;
