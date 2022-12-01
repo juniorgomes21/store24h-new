@@ -1,13 +1,10 @@
 package br.com.store24h.store24h.model;
 
 import javax.persistence.*;
-<<<<<<< HEAD
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Map;
-=======
 import java.io.Serializable;
->>>>>>> ac7fb219413741ef695e24649f9f4d931b1cd1ab
 
 @Entity
 @Table(name = "servicos")

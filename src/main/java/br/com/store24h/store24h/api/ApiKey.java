@@ -1,6 +1,8 @@
 package br.com.store24h.store24h.api;
 
 import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
+import br.com.store24h.store24h.dto.ApiKeyDTO;
+import br.com.store24h.store24h.dto.ErrorResponseDto;
 import br.com.store24h.store24h.model.Administrador;
 import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.UserDbRepository;
@@ -9,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/stubs/handler_api")
@@ -39,6 +44,19 @@ public class ApiKey {
         } else {
 
             return ResponseEntity.badRequest().body("Você não pode ter mais de uma ApiKey");
+        }
+    }
+
+    @GetMapping("/getApiKey")
+    public ResponseEntity<Object> getApiKey() {
+        try {
+            Optional<User> userOptional = userDbRepository.findByEmail("fernando@fernando.com");
+            String apiKey = userOptional.get().getApiKey();
+
+            return ResponseEntity.ok().body(new ApiKeyDTO(apiKey));
+        } catch (Exception e) {
+
+            return ResponseEntity.badRequest().body(new ErrorResponseDto("Ops, algo deu errado!"));
         }
     }
 }

@@ -29,7 +29,6 @@ public class RequisicaoNovoUser {
         this.nome = user.getNome();
         this.cpf = user.getCpf();
         this.email = user.getEmail();
-        this.saldo = user.getSaldo();
     }
 
     public RequisicaoNovoUser(String nome, String cpf, String email, String senhaUser, String senhaUser2, String apiKey, int saldo) {
@@ -105,7 +104,6 @@ public class RequisicaoNovoUser {
         user.setCpf(cpf);
         user.setEmail(email);
         user.setPerfil(Role.USER.name());
-        user.setSaldo(0);
         user.setSenha(new BCryptPasswordEncoder().encode(senhaUser));
 
         return user;

@@ -18,7 +18,7 @@ public class UserDTO {
         this.email = user.getEmail();
         this.cpf = user.getCpf();
         this.apiKey = user.getApiKey();
-        this.saldo = user.getSaldo();
+//        this.saldo = user.getConta().getSaldo().intValue();
     }
 
     public String getNome() {

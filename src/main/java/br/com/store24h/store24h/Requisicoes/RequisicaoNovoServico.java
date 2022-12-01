@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Map;
 
-@Service
 public class RequisicaoNovoServico {
     private String SENHA;
     private String name;

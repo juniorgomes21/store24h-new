@@ -6,6 +6,7 @@ import br.com.store24h.store24h.model.Administrador;
 import br.com.store24h.store24h.model.Role;
 import br.com.store24h.store24h.security.TokenApp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

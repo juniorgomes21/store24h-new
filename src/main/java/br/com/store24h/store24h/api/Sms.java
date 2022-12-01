@@ -162,8 +162,8 @@ public class Sms {
 
         // RESPOSTA DO SERVIDOR
         Optional<User> user = userDbRepository.findByApiKey(api_key);
-        int saldoUser = user.get().getSaldo();
-        myJson.put("ACCESS_BALANCE", saldoUser);
+//        int saldoUser = user.get().getConta().getSaldo().intValue();
+//        myJson.put("ACCESS_BALANCE", saldoUser);
 
         return ResponseEntity.ok().body(myJson);
     }
@@ -171,7 +171,7 @@ public class Sms {
     /***
      * Número do pedido
      * https://smshub.org/stubs/handler_api.php?api_key=APIKEY&action=getNumber&service=SERVICE&operator=OPERATOR&country=COUNTRY
-     * ACCESS_NUMBER:ID:NUMBER
+     * ACCESS_NUMBER:ID:NUMBER - ID é referente a 'Activation'
      * {
      * 	"ACCESS_NUMBER" : "23424:5521983364786"
      * }
@@ -186,6 +186,7 @@ public class Sms {
     public ResponseEntity<?> number(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
                                     @RequestParam("service") String service, @RequestParam("operator") String operator,
                                     @RequestParam("country") String country ) {
+
 
         JSONObject myJson = new JSONObject();
 

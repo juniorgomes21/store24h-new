@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 //package br.com.store24h.store24h.model;
 //
 //import javax.persistence.*;
@@ -89,7 +89,6 @@
 //        this.status = status;
 //    }
 //}
-=======
 package br.com.store24h.store24h.model;
 
 import javax.persistence.*;
@@ -180,4 +179,3 @@ public class Activation implements Serializable {
         this.status = status;
     }
 }
->>>>>>> ac7fb219413741ef695e24649f9f4d931b1cd1ab

@@ -5,8 +5,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -21,10 +23,19 @@ public class User implements UserDetails {
     private String cpf;
     private String senha;
     private String apiKey;
-    private int saldo;
+    private BigDecimal credito = BigDecimal.valueOf(0);
 
-    public User() {
-    }
+//    private Conta conta;
+
+//    private List<Compra> compra;
+
+//    public User() {
+//        conta = new Conta(BigDecimal.ZERO);
+//    }
+//
+//    public Conta getConta() {
+//        return conta;
+//    }
 
     public Long getId() {
         return id;
@@ -78,12 +89,12 @@ public class User implements UserDetails {
         this.apiKey = apiKey;
     }
 
-    public int getSaldo() {
-        return saldo;
+    public BigDecimal getCredito() {
+        return credito;
     }
 
-    public void setSaldo(int saldo) {
-        this.saldo = saldo;
+    public void setCredito(BigDecimal credito) {
+        this.credito = credito;
     }
 
     @Override

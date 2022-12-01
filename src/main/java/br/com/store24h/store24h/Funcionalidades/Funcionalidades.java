@@ -2,12 +2,14 @@ package br.com.store24h.store24h.Funcionalidades;
 
 import br.com.store24h.store24h.model.Administrador;
 import br.com.store24h.store24h.model.User;
+import br.com.store24h.store24h.repository.UserDbRepository;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -26,6 +28,13 @@ public class Funcionalidades {
         }
 
         return adm;
+    }
+
+    public static void addCredito(UserDbRepository userDbRepository, BigDecimal credito) {
+        User user = userDbRepository.findByEmail("fernando@fernando.com").get();
+        BigDecimal newCredito = user.getCredito().add(credito);
+        user.setCredito(newCredito);
+        userDbRepository.save(user);
     }
 
     public static String gerarKeyApi(String nomeUser) {
