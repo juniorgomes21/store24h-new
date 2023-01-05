@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.store24h</groupId>
-	<artifactId>suasorte</artifactId>
+	<artifactId>smshubx1</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>suasorte</name>
+	<name>smshubx1</name>
 	<description>aplicativo store24h</description>
 	<properties>
 		<java.version>11</java.version>
