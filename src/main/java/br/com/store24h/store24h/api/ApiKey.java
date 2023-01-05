@@ -48,9 +48,10 @@ public class ApiKey {
     }
 
     @GetMapping("/getApiKey")
-    public ResponseEntity<Object> getApiKey() {
+    public ResponseEntity<Object> getApiKey(Authentication authentication) {
         try {
-            Optional<User> userOptional = userDbRepository.findByEmail("fernando@fernando.com");
+            User user = Funcionalidades.userLogado(authentication);
+            Optional<User> userOptional = userDbRepository.findByEmail(user.getEmail());
             String apiKey = userOptional.get().getApiKey();
 
             return ResponseEntity.ok().body(new ApiKeyDTO(apiKey));

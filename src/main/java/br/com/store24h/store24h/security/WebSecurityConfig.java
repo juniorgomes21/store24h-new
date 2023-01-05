@@ -89,7 +89,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/stubs/handler_api/getCredito").permitAll()
                 .antMatchers("/stubs/handler_api/getTableCredito").permitAll()
 
-                .antMatchers("/stubs/handler_api/getApiKey").permitAll()
+                .antMatchers("/stubs/handler_api/getApiKey").hasAuthority(Role.USER.getNome())
                 //Padrão API CLIENTE
                 .antMatchers("/stubs/handler_api").permitAll()
                 .anyRequest().authenticated()
