@@ -1,12 +1,17 @@
 package br.com.store24h.store24h.api;
 
+import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
 import br.com.store24h.store24h.Requisicoes.RequisicaoUpdateService;
 import br.com.store24h.store24h.dto.ErrorResponseDto;
 import br.com.store24h.store24h.dto.ServicoDto;
 import br.com.store24h.store24h.dto.ServicoDtoJunior;
+import br.com.store24h.store24h.model.CompraServiso;
 import br.com.store24h.store24h.model.Servico;
+import br.com.store24h.store24h.model.User;
+import br.com.store24h.store24h.repository.CompraServicoRepository;
 import br.com.store24h.store24h.repository.ServicosDbRepository;
+import br.com.store24h.store24h.repository.UserDbRepository;
 import br.com.store24h.store24h.response.ServiceResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +31,12 @@ public class ServicoApi {
     @Autowired
     private ServicosDbRepository servicosRepository;
 
+    @Autowired
+    private UserDbRepository userDbRepository;
+
+    @Autowired
+    private CompraServicoRepository compraServicoRepository;
+
 //    @PostMapping("/newService")
 //    public ResponseEntity<ServiceResponse<ServicoDto>> newService(@RequestBody @Valid RequisicaoNovoServico requisicaoNovoServico) {
 //        try {
@@ -38,8 +49,19 @@ public class ServicoApi {
 //        }
 //    }
 
+    @GetMapping("/getAllServicesX")
+    public ResponseEntity<Object> getAllServicesX() {
+        try {
+            List<Servico> servicoPage = servicosRepository.findAll();
+
+            return ResponseEntity.ok(servicoPage);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponseDto("sua senha é imcompátivel!"));
+        }
+    }
+
     @GetMapping("/getAllServices")
-    public ResponseEntity<Object> getAllServices(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 15) Pageable pageable) {
+    public ResponseEntity<Object> getAllServices(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 12) Pageable pageable) {
         try {
             Page<Servico> servicoPage = servicosRepository.findAll(pageable);
 
@@ -94,7 +116,7 @@ public class ServicoApi {
         }
     }
 
-    @PutMapping("/editService/{id}")
+    @PostMapping("/editService/{id}")
     public ResponseEntity<Object> editService(@PathVariable Long id, @RequestBody RequisicaoUpdateService requisicaoUpdateService) {
         try {
             Optional<Servico> servicoOptional = servicosRepository.findById(id);
@@ -103,8 +125,9 @@ public class ServicoApi {
             }
 
             Servico serv = servicoOptional.get();
+            serv.setPrice(requisicaoUpdateService.getPrice());
 
-//            Servico = requisicaoUpdateService.toServico(serv);
+            servicosRepository.save(serv);
 
             return ResponseEntity.ok(new ServicoDtoJunior(serv));
 
@@ -128,6 +151,26 @@ public class ServicoApi {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponseDto("Ops! algo deu errado."));
         }
+    }
+
+    @PostMapping("/comprarServico/{id}")
+    public ResponseEntity<Object> comprarServico(@PathVariable Long id) {
+        Servico servico = servicosRepository.findById(id).get();
+        User user = userDbRepository.findByEmail("fernando@fernando.com").get();
+
+        CompraServiso compraServiso = new CompraServiso(servico.getName());
+
+        compraServicoRepository.save(compraServiso);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/getComprasFeitas")
+    public ResponseEntity<Object> comprasFeitas(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 3) Pageable pageable) {
+
+        Page<CompraServiso> compraServisoPage = compraServicoRepository.findAll(pageable);
+
+        return ResponseEntity.ok(compraServisoPage);
     }
 
     @PostMapping("/loadService")

@@ -78,9 +78,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/stubs/handler_api/apiServicos/newService").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/loadService").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/getAllServices").permitAll()
+                .antMatchers("/stubs/handler_api/apiServicos/getAllServicesX").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/getService/**").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/editService/**").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/deleteService/**").permitAll()
+                .antMatchers("/stubs/handler_api/apiServicos/comprarServico/**").permitAll()
+                .antMatchers("/stubs/handler_api/apiServicos/getComprasFeitas").permitAll()
 
                 .antMatchers("/stubs/handler_api/comprarCredito").permitAll()
                 .antMatchers("/stubs/handler_api/getCredito").permitAll()

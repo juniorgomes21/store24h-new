@@ -70,7 +70,7 @@ public class CreditoApi {
     }
 
     @GetMapping("/getTableCredito")
-    public ResponseEntity<Object> getTableCredito(@PageableDefault(sort = "localDateTime", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable) {
+    public ResponseEntity<Object> getTableCredito(@PageableDefault(sort = "localDateTime", direction = Sort.Direction.DESC, page = 0, size = 2) Pageable pageable) {
         try {
             Page<ComprasCredito> comprasCreditoPage = comprasCreditoRepository.findAll(pageable);
 
