@@ -1,5 +1,6 @@
 package br.com.store24h.store24h.api;
 
+import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoUser;
 import br.com.store24h.store24h.dto.ErrorCadastroDTO;
 import br.com.store24h.store24h.model.User;
@@ -21,13 +22,16 @@ public class CreateUserX {
     @Autowired
     private UserDbRepository userDbRepository;
 
+    @Autowired
+    private Funcionalidades funcionalidades;
+
     @PostMapping("/createUser")
     public ResponseEntity<Object> createUser(@RequestBody @Valid RequisicaoNovoUser requisicaoNovoUser, UriComponentsBuilder uriBuilder) {
 
         Optional<User> userOptional = userDbRepository.findByEmail(requisicaoNovoUser.getEmail());
 
         if(requisicaoNovoUser.getSenhaUser().equals(requisicaoNovoUser.getSenhaUser2()) & !userOptional.isPresent()) {
-            User user = requisicaoNovoUser.toUser();
+            User user = requisicaoNovoUser.toUser(funcionalidades);
             userDbRepository.save(user);
 
             URI uri = uriBuilder.path("/createUser/{id}").buildAndExpand(user.getId()).toUri();

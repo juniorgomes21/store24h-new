@@ -28,10 +28,13 @@ public class UserCompraContaControl {
 //    @Autowired
 //    private CompraRepository compraRepository;
 
+    @Autowired
+    private Funcionalidades funcionalidades;
+
     @PostMapping
     public ResponseEntity<Object> adicionarCredito(Authentication authentication, RequisicaoCredito requisicaoCredito){
         try {
-            User user = Funcionalidades.userLogado(authentication);
+            User user = funcionalidades.userLogado(authentication);
 //            Conta conta = user.getConta();
 //            conta.add(requisicaoCredito.getValue());
             userDbRepository.save(user);

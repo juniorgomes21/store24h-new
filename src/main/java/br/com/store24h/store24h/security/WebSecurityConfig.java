@@ -57,6 +57,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .authorizeRequests()
                 //Padrão API ADM
+                .antMatchers("/stubs/handler_api/ping").permitAll()
                 .antMatchers("/stubs/handler_api/auth/login").permitAll()
                 .antMatchers("/stubs/handler_api/createADM").permitAll()
                 .antMatchers("/stubs/handler_api/createKeyApiMD5").permitAll()
@@ -85,9 +86,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/stubs/handler_api/apiServicos/comprarServico/**").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/getComprasFeitas").permitAll()
 
-                .antMatchers("/stubs/handler_api/comprarCredito").permitAll()
                 .antMatchers("/stubs/handler_api/getCredito").permitAll()
                 .antMatchers("/stubs/handler_api/getTableCredito").permitAll()
+                .antMatchers("/stubs/handler_api/comprarCredito").hasAuthority(Role.USER.getNome())
                 .antMatchers("/stubs/handler_api/edit/password").hasAuthority(Role.USER.getNome())
                 .antMatchers("/stubs/handler_api/getApiKey").hasAuthority(Role.USER.getNome())
                 //Padrão API CLIENTE

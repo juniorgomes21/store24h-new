@@ -26,6 +26,11 @@ public class Login {
     @Autowired
     private TokenApp tokenApp;
 
+    @GetMapping("/ping")
+    public ResponseEntity<Object> ping() {
+        return ResponseEntity.ok().body("pong");
+    }
+
     @PostMapping("/auth/login")
     public ResponseEntity<TokenDTO> autenticarAdm(@RequestBody @Valid LoginForm form) {
         UsernamePasswordAuthenticationToken dadosLogin = form.converter();

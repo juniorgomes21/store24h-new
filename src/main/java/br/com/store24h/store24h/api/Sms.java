@@ -33,6 +33,9 @@ public class Sms {
     @Autowired
     private ServicosDbRepository servicosRepository;
 
+    @Autowired
+    private Funcionalidades funcionalidades;
+
     /***
      * Todas as solicitações devem ter uma chave de API como parâmetro "api_key" "api_key"
      * https://smshub.org/stubs/handler_api.php?api_key=APIKEY&action=getNumbersStatus&country=COUNTRY&operator=OPERATOR
@@ -226,7 +229,7 @@ public class Sms {
             myJson.put("WRONG_SERVICE", "Identificador de serviço inválido");
             return ResponseEntity.badRequest().body(myJson);
         }
-        String numeroDisponivel = Funcionalidades.getNumumeroDisponivel();
+        String numeroDisponivel = funcionalidades.getNumumeroDisponivel();
         myJson.put("numero gerado", numeroDisponivel);
 
         return ResponseEntity.ok().body(myJson);
@@ -268,7 +271,7 @@ public class Sms {
             return ResponseEntity.badRequest().body(myJson);
         }
 
-        JSONObject stausCode = Funcionalidades.getNumeroStatus();
+        JSONObject stausCode = funcionalidades.getNumeroStatus();
 
         return ResponseEntity.ok().body(stausCode);
     }

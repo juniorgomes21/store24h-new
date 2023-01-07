@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.security.MessageDigest;
@@ -20,8 +21,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@Service
 public class Funcionalidades {
-    public static Administrador admLogado(Authentication authentication) {
+
+    public Administrador admLogado(Authentication authentication) {
         Administrador adm = null;
         if(authentication.getPrincipal() instanceof Administrador) {
             adm = (Administrador) authentication.getPrincipal();
@@ -30,14 +33,7 @@ public class Funcionalidades {
         return adm;
     }
 
-    public static void addCredito(UserDbRepository userDbRepository, BigDecimal credito) {
-        User user = userDbRepository.findByEmail("fernando@fernando.com").get();
-        BigDecimal newCredito = user.getCredito().add(credito);
-        user.setCredito(newCredito);
-        userDbRepository.save(user);
-    }
-
-    public static String gerarKeyApi(String nomeUser) {
+    public String gerarKeyApi(String nomeUser) {
         String userName = nomeUser;
         LocalDate dateObj = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -58,7 +54,7 @@ public class Funcionalidades {
         return password;
 
     }
-    private static String bytesToHex(byte[] bytes) {
+    private String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02x", b));
@@ -66,7 +62,7 @@ public class Funcionalidades {
         return sb.toString();
     }
 
-    public static User userLogado(Authentication authentication) {
+    public User userLogado(Authentication authentication) {
         User user = null;
         if(authentication.getPrincipal() instanceof User) {
             user = (User) authentication.getPrincipal();
@@ -75,7 +71,14 @@ public class Funcionalidades {
         return user;
     }
 
-    public static String getNumumeroDisponivel() {
+    public void addCredito(UserDbRepository userDbRepository, BigDecimal credito, Authentication authentication) {
+        User user = this.userLogado(authentication);
+        BigDecimal newCredito = user.getCredito().add(credito);
+        user.setCredito(newCredito);
+        userDbRepository.save(user);
+    }
+
+    public String getNumumeroDisponivel() {
         ArrayList<String> numerosDiponives = new ArrayList<>();
         numerosDiponives.add("+55 66 9 8336-3821");
         numerosDiponives.add("+55 21 9 8323-4367");
@@ -93,7 +96,7 @@ public class Funcionalidades {
         return numerosDiponives.get(result);
     }
 
-    public static JSONObject getNumeroStatus() {
+    public JSONObject getNumeroStatus() {
         ArrayList<JSONObject> listJson = new ArrayList();
         JSONObject myJson = new JSONObject();
         int index = (int) ThreadLocalRandom.current().nextLong(0, 3);

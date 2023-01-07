@@ -24,14 +24,17 @@ public class ApiKey {
     @Autowired
     private UserDbRepository userDbRepository;
 
+    @Autowired
+    private Funcionalidades funcionalidades;
+
     @GetMapping("/criarChaveApi")
     public ResponseEntity chaveApi(Authentication authentication) {
         JSONObject myJson = new JSONObject();
-        User user = Funcionalidades.userLogado(authentication);
+        User user = funcionalidades.userLogado(authentication);
 
         if (user.getApiKey() == null) {
             try {
-                String apiKey = Funcionalidades.gerarKeyApi("null");
+                String apiKey = funcionalidades.gerarKeyApi("null");
                 user.setApiKey(apiKey);
                 userDbRepository.save(user);
                 myJson.put("apiKey", apiKey);
@@ -50,7 +53,7 @@ public class ApiKey {
     @GetMapping("/getApiKey")
     public ResponseEntity<Object> getApiKey(Authentication authentication) {
         try {
-            User user = Funcionalidades.userLogado(authentication);
+            User user = funcionalidades.userLogado(authentication);
             Optional<User> userOptional = userDbRepository.findByEmail(user.getEmail());
             String apiKey = userOptional.get().getApiKey();
 

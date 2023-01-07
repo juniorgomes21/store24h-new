@@ -18,9 +18,12 @@ public class UserDetails {
     @Autowired
     private UserDbRepository userDbRepository;
 
+    @Autowired
+    private Funcionalidades funcionalidades;
+
     @GetMapping("/userDetails")
     public ResponseEntity<UserDTO> hellow(Authentication authentication) {
-        User user = Funcionalidades.userLogado(authentication);
+        User user = funcionalidades.userLogado(authentication);
 
         UserDTO userDTO = new UserDTO(user);
 

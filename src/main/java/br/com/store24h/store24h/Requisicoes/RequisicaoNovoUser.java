@@ -3,6 +3,7 @@ package br.com.store24h.store24h.Requisicoes;
 import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.model.Role;
 import br.com.store24h.store24h.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.validation.constraints.NotBlank;
@@ -97,10 +98,10 @@ public class RequisicaoNovoUser {
         this.saldo = saldo;
     }
 
-    public User toUser() {
+    public User toUser(Funcionalidades funcionalidades) {
         User user = new User();
         user.setNome(nome);
-        user.setApiKey(Funcionalidades.gerarKeyApi(this.nome));
+        user.setApiKey(funcionalidades.gerarKeyApi(this.nome));
         user.setCpf(cpf);
         user.setEmail(email);
         user.setPerfil(Role.USER.name());

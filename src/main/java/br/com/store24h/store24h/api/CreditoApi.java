@@ -8,12 +8,14 @@ import br.com.store24h.store24h.model.ComprasCredito;
 import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.ComprasCreditoRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
+import br.com.store24h.store24h.services.Adm.ServicesUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,17 +32,23 @@ public class CreditoApi {
     @Autowired
     private ComprasCreditoRepository comprasCreditoRepository;
 
+    @Autowired
+    private ServicesUser servicesUser;
+
+    @Autowired
+    private Funcionalidades funcionalidades;
+
     /***
      * Efetua a compra de credito para um usuario e registra na taabela de compras.
      * @param requisicaoCredito
      * @return
      */
     @PostMapping("/comprarCredito")
-    public ResponseEntity<Object> comprarCredito(@RequestBody @Valid RequisicaoCredito requisicaoCredito) {
+    public ResponseEntity<Object> comprarCredito(@RequestBody @Valid RequisicaoCredito requisicaoCredito, Authentication authentication) {
         try {
             BigDecimal credito = requisicaoCredito.getValue();
 
-            Funcionalidades.addCredito(userDbRepository, credito);
+            funcionalidades.addCredito(userDbRepository, credito, authentication);
 
             ComprasCredito comprasCredito = new ComprasCredito(LocalDateTime.now(), credito);
             comprasCreditoRepository.save(comprasCredito);
@@ -57,11 +65,9 @@ public class CreditoApi {
      * @return
      */
     @GetMapping("/getCredito")
-    public ResponseEntity<Object> getCredito() {
+    public ResponseEntity<Object> getCredito(Authentication authentication) {
         try {
-            User user = userDbRepository.findByEmail("fernando@fernando.com").get();
-
-
+            User user = servicesUser.userLogado(authentication);
             return ResponseEntity.ok().body(new CreditoDTO(user.getCredito()));
         } catch (Exception e) {
 
