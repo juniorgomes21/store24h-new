@@ -86,8 +86,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/stubs/handler_api/apiServicos/comprarServico/**").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/getComprasFeitas").permitAll()
 
-                .antMatchers("/stubs/handler_api/getCredito").permitAll()
                 .antMatchers("/stubs/handler_api/getTableCredito").permitAll()
+                .antMatchers("/stubs/handler_api/getCredito").hasAuthority(Role.USER.getNome())
                 .antMatchers("/stubs/handler_api/comprarCredito").hasAuthority(Role.USER.getNome())
                 .antMatchers("/stubs/handler_api/edit/password").hasAuthority(Role.USER.getNome())
                 .antMatchers("/stubs/handler_api/getApiKey").hasAuthority(Role.USER.getNome())

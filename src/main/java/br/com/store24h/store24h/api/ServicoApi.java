@@ -176,12 +176,14 @@ public class ServicoApi {
     @PostMapping("/loadService")
     public ResponseEntity<Object> loadService(@RequestBody Map<String, Servico> requisicaoNovoServicoList) {
         try {
-            ArrayList<RequisicaoNovoServico> list = new ArrayList<>(requisicaoNovoServicoList.size());
+            ArrayList<Servico> list = new ArrayList<>(requisicaoNovoServicoList.size());
             for(Servico ls: requisicaoNovoServicoList.values()) {
                 RequisicaoNovoServico lol = new RequisicaoNovoServico();
                 BeanUtils.copyProperties(ls, lol);
-                list.add(lol);
+                list.add(ls);
             }
+
+            servicosRepository.saveAll(list);
 
             return ResponseEntity.ok().body(list);
         } catch (Exception e) {
