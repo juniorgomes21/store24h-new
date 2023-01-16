@@ -7,6 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
+
 @Service
 public class ServicesUser {
 
@@ -36,6 +38,11 @@ public class ServicesUser {
         User user = this.userLogado(authentication);
 
         return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    public boolean isValidApiKey(String apiKey) {
+
+        return userDbRepository.findByApiKey(apiKey).isPresent();
     }
 
 }

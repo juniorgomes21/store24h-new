@@ -8,11 +8,13 @@ import br.com.store24h.store24h.repository.AdmDbRepository;
 import br.com.store24h.store24h.repository.PaisOperadorasDbRepository;
 import br.com.store24h.store24h.repository.ServicosDbRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
+import br.com.store24h.store24h.services.Adm.ServicesUser;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,6 +38,10 @@ public class Sms {
     @Autowired
     private Funcionalidades funcionalidades;
 
+    @Autowired
+    private ServicesUser servicesUser;
+
+
     /***
      * Todas as solicitações devem ter uma chave de API como parâmetro "api_key" "api_key"
      * https://smshub.org/stubs/handler_api.php?api_key=APIKEY&action=getNumbersStatus&country=COUNTRY&operator=OPERATOR
@@ -50,9 +56,9 @@ public class Sms {
     public ResponseEntity<?> numberStatus(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
                                           @RequestParam("country") String country, @RequestParam("operator") String operator) {
         JSONObject myJson = new JSONObject();
-        System.out.println(api_key);
+
         // POSSÍVEIS ERROS
-        if(!isValidKeyApi(api_key)) { // BAD_KEY
+        if(!servicesUser.isValidApiKey(api_key)) { // BAD_KEY
             myJson.put("BAD_KEY", "Chave de API inválida");
             return ResponseEntity.badRequest().body(myJson);
         }
@@ -139,18 +145,13 @@ public class Sms {
      * @return valor em R$
      */
     @GetMapping("/getBalance")
-    public ResponseEntity<?> balance(@RequestParam("api_key") String api_key, @RequestParam("action") String action) {
+    public ResponseEntity<Object> balance(@RequestParam("api_key") String api_key, @RequestParam("action") String action) {
         JSONObject myJson = new JSONObject();
-
-        // Pergutnar mais tarde !!! importante!!
-
-        if (!isServiceOn()) {
-            myJson.put("DEV_MODE", "Tudo OK, mas a API está em mode desenvolvimento, conecte os outros serviços ...");
-            return ResponseEntity.badRequest().body(myJson);
-        }
+        System.out.println(action);
+        boolean isValidApiKey = false;
 
         // POSSÍVEIS ERROS
-        if(!isValidKeyApi(api_key)) { // BAD_KEY
+        if(!servicesUser.isValidApiKey(api_key)) { // BAD_KEY
             myJson.put("BAD_KEY", "Chave de API inválida");
             return ResponseEntity.badRequest().body(myJson);
         }
@@ -164,9 +165,9 @@ public class Sms {
         }
 
         // RESPOSTA DO SERVIDOR
-        Optional<User> user = userDbRepository.findByApiKey(api_key);
-//        int saldoUser = user.get().getConta().getSaldo().intValue();
-//        myJson.put("ACCESS_BALANCE", saldoUser);
+        User user = userDbRepository.findByApiKey(api_key).get();
+        BigDecimal saldoUser = user.getCredito();
+        myJson.put("ACCESS_BALANCE", saldoUser);
 
         return ResponseEntity.ok().body(myJson);
     }
