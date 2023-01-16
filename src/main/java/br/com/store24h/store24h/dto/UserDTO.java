@@ -8,6 +8,7 @@ public class UserDTO {
     private String email;
     private String cpf;
     private String apiKey;
+    private String role;
     private int saldo;
 
     public UserDTO() {
@@ -18,6 +19,7 @@ public class UserDTO {
         this.email = user.getEmail();
         this.cpf = user.getCpf();
         this.apiKey = user.getApiKey();
+        this.role = user.getPerfil();
 //        this.saldo = user.getConta().getSaldo().intValue();
     }
 
@@ -31,6 +33,14 @@ public class UserDTO {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public void setEmail(String email) {
