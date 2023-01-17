@@ -8,12 +8,15 @@ import br.com.store24h.store24h.repository.AdmDbRepository;
 import br.com.store24h.store24h.repository.PaisOperadorasDbRepository;
 import br.com.store24h.store24h.repository.ServicosDbRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
+import br.com.store24h.store24h.services.Adm.ServiceMethodsHub;
 import br.com.store24h.store24h.services.Adm.ServicesUser;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +44,99 @@ public class Sms {
     @Autowired
     private ServicesUser servicesUser;
 
+    @Autowired
+    private ServiceMethodsHub serviceMethodsHub;
+
+    @GetMapping
+    public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
+                                             Optional<String> country, Optional<String> operator) throws NoSuchMethodException {
+
+//        @RequestParam("api_key") String api_key,
+        JSONObject myJson = new JSONObject();
+        ResponseEntity<Object> result = null;
+
+        if(!servicesUser.isValidApiKey(api_key)) { // BAD_KEY
+            myJson.put("BAD_KEY", "Chave de API inválida");
+
+            return ResponseEntity.badRequest().body(myJson);
+        }
+
+        if(action.equals("getBalance")){
+
+            return serviceMethodsHub.getBalance(api_key);
+        } else {
+            System.out.println("hhahhahahhahhahahahhah!");
+        }
+
+//        JSONObject myJson = new JSONObject();
+//        myJson.put("av_0", 99);
+//        return ResponseEntity.ok().body(myJson);
+        return result;
+    }
+
+//    @GetMapping
+//    public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
+//                                          @RequestParam("country") String country, @RequestParam("operator") String operator) throws NoSuchMethodException {
+//
+////        @RequestParam("api_key") String api_key,
+//        ResponseEntity<Object> result = null;
+//
+//        if(action.equals("getBalance")){
+//            String methodName = action;
+//            Class[] parameterTypes = new Class[]{String.class};
+//            Object[] parameters = new Object[]{api_key};
+//
+//            Method method = null;
+//            try {
+//                method = Sms.this.getClass().getMethod(methodName, parameterTypes);
+//            } catch (NoSuchMethodException e) {
+//                e.printStackTrace();
+//            }
+//            try {
+//                result = (ResponseEntity<Object>) method.invoke(Sms.this, parameters);
+//            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+//            } catch (InvocationTargetException e) {
+//                e.printStackTrace();
+//            }
+//        } else if (action.equals("m1")){
+//            String methodName = action;
+//            Class[] parameterTypes = new Class[]{String.class};
+//            Object[] parameters = new Object[]{api_key};
+//
+//            Method method = Sms.this.getClass().getMethod(methodName, parameterTypes);
+//            try {
+//                result = (ResponseEntity<Object>) method.invoke(Sms.this, parameters);
+//            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+//            } catch (InvocationTargetException e) {
+//                e.printStackTrace();
+//            }
+//        } else if (action.equals("m2")){
+//            String methodName = action;
+//            Class[] parameterTypes = new Class[]{String.class};
+//            Object[] parameters = new Object[]{api_key};
+//
+//            Method method = Sms.this.getClass().getMethod(methodName, parameterTypes);
+//            try {
+//                result = (ResponseEntity<Object>) method.invoke(Sms.this, parameters);
+//            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+//            } catch (InvocationTargetException e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            System.out.println("hhahhahahhahhahahahhah!");
+//        }
+//
+////        JSONObject myJson = new JSONObject();
+////        myJson.put("av_0", 99);
+////        return ResponseEntity.ok().body(myJson);
+//        return result;
+//    }
+
+
+
 
     /***
      * Todas as solicitações devem ter uma chave de API como parâmetro "api_key" "api_key"
@@ -56,6 +152,8 @@ public class Sms {
     public ResponseEntity<?> numberStatus(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
                                           @RequestParam("country") String country, @RequestParam("operator") String operator) {
         JSONObject myJson = new JSONObject();
+
+//        Sms.class.getMethod("numberStatus", )
 
         // POSSÍVEIS ERROS
         if(!servicesUser.isValidApiKey(api_key)) { // BAD_KEY
@@ -144,8 +242,8 @@ public class Sms {
      * @param action
      * @return valor em R$
      */
-    @GetMapping("/getBalance")
-    public ResponseEntity<Object> balance(@RequestParam("api_key") String api_key, @RequestParam("action") String action) {
+//    @GetMapping("/getBalance")
+    public ResponseEntity<Object> getBalance(@RequestParam("api_key") String api_key, @RequestParam("action") String action) {
         JSONObject myJson = new JSONObject();
         System.out.println(action);
         boolean isValidApiKey = false;
