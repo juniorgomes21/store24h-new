@@ -49,9 +49,9 @@ public class Sms {
 
     @GetMapping
     public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
-                                             Optional<String> country, Optional<String> operator) throws NoSuchMethodException {
+                                             Optional<String> country, Optional<String> operator, Optional<String> service,
+                                             Optional<String> id) throws NoSuchMethodException {
 
-//        @RequestParam("api_key") String api_key,
         JSONObject myJson = new JSONObject();
         ResponseEntity<Object> result = null;
 
@@ -61,17 +61,20 @@ public class Sms {
             return ResponseEntity.badRequest().body(myJson);
         }
 
-        if(action.equals("getBalance")){
+        if(action.equals("getBalance")){ // GET_BALANCER
 
             return serviceMethodsHub.getBalance(api_key);
-        } else {
-            System.out.println("hhahhahahhahhahahahhah!");
+        } else if(action.equals("getNumber")){ // GET_NUMBER
+
+            return serviceMethodsHub.getNumber(service.get(), operator.get(), country.get());
+        } else if(action.equals("getStatus")){ // GET_STATUS
+
+            return serviceMethodsHub.getStatus(id.get());
         }
 
-//        JSONObject myJson = new JSONObject();
-//        myJson.put("av_0", 99);
-//        return ResponseEntity.ok().body(myJson);
-        return result;
+        myJson.put("BAD_ACTION", "Consulta geral malformada");
+
+        return ResponseEntity.badRequest().body(myJson);
     }
 
 //    @GetMapping
