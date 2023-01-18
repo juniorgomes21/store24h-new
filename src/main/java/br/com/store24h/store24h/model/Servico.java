@@ -7,7 +7,8 @@ import java.util.Map;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "servicos")
+@Table(name = "servicos", indexes = {
+        @Index(name = "idx_alias", columnList = "alias")})
 public class Servico implements Serializable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

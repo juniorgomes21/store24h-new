@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "usuario", indexes = {
+        @Index(name = "idx_email", columnList = "email"),
+        @Index(name = "idx_apikey", columnList = "apiKey")})
 public class User implements UserDetails {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
