@@ -1,7 +1,7 @@
 package br.com.store24h.store24h.api;
 
 import br.com.store24h.store24h.Requisicoes.RequisitionNewPassword;
-import br.com.store24h.store24h.services.Adm.ServicesUser;
+import br.com.store24h.store24h.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,7 +17,7 @@ import javax.validation.Valid;
 public class AlterarSenha {
 
     @Autowired
-    private ServicesUser servicesUser;
+    private UserService userService;
 
     @PostMapping("/edit/password")
     public ResponseEntity<String> editPassword(@RequestBody @Valid RequisitionNewPassword requisitionNewPassword, Authentication authentication) {
@@ -29,11 +29,11 @@ public class AlterarSenha {
                 return ResponseEntity.badRequest().body("As senhas não são iguais!");
             }
 
-            if (servicesUser.testPassword(currentPassword, authentication)) {
+            if (userService.testPassword(currentPassword, authentication)) {
                 return ResponseEntity.badRequest().body("Sua senha está incorreta!");
             }
 
-            servicesUser.updatePassword(authentication, currentPassword);
+            userService.updatePassword(authentication, currentPassword);
 
             return ResponseEntity.ok().body("Senha alterada!");
 

@@ -1,19 +1,22 @@
-package br.com.store24h.store24h.services.Adm;
+package br.com.store24h.store24h.services;
 
+import br.com.store24h.store24h.model.Servico;
 import br.com.store24h.store24h.model.User;
+import br.com.store24h.store24h.repository.ServicosDbRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
-
 @Service
-public class ServicesUser {
+public class UserService {
 
     @Autowired
     private UserDbRepository userDbRepository;
+
+    @Autowired
+    private ServicosDbRepository servicosDbRepository;
 
     public User userLogado(Authentication authentication) {
         User user = null;
@@ -44,5 +47,4 @@ public class ServicesUser {
 
         return userDbRepository.findByApiKey(apiKey).isPresent();
     }
-
 }

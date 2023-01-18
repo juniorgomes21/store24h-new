@@ -8,7 +8,7 @@ import br.com.store24h.store24h.model.ComprasCredito;
 import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.ComprasCreditoRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
-import br.com.store24h.store24h.services.Adm.ServicesUser;
+import br.com.store24h.store24h.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +33,7 @@ public class CreditoApi {
     private ComprasCreditoRepository comprasCreditoRepository;
 
     @Autowired
-    private ServicesUser servicesUser;
+    private UserService userService;
 
     @Autowired
     private Funcionalidades funcionalidades;
@@ -67,7 +67,7 @@ public class CreditoApi {
     @GetMapping("/getCredito")
     public ResponseEntity<Object> getCredito(Authentication authentication) {
         try {
-            User user = servicesUser.userLogado(authentication);
+            User user = userService.userLogado(authentication);
             return ResponseEntity.ok().body(new CreditoDTO(user.getCredito()));
         } catch (Exception e) {
 

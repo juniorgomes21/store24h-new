@@ -8,15 +8,13 @@ import br.com.store24h.store24h.repository.AdmDbRepository;
 import br.com.store24h.store24h.repository.PaisOperadorasDbRepository;
 import br.com.store24h.store24h.repository.ServicosDbRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
-import br.com.store24h.store24h.services.Adm.ServiceMethodsHub;
-import br.com.store24h.store24h.services.Adm.ServicesUser;
+import br.com.store24h.store24h.services.core.PublicApiService;
+import br.com.store24h.store24h.services.UserService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -42,39 +40,53 @@ public class Sms {
     private Funcionalidades funcionalidades;
 
     @Autowired
-    private ServicesUser servicesUser;
+    private UserService userService;
 
     @Autowired
-    private ServiceMethodsHub serviceMethodsHub;
+    private PublicApiService methodsHubService;
 
     @GetMapping
-    public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
+    public ResponseEntity<String> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
                                              Optional<String> country, Optional<String> operator, Optional<String> service,
                                              Optional<String> id) throws NoSuchMethodException {
 
-        JSONObject myJson = new JSONObject();
-        ResponseEntity<Object> result = null;
+        String responseAPI = "";
 
-        if(!servicesUser.isValidApiKey(api_key)) { // BAD_KEY
-            myJson.put("BAD_KEY", "Chave de API inválida");
+        if(!userService.isValidApiKey(apiKey)) { // BAD_KEY
+            // "Chave de API inválida"
+            responseAPI = "BAD_KEY";
 
-            return ResponseEntity.badRequest().body(myJson);
+            return ResponseEntity.badRequest().body(responseAPI);
         }
 
-        if(action.equals("getBalance")){ // GET_BALANCER
+        if(action.equals("getBalancer")){ // GET_BALANCER
+            String responseGetBalancer = methodsHubService.getBalancer(apiKey);
+            if(responseGetBalancer.equals("BAD_ACTION")) {
+                return ResponseEntity.badRequest().body(responseGetBalancer);
+            } else {
+                return ResponseEntity.ok(responseGetBalancer);
+            }
 
-            return serviceMethodsHub.getBalance(api_key);
+
         } else if(action.equals("getNumber")){ // GET_NUMBER
+            String responseGetNumber = methodsHubService.getNumber(apiKey, service, operator, country);
 
-            return serviceMethodsHub.getNumber(service.get(), operator.get(), country.get());
+            if(responseGetNumber.equals("BAD_ACTION") || responseGetNumber.equals("BAD_SERVICE")) {
+                return ResponseEntity.badRequest().body(responseGetNumber);
+            } else {
+                return ResponseEntity.ok(responseGetNumber);
+            }
+
+
         } else if(action.equals("getStatus")){ // GET_STATUS
-
-            return serviceMethodsHub.getStatus(id.get());
+            // TODO fazer ainda
+            return ResponseEntity.badRequest().body("methodsHubService.getStatus(id.get())");
         }
 
-        myJson.put("BAD_ACTION", "Consulta geral malformada");
+        //"Consulta geral malformada"
+        responseAPI = "BAD_ACTION";
 
-        return ResponseEntity.badRequest().body(myJson);
+        return ResponseEntity.badRequest().body(responseAPI);
     }
 
 //    @GetMapping
@@ -159,7 +171,7 @@ public class Sms {
 //        Sms.class.getMethod("numberStatus", )
 
         // POSSÍVEIS ERROS
-        if(!servicesUser.isValidApiKey(api_key)) { // BAD_KEY
+        if(!userService.isValidApiKey(api_key)) { // BAD_KEY
             myJson.put("BAD_KEY", "Chave de API inválida");
             return ResponseEntity.badRequest().body(myJson);
         }
@@ -252,7 +264,7 @@ public class Sms {
         boolean isValidApiKey = false;
 
         // POSSÍVEIS ERROS
-        if(!servicesUser.isValidApiKey(api_key)) { // BAD_KEY
+        if(!userService.isValidApiKey(api_key)) { // BAD_KEY
             myJson.put("BAD_KEY", "Chave de API inválida");
             return ResponseEntity.badRequest().body(myJson);
         }
