@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public class Activation {
 
     private StatusService statusBuz = StatusService.SOLICITADA; // SOLICITADA e com ID fornecida | NUMERO_FORNECIDO |
     // AGUARDANDO_MENSAGENS | FINALIZADA | CANCELADA
-//    private final List<SmsModel> smsModels = new ArrayList<>();
+    private final List<String> smsStringModels = new ArrayList<>();
     private Integer neededSmsToFinalize = 1;
     private LocalDateTime initialTime = LocalDateTime.now();
     private LocalDateTime endTime;
@@ -72,6 +73,10 @@ public class Activation {
         this.chipNumber = chipNumber;
 //        this.siteNumber = siteNumber;
         // this.status = status;
+    }
+
+    public List<String> getSmsStringModels() {
+        return smsStringModels;
     }
 
     public boolean reserveNumber() {

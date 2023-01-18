@@ -16,4 +16,8 @@ public interface SmsRepository extends JpaRepository<SmsModel, Long>{
 
     Optional<List<SmsModel>> findByDateBetween(LocalDateTime start, LocalDateTime end);
     Optional<List<SmsModel>> findByDateBetweenAndChipnumber(LocalDateTime start, LocalDateTime end, String chipnumber);
+
+    //gambi
+//    Optional<List<SmsModel>> findByChipnumber(String chipnumber);
+
 }

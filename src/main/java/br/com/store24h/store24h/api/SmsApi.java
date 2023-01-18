@@ -97,9 +97,10 @@ public class SmsApi {
     @GetMapping("/getSms")
     public ResponseEntity<Object> getSms(@RequestParam("api_key") String apiKey, @RequestParam("id") Long idActivation) {
         Activation activation = activationRepository.getById(idActivation);
-        Optional<List<SmsModel>> smsModelList = smsRepository.findByDateAfter(activation.getInitialTime());
+//        Optional<List<SmsModel>> smsModelList = smsRepository.findByDateAfter(activation.getInitialTime());
 
-        return ResponseEntity.ok( smsModelList.get());
+        Optional<List<SmsModel>> smsModelList = smsRepository.findByChipnumber("5535998032792");
+        return ResponseEntity.ok( smsModelList.get()); //SmsModel
     }
 
 //    @GetMapping
