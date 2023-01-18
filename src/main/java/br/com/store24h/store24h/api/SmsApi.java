@@ -71,7 +71,10 @@ public class Sms {
         } else if(action.equals("getNumber")){ // GET_NUMBER
             String responseGetNumber = methodsHubService.getNumber(apiKey, service, operator, country);
 
-            if(responseGetNumber.equals("BAD_ACTION") || responseGetNumber.equals("BAD_SERVICE")) {
+            if(responseGetNumber.isEmpty()) {
+                return ResponseEntity.badRequest().body("ERROR_SQL");
+            }
+            else if(responseGetNumber.equals("BAD_ACTION") || responseGetNumber.equals("BAD_SERVICE") || responseGetNumber.equals("NO_BALANCE")) {
                 return ResponseEntity.badRequest().body(responseGetNumber);
             } else {
                 return ResponseEntity.ok(responseGetNumber);
