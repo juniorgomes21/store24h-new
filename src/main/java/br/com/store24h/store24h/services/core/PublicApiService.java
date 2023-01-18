@@ -7,7 +7,6 @@ import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.ChipRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
 import br.com.store24h.store24h.services.CompraService;
-
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +37,9 @@ public class PublicApiService {
     @Autowired
     private Funcionalidades funcionalidades;
 
+    @Autowired
+    private ActivationService activationService;
+
     public String getBalancer(String api_key) {
         String responseAPI = "";
 
@@ -65,7 +67,7 @@ public class PublicApiService {
     public String getNumber(String apiKey, Optional<String> service, Optional<String> operator, Optional<String> country ) {
 
         String responseAPI = "";
-
+//        https://apcodes.top:9081/stubs/handler_api?api_key=d750b75c9a683217a0ede2a8d2ca4cac&action=getNumber&service=wa&operator=VIVO&country=73
         // POSSÍVEIS ERROS
         if (!service.isPresent() || !operator.isPresent() || !country.isPresent()) { // BAD_ACTION
             //"Consulta geral malformada"
@@ -103,17 +105,26 @@ public class PublicApiService {
 //            return ResponseEntity.badRequest().body(myJson);
 //        }
 
-        String idActivation = compraService.buyService(apiKey, servicoOptional.get());
+        String hasCredit = compraService.virifyCredit(apiKey, servicoOptional.get());
 
-        if (idActivation.equals("false")) { // NO_BALANCE
+        if (hasCredit.equals("false")) { // NO_BALANCE
             //"A chave da API ficou sem dinheiro suficiente"
             responseAPI = "NO_BALANCE";
             return responseAPI;
         }
 
+        Long idActivation = activationService.newActivation(service.get(), numeroDisponivelList.get(0).getNumber());
+
+        if(idActivation == null) {
+            return "";
+        }
 
         //TODO fazer um DTO para ChipModel.
-        responseAPI = "ACCESS_NUMBER:" + idActivation + ":" + numeroDisponivelList.get(0);
+        responseAPI = "ACCESS_NUMBER:" + idActivation + ":" + numeroDisponivelList.get(0).getNumber();
+
+        ChipModel chipModel = chipRepository.findByNumber(numeroDisponivelList.get(0).getNumber());
+        chipModel.setAlugado(true);
+        chipRepository.save(chipModel);
 
         return responseAPI;
     }

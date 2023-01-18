@@ -10,6 +10,14 @@ import java.util.Optional;
 public interface SmsRepository extends JpaRepository<SmsModel, Long>{
     Optional<List<SmsModel>> findByChipnumber(String chipnumber);
     Optional<List<SmsModel>> findByMsgContaining(String parteNome);
+
+    Optional<List<SmsModel>> findByDate(LocalDateTime date);
+    Optional<List<SmsModel>> findByDateAfter(LocalDateTime date);
+
     Optional<List<SmsModel>> findByDateBetween(LocalDateTime start, LocalDateTime end);
     Optional<List<SmsModel>> findByDateBetweenAndChipnumber(LocalDateTime start, LocalDateTime end, String chipnumber);
+
+    //gambi
+//    Optional<List<SmsModel>> findByChipnumber(String chipnumber);
+
 }

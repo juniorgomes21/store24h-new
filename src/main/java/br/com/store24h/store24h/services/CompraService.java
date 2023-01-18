@@ -11,24 +11,12 @@ public class CompraService {
     @Autowired
     private UserDbRepository userDbRepository;
 
-    public String buyService(String apiKey, Servico servicoDb) {
-
-        //retirar if
-        if (true) {
-            return "false";
-        }
+    public String virifyCredit(String apiKey, Servico servicoDb) {
 
         User user = userDbRepository.findByApiKey(apiKey).get();
 
         if(user.getCredito().compareTo(servicoDb.getPrice()) >= 0) {
-            try {
-                //TODO fazer o código de desconto de rédito do usuário.
-
-                return "true";
-            } catch (Exception e) {
-
-                return "false";
-            }
+            return "true";
         } else {
             return "false";
         }

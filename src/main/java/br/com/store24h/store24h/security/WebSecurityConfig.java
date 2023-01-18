@@ -58,6 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .authorizeRequests()
                 //Padrão API ADM
                 .antMatchers("/stubs/handler_api/ping").permitAll()
+                .antMatchers("/stubs/handler_api/getSms").permitAll()
+
                 .antMatchers("/stubs/handler_api/auth/login").permitAll()
                 .antMatchers("/stubs/handler_api/createADM").permitAll()
                 .antMatchers("/stubs/handler_api/createKeyApiMD5").permitAll()
