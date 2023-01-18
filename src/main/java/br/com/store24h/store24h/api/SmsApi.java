@@ -1,13 +1,8 @@
 package br.com.store24h.store24h.api;
 
 import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
-import br.com.store24h.store24h.model.PaisOperadoras;
-import br.com.store24h.store24h.model.Servico;
-import br.com.store24h.store24h.model.User;
-import br.com.store24h.store24h.repository.AdmDbRepository;
-import br.com.store24h.store24h.repository.PaisOperadorasDbRepository;
-import br.com.store24h.store24h.repository.ServicosDbRepository;
-import br.com.store24h.store24h.repository.UserDbRepository;
+import br.com.store24h.store24h.model.*;
+import br.com.store24h.store24h.repository.*;
 import br.com.store24h.store24h.services.core.PublicApiService;
 import br.com.store24h.store24h.services.UserService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -16,13 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/stubs/handler_api")
-public class Sms {
+public class SmsApi {
 
     @Autowired
     private AdmDbRepository admDbRepository;
@@ -43,7 +39,13 @@ public class Sms {
     private UserService userService;
 
     @Autowired
+    private SmsRepository smsRepository;
+
+    @Autowired
     private PublicApiService methodsHubService;
+
+    @Autowired
+    private ActivationRepository activationRepository;
 
     @GetMapping
     public ResponseEntity<String> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
@@ -92,6 +94,14 @@ public class Sms {
         return ResponseEntity.badRequest().body(responseAPI);
     }
 
+    @GetMapping("/getSms")
+    public ResponseEntity<Object> getSms(@RequestParam("api_key") String apiKey, @RequestParam("id") Long idActivation) {
+        Activation activation = activationRepository.getById(idActivation);
+        Optional<List<SmsModel>> smsModelList = smsRepository.findByDateAfter(activation.getInitialTime());
+
+        return ResponseEntity.ok( smsModelList.get());
+    }
+
 //    @GetMapping
 //    public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
 //                                          @RequestParam("country") String country, @RequestParam("operator") String operator) throws NoSuchMethodException {
@@ -106,12 +116,12 @@ public class Sms {
 //
 //            Method method = null;
 //            try {
-//                method = Sms.this.getClass().getMethod(methodName, parameterTypes);
+//                method = SmsApi.this.getClass().getMethod(methodName, parameterTypes);
 //            } catch (NoSuchMethodException e) {
 //                e.printStackTrace();
 //            }
 //            try {
-//                result = (ResponseEntity<Object>) method.invoke(Sms.this, parameters);
+//                result = (ResponseEntity<Object>) method.invoke(SmsApi.this, parameters);
 //            } catch (IllegalAccessException e) {
 //                e.printStackTrace();
 //            } catch (InvocationTargetException e) {
@@ -122,9 +132,9 @@ public class Sms {
 //            Class[] parameterTypes = new Class[]{String.class};
 //            Object[] parameters = new Object[]{api_key};
 //
-//            Method method = Sms.this.getClass().getMethod(methodName, parameterTypes);
+//            Method method = SmsApi.this.getClass().getMethod(methodName, parameterTypes);
 //            try {
-//                result = (ResponseEntity<Object>) method.invoke(Sms.this, parameters);
+//                result = (ResponseEntity<Object>) method.invoke(SmsApi.this, parameters);
 //            } catch (IllegalAccessException e) {
 //                e.printStackTrace();
 //            } catch (InvocationTargetException e) {
@@ -135,9 +145,9 @@ public class Sms {
 //            Class[] parameterTypes = new Class[]{String.class};
 //            Object[] parameters = new Object[]{api_key};
 //
-//            Method method = Sms.this.getClass().getMethod(methodName, parameterTypes);
+//            Method method = SmsApi.this.getClass().getMethod(methodName, parameterTypes);
 //            try {
-//                result = (ResponseEntity<Object>) method.invoke(Sms.this, parameters);
+//                result = (ResponseEntity<Object>) method.invoke(SmsApi.this, parameters);
 //            } catch (IllegalAccessException e) {
 //                e.printStackTrace();
 //            } catch (InvocationTargetException e) {
@@ -166,12 +176,13 @@ public class Sms {
      * @param operator
      * @return
      */
+
     @GetMapping("/getNumberStatus")
     public ResponseEntity<?> numberStatus(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
                                           @RequestParam("country") String country, @RequestParam("operator") String operator) {
         JSONObject myJson = new JSONObject();
 
-//        Sms.class.getMethod("numberStatus", )
+//        SmsApi.class.getMethod("numberStatus", )
 
         // POSSÍVEIS ERROS
         if(!userService.isValidApiKey(api_key)) { // BAD_KEY
