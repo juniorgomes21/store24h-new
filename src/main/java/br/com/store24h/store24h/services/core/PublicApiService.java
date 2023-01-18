@@ -42,11 +42,11 @@ public class PublicApiService {
         String responseAPI = "";
 
 
-//        if (false) { // ERROR_SQL
-//            //"erro SQL-server"
-//            responseAPI = "ERROR_SQL";
-//            return ResponseEntity.badRequest().body(myJson);
-//        }
+        if (false) { // ERROR_SQL
+            //"erro SQL-server"
+            responseAPI = "ERROR_SQL";
+            return responseAPI;
+        }
 
         if(false) { // BAD_ACTION
             //"Consulta geral malformada"

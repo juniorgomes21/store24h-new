@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/stubs/handler_api")
-public class Sms {
+public class SmsApi {
 
     @Autowired
     private AdmDbRepository admDbRepository;
