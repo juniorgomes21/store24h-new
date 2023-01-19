@@ -7,12 +7,19 @@ import br.com.store24h.store24h.services.core.PublicApiService;
 import br.com.store24h.store24h.services.UserService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -98,9 +105,34 @@ public class SmsApi {
     public ResponseEntity<Object> getSms(@RequestParam("api_key") String apiKey, @RequestParam("id") Long idActivation) {
         Activation activation = activationRepository.getById(idActivation);
 //        Optional<List<SmsModel>> smsModelList = smsRepository.findByDateAfter(activation.getInitialTime());
+        Optional<List<SmsModel>> smsModelList = Optional.of(new ArrayList<>());
+        if(activation.getSmsStringModels().size() == 0) {
+            Pageable pageable = PageRequest.of(0, 1, Sort.by("date").descending());
+            smsModelList = smsRepository.findByChipnumber(activation.getChipNumber(), pageable);
+        }
 
-        Optional<List<SmsModel>> smsModelList = smsRepository.findByChipnumber("5535998032792");
-        return ResponseEntity.ok( smsModelList.get()); //SmsModel
+        if(!smsModelList.isPresent()) {
+            activation.setStatus(7);
+            activation.getSmsStringModels().add(smsModelList.get().get(0).getMsg());
+
+            LocalDateTime now = LocalDateTime.now();
+            ZoneId brasiliaZone = ZoneId.of("America/Sao_Paulo");
+            ZonedDateTime brasiliaNow = now.atZone(brasiliaZone);
+            activation.setEndTime(brasiliaNow.toLocalDateTime());
+
+            activationRepository.save(activation);
+
+            return ResponseEntity.ok( smsModelList.get()
+                    //.get(0) //Todo ver se lista ou SmsModel
+            ); //SmsModel
+        }
+
+        ;
+
+
+        return ResponseEntity.ok( activation.getSmsStringModels()
+                //.get(0) //Todo ver se lista ou SmsModel
+        ); //SmsModel
     }
 
 //    @GetMapping

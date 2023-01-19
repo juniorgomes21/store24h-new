@@ -2,10 +2,7 @@ package br.com.store24h.store24h.model;
 
 import br.com.store24h.store24h.services.StatusService;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +26,9 @@ public class Activation {
 
     private StatusService statusBuz = StatusService.SOLICITADA; // SOLICITADA e com ID fornecida | NUMERO_FORNECIDO |
     // AGUARDANDO_MENSAGENS | FINALIZADA | CANCELADA
+    @ElementCollection
+    @CollectionTable(name = "sms_string_models", joinColumns = @JoinColumn(name = "activation_id"))
+    @Column(name = "sms_string_models")
     private final List<String> smsStringModels = new ArrayList<>();
     private Integer neededSmsToFinalize = 1;
     private LocalDateTime initialTime = LocalDateTime.now();
