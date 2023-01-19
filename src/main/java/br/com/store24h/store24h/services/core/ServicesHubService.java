@@ -17,6 +17,5 @@ public class ServicesHubService {
         Optional<Servico> servico = servicosDbRepository.findByAlias(aliasService);
 
         return  servico;
-
     }
 }

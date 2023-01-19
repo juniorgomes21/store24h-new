@@ -1,6 +1,7 @@
 package br.com.store24h.store24h.api;
 
 import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
+import br.com.store24h.store24h.dto.SmsDTO;
 import br.com.store24h.store24h.model.*;
 import br.com.store24h.store24h.repository.*;
 import br.com.store24h.store24h.services.core.PublicApiService;
@@ -55,9 +56,9 @@ public class SmsApi {
     private ActivationRepository activationRepository;
 
     @GetMapping
-    public ResponseEntity<String> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
+    public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
                                              Optional<String> country, Optional<String> operator, Optional<String> service,
-                                             Optional<String> id) throws NoSuchMethodException {
+                                             Optional<Long> id) throws NoSuchMethodException {
 
         String responseAPI = "";
 
@@ -78,6 +79,7 @@ public class SmsApi {
 
 
         } else if(action.equals("getNumber")){ // GET_NUMBER
+
             String responseGetNumber = methodsHubService.getNumber(apiKey, service, operator, country);
 
             if(responseGetNumber.isEmpty()) {
@@ -93,6 +95,10 @@ public class SmsApi {
         } else if(action.equals("getStatus")){ // GET_STATUS
             // TODO fazer ainda
             return ResponseEntity.badRequest().body("methodsHubService.getStatus(id.get())");
+        } else if(action.equals("getSms")) {
+            SmsDTO smsDTO = methodsHubService.getSms(apiKey, id.get());
+
+            return ResponseEntity.ok(smsDTO);
         }
 
         //"Consulta geral malformada"

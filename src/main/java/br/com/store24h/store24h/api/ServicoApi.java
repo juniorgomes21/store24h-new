@@ -158,9 +158,8 @@ public class ServicoApi {
         Servico servico = servicosRepository.findById(id).get();
         User user = userDbRepository.findByEmail("fernando@fernando.com").get();
 
-        CompraServiso compraServiso = new CompraServiso(servico.getName());
-
-        compraServicoRepository.save(compraServiso);
+//        CompraServiso compraServiso = new CompraServiso(servico.getName());
+//        compraServicoRepository.save(compraServiso);
 
         return ResponseEntity.ok().build();
     }

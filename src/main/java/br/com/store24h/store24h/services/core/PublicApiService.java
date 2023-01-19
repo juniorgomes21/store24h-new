@@ -1,21 +1,28 @@
 package br.com.store24h.store24h.services.core;
 
 import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
-import br.com.store24h.store24h.model.ChipModel;
-import br.com.store24h.store24h.model.Servico;
-import br.com.store24h.store24h.model.User;
+import br.com.store24h.store24h.dto.SmsDTO;
+import br.com.store24h.store24h.model.*;
+import br.com.store24h.store24h.repository.ActivationRepository;
 import br.com.store24h.store24h.repository.ChipRepository;
+import br.com.store24h.store24h.repository.SmsRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
 import br.com.store24h.store24h.services.CompraService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +43,12 @@ public class PublicApiService {
 
     @Autowired
     private Funcionalidades funcionalidades;
+
+    @Autowired
+    private ActivationRepository activationRepository;
+
+    @Autowired
+    private SmsRepository smsRepository;
 
     @Autowired
     private ActivationService activationService;
@@ -69,7 +82,7 @@ public class PublicApiService {
         String responseAPI = "";
 //        https://apcodes.top:9081/stubs/handler_api?api_key=d750b75c9a683217a0ede2a8d2ca4cac&action=getNumber&service=wa&operator=VIVO&country=73
         // POSSÍVEIS ERROS
-        if (!service.isPresent() || !operator.isPresent() || !country.isPresent()) { // BAD_ACTION
+        if (!service.isPresent() || !country.isPresent()) { // BAD_ACTION
             //"Consulta geral malformada"
             responseAPI = "BAD_ACTION";
 
@@ -90,7 +103,13 @@ public class PublicApiService {
 //        }
 
         Pageable pageable = PageRequest.of(0, 1);
-        List<ChipModel> numeroDisponivelList = chipRepository.findByAlugadoAndAtivoAndOperadora(false, true, operator.get(), pageable);
+        List<ChipModel> numeroDisponivelList = null;
+        if(operator.isPresent()) {
+            numeroDisponivelList = chipRepository.findByAlugadoAndAtivoAndOperadora(false, true, operator.get(), pageable);
+        } else {
+            numeroDisponivelList = chipRepository.findByAlugadoAndAtivo(false, true, pageable);
+        }
+
 
         // RESPOSTAS DO SERVIDOR - BUZ
         if (numeroDisponivelList.isEmpty()) { // NO_NUMBERS
@@ -105,7 +124,9 @@ public class PublicApiService {
 //            return ResponseEntity.badRequest().body(myJson);
 //        }
 
-        String hasCredit = compraService.virifyCredit(apiKey, servicoOptional.get());
+        User user = userDbRepository.findByApiKey(apiKey).get();
+
+        String hasCredit = compraService.virifyCredit(user, servicoOptional.get());
 
         if (hasCredit.equals("false")) { // NO_BALANCE
             //"A chave da API ficou sem dinheiro suficiente"
@@ -113,7 +134,7 @@ public class PublicApiService {
             return responseAPI;
         }
 
-        Long idActivation = activationService.newActivation(service.get(), numeroDisponivelList.get(0).getNumber());
+        Long idActivation = activationService.newActivation(user, servicoOptional.get(), numeroDisponivelList.get(0).getNumber());
 
         if(idActivation == null) {
             return "";
@@ -124,11 +145,49 @@ public class PublicApiService {
 
         ChipModel chipModel = chipRepository.findByNumber(numeroDisponivelList.get(0).getNumber());
         chipModel.setAlugado(true);
+        //Descomentar para salvar alugado true
         chipRepository.save(chipModel);
 
         return responseAPI;
     }
 
+    public SmsDTO getSms(String apiKey, Long idActivation) {
+        Activation activation = activationRepository.getById(idActivation);
+//        Optional<List<SmsModel>> smsModelList = smsRepository.findByDateAfter(activation.getInitialTime());
+        Optional<List<SmsModel>> smsModelList = Optional.of(new ArrayList<>());
+        if(activation.getSmsStringModels().size() == 0) {
+            Pageable pageable = PageRequest.of(0, 1, Sort.by("date").descending());
+            smsModelList = smsRepository.findByChipnumber(activation.getChipNumber(), pageable);
+        }
+
+        SmsDTO smsDTO = new SmsDTO();
+
+        if(!smsModelList.isPresent()) {
+            activation.setStatus(7);
+            activation.getSmsStringModels().add(smsModelList.get().get(0).getMsg());
+
+            LocalDateTime now = LocalDateTime.now();
+            ZoneId brasiliaZone = ZoneId.of("America/Sao_Paulo");
+            ZonedDateTime brasiliaNow = now.atZone(brasiliaZone);
+            activation.setEndTime(brasiliaNow.toLocalDateTime());
+
+            activationRepository.save(activation);
+
+
+            smsDTO.getSmsList().add(smsModelList.get().get(0).getMsg());
+            smsDTO.setNumberActivation(activation.getChipNumber());
+            smsDTO.setAliasService(activation.getServiceName());
+
+            //Todo ver se lista ou SmsModel
+            return smsDTO;
+        }
+
+        smsDTO.setSmsList(activation.getSmsStringModels());
+        smsDTO.setNumberActivation(activation.getChipNumber());
+        smsDTO.setAliasService(activation.getServiceName());
+
+        return smsDTO;
+    }
 
     public ResponseEntity<Object> getStatus(String id) {
         JSONObject myJson = new JSONObject();
