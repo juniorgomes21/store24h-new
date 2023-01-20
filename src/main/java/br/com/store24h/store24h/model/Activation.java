@@ -4,6 +4,7 @@ import br.com.store24h.store24h.services.StatusService;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  * De forma geral deve ser simples e sem muita validação, apenas se há saldo ou não na key_api
  */
 @Entity
-public class Activation {
+public class Activation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -115,6 +116,21 @@ public class Activation {
         statusBuz = StatusService.CANCELADA;
         return true;
     };
+
+    @Override
+    public String toString() {
+        return "Activation{" +
+                "serviceName='" + serviceName + '\'' +
+                ", apiKey='" + apiKey + '\'' +
+                ", chipNumber='" + chipNumber + '\'' +
+                ", statusBuz=" + statusBuz +
+                ", smsStringModels=" + smsStringModels +
+                ", neededSmsToFinalize=" + neededSmsToFinalize +
+                ", initialTime=" + initialTime +
+                ", endTime=" + endTime +
+                ", status=" + status +
+                '}';
+    }
 
     public long getId() {
         return id;

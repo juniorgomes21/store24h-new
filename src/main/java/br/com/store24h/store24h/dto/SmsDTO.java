@@ -2,12 +2,14 @@ package br.com.store24h.store24h.dto;
 
 import br.com.store24h.store24h.model.SmsModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SmsDTO {
     private String aliasService;
     private String numberActivation;
-    private List<String> smsList;
+    private List<String> smsList = new ArrayList<>();
+
     public SmsDTO() {
     }
 

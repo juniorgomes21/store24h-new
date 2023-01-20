@@ -107,20 +107,21 @@ public class SmsApi {
         return ResponseEntity.badRequest().body(responseAPI);
     }
 
-    @GetMapping("/getSms")
-    public ResponseEntity<Object> getSms(@RequestParam("api_key") String apiKey, @RequestParam("id") Long idActivation) {
+    @GetMapping("/getSmsx")
+    public ResponseEntity<Object> getSmsx(@RequestParam("api_key") String apiKey, @RequestParam("id") Long idActivation) {
         Activation activation = activationRepository.getById(idActivation);
 //        Optional<List<SmsModel>> smsModelList = smsRepository.findByDateAfter(activation.getInitialTime());
         Optional<List<SmsModel>> smsModelList = Optional.of(new ArrayList<>());
         if(activation.getSmsStringModels().size() == 0) {
             Pageable pageable = PageRequest.of(0, 1, Sort.by("date").descending());
+            System.out.println(activation.getChipNumber());
             smsModelList = smsRepository.findByChipnumber(activation.getChipNumber(), pageable);
         }
-
+//        @GetMapping("/getSmsx")@GetMapping("/getSmsx")@GetMapping("/getSmsx")@GetMapping("/getSmsx")@GetMapping("/getSmsx")
         if(!smsModelList.isPresent()) {
             activation.setStatus(7);
             activation.getSmsStringModels().add(smsModelList.get().get(0).getMsg());
-
+//            @GetMapping("/getSmsx")@GetMapping("/getSmsx")@GetMapping("/getSmsx")@GetMapping("/getSmsx")@GetMapping("/getSmsx")
             LocalDateTime now = LocalDateTime.now();
             ZoneId brasiliaZone = ZoneId.of("America/Sao_Paulo");
             ZonedDateTime brasiliaNow = now.atZone(brasiliaZone);

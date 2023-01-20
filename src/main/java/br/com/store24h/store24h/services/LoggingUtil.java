@@ -14,8 +14,7 @@ import java.util.Arrays;
 public class LoggingUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingUtil.class);
-//    br.com.store24h.store24h.repository
-    @Around("execution(* br.com.store24h.store24h.resources..*.*(..))")
+    @Around("execution(* br.com.store24h.store24h.repository..*.*(..))")
     public Object logMethodCall(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
         String className = joinPoint.getSignature().getDeclaringTypeName();

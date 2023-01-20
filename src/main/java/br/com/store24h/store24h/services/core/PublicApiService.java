@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -52,6 +53,9 @@ public class PublicApiService {
 
     @Autowired
     private ActivationService activationService;
+
+    @Autowired
+    private EntityManager em;
 
     public String getBalancer(String api_key) {
         String responseAPI = "";
@@ -157,15 +161,20 @@ public class PublicApiService {
         Optional<List<SmsModel>> smsModelList = Optional.of(new ArrayList<>());
         if(activation.getSmsStringModels().size() == 0) {
             Pageable pageable = PageRequest.of(0, 1, Sort.by("date").descending());
+            String num = activation.getChipNumber();
+
+            System.out.println(activation);
             smsModelList = smsRepository.findByChipnumber(activation.getChipNumber(), pageable);
         }
 
         SmsDTO smsDTO = new SmsDTO();
 
-        if(!smsModelList.isPresent()) {
+        if(smsModelList.get().size() != 0) {
             activation.setStatus(7);
-            activation.getSmsStringModels().add(smsModelList.get().get(0).getMsg());
+            String ss = smsModelList.get().get(0).getMsg();
+            activation.getSmsStringModels().add(ss);
 
+            //TODO criar uma função para timeZone
             LocalDateTime now = LocalDateTime.now();
             ZoneId brasiliaZone = ZoneId.of("America/Sao_Paulo");
             ZonedDateTime brasiliaNow = now.atZone(brasiliaZone);
@@ -173,8 +182,13 @@ public class PublicApiService {
 
             activationRepository.save(activation);
 
+            ChipModel chip = chipRepository.findByNumber(activation.getChipNumber());
+            chip.setAlugado(false);
+            chipRepository.save(chip);
 
-            smsDTO.getSmsList().add(smsModelList.get().get(0).getMsg());
+
+
+            smsDTO.getSmsList().add(ss.toString());
             smsDTO.setNumberActivation(activation.getChipNumber());
             smsDTO.setAliasService(activation.getServiceName());
 
