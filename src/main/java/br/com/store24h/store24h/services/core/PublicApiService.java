@@ -144,13 +144,13 @@ public class PublicApiService {
             return "";
         }
 
+
         //TODO fazer um DTO para ChipModel.
         responseAPI = "ACCESS_NUMBER:" + idActivation + ":" + numeroDisponivelList.get(0).getNumber();
 
         ChipModel chipModel = chipRepository.findByNumber(numeroDisponivelList.get(0).getNumber());
-//        chipModel.setAlugado(true);
-        //Descomentar para salvar alugado true
-//        chipRepository.save(chipModel);
+        chipModel.setAlugado(true);
+        chipRepository.save(chipModel);
 
         return responseAPI;
     }
