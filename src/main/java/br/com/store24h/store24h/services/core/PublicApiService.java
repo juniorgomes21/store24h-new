@@ -148,9 +148,9 @@ public class PublicApiService {
         responseAPI = "ACCESS_NUMBER:" + idActivation + ":" + numeroDisponivelList.get(0).getNumber();
 
         ChipModel chipModel = chipRepository.findByNumber(numeroDisponivelList.get(0).getNumber());
-        chipModel.setAlugado(true);
+//        chipModel.setAlugado(true);
         //Descomentar para salvar alugado true
-        chipRepository.save(chipModel);
+//        chipRepository.save(chipModel);
 
         return responseAPI;
     }
@@ -186,19 +186,18 @@ public class PublicApiService {
             chip.setAlugado(false);
             chipRepository.save(chip);
 
-
-
-            smsDTO.getSmsList().add(ss.toString());
+            smsDTO.getSmsList().add(ss);
+            smsDTO.setNameService(activation.getServiceName());
+            smsDTO.setAliasService(activation.getAliasService());
             smsDTO.setNumberActivation(activation.getChipNumber());
-            smsDTO.setAliasService(activation.getServiceName());
 
             //Todo ver se lista ou SmsModel
             return smsDTO;
         }
-
+        smsDTO.setNameService(activation.getServiceName());
+        smsDTO.setAliasService(activation.getAliasService());
         smsDTO.setSmsList(activation.getSmsStringModels());
         smsDTO.setNumberActivation(activation.getChipNumber());
-        smsDTO.setAliasService(activation.getServiceName());
 
         return smsDTO;
     }

@@ -20,6 +20,8 @@ public class Activation implements Serializable {
     private long id;
     @NotBlank
     private String serviceName;
+    @NotBlank
+    private String aliasService;
 //    @NotBlank
     private String apiKey;
     private String chipNumber; // uma hora fica inválido e enquanto válido, segue abaixo. É o numero usado para esta ativação
@@ -62,15 +64,15 @@ public class Activation implements Serializable {
 
     public Activation() {
     }
-    public Activation(String serviceName, String chipNumber) {
+    public Activation(String serviceName, String aliasService, String chipNumber) {
+        this.aliasService = aliasService;
         this.serviceName = serviceName;
         this.chipNumber = chipNumber;
 //        this.siteNumber = siteNumber;
         // this.status = status;
     }
-    public Activation(String serviceName, String apiKey, String chipNumber) {
+    public Activation(String serviceName, String chipNumber) {
         this.serviceName = serviceName;
-        this.apiKey = apiKey;
         this.chipNumber = chipNumber;
 //        this.siteNumber = siteNumber;
         // this.status = status;
@@ -138,6 +140,14 @@ public class Activation implements Serializable {
 
     public String getServiceName() {
         return serviceName;
+    }
+
+    public String getAliasService() {
+        return aliasService;
+    }
+
+    public void setAliasService(String aliasService) {
+        this.aliasService = aliasService;
     }
 
     public String getApiKey() {

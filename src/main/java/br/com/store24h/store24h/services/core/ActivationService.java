@@ -28,7 +28,7 @@ public class ActivationService {
         try {
 //            TODO tirar daqui
             compraService.buyService(user, servico, chipNumber);
-            Activation activation = new Activation(servico.getName(), chipNumber);
+            Activation activation = new Activation(servico.getName(), servico.getAlias(), chipNumber);
 
             smsRepository.deleteByChipnumber(chipNumber);
             return activationRepository.save(activation).getId();

@@ -6,11 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SmsDTO {
+    private String nameService;
     private String aliasService;
     private String numberActivation;
     private List<String> smsList = new ArrayList<>();
 
     public SmsDTO() {
+    }
+
+    public String getNameService() {
+        return nameService;
+    }
+
+    public void setNameService(String nameService) {
+        this.nameService = nameService;
     }
 
     public String getAliasService() {
