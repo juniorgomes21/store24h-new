@@ -18,10 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
@@ -93,8 +90,23 @@ public class SmsApi {
 
 
         } else if(action.equals("getStatus")){ // GET_STATUS
-            // TODO fazer ainda
-            return ResponseEntity.badRequest().body("methodsHubService.getStatus(id.get())");
+
+            String responseGetStatus = methodsHubService.getStatus(id);
+
+            List<String> badStatuses = Arrays.asList("BAD_ACTION", "NO_ACTIVATION", "ERROR_SQL");
+
+            if(badStatuses.contains(responseGetStatus)) {
+                return ResponseEntity.badRequest().body(responseGetStatus);
+            }
+
+            List<String> badStatusOk = Arrays.asList("STATUS_WAIT_CODE", "STATUS_WAIT_RETRY:LASTCODE", "STATUS_CANCEL");
+
+            if(badStatuses.contains(responseGetStatus)) {
+                return ResponseEntity.ok(responseGetStatus);
+            }
+
+            return ResponseEntity.ok(responseGetStatus);
+
         } else if(action.equals("getSms")) {
             SmsDTO smsDTO = methodsHubService.getSms(apiKey, id.get());
 

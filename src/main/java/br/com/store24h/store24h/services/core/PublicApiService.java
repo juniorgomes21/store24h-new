@@ -202,26 +202,45 @@ public class PublicApiService {
         return smsDTO;
     }
 
-    public ResponseEntity<Object> getStatus(String id) {
+    public String getStatus(Optional<Long> id) {
         JSONObject myJson = new JSONObject();
 
         // POSSÍVEIS ERROS
-        if(false) {
-            myJson.put("BAD_ACTION", "Consulta geral malformada");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if(false) {
-            myJson.put("NO_ATIVATION", "ID de ativação não existe");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if(false) {
-            myJson.put("ERROR_SQL", "Erro no banco de dados do servidor SQL, entre em contato com seu administrador");
-            return ResponseEntity.badRequest().body(myJson);
+        if(!id.isPresent() && !(id.get() instanceof Long)) {
+            //Consulta geral malformada
+            return "BAD_ACTION";
         }
 
-        JSONObject stausCode = funcionalidades.getNumeroStatus();
+        Optional<Activation> activationOptional;
 
-        return ResponseEntity.ok().body(stausCode);
+        try {
+            //Erro no banco de dados do servidor SQL, entre em contato com seu administrador
+            activationOptional = activationRepository.findById(id.get());
+        } catch (Exception e) {
+            return "ERROR_SQL";
+        }
+
+        if(!activationOptional.isPresent()) {
+            // ID de ativação não existe
+            return "NO_ATIVATION";
+        }
+
+        Activation activation = activationOptional.get();
+
+        int statusCode = activation.getStatus();
+
+        if(statusCode == -1) {
+            return "STATUS_WAIT_CODE";
+        }
+        if(false) {
+            return "STATUS_WAIT_RETRY:LASTCODE";
+        }
+        if(statusCode == 8) {
+            return "STATUS_CANCEL";
+        }
+        else {
+            return "STATUS_OK:" + activation.getId();
+        }
     }
 
     public ResponseEntity<Object> getNumberStatus(String country, String operator) {
