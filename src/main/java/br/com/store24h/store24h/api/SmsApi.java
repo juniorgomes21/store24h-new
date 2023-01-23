@@ -55,7 +55,7 @@ public class SmsApi {
     @GetMapping
     public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
                                              Optional<String> country, Optional<String> operator, Optional<String> service,
-                                             Optional<Long> id) throws NoSuchMethodException {
+                                             Optional<Long> id, Optional<String> status) throws NoSuchMethodException {
 
         String responseAPI = "";
 
@@ -79,10 +79,9 @@ public class SmsApi {
 
             String responseGetNumber = methodsHubService.getNumber(apiKey, service, operator, country);
 
-            if(responseGetNumber.isEmpty()) {
-                return ResponseEntity.badRequest().body("ERROR_SQL");
-            }
-            else if(responseGetNumber.equals("BAD_ACTION") || responseGetNumber.equals("BAD_SERVICE")) {
+            List<String> badStatuses = Arrays.asList("BAD_ACTION", "BAD_SERVICE", "ERROR_SQL");
+
+            if(badStatuses.contains(responseGetNumber)) {
                 return ResponseEntity.badRequest().body(responseGetNumber);
             } else {
                 return ResponseEntity.ok(responseGetNumber);
@@ -97,20 +96,21 @@ public class SmsApi {
 
             if(badStatuses.contains(responseGetStatus)) {
                 return ResponseEntity.badRequest().body(responseGetStatus);
-            }
-
-            List<String> badStatusOk = Arrays.asList("STATUS_WAIT_CODE", "STATUS_WAIT_RETRY:LASTCODE", "STATUS_CANCEL");
-
-            if(badStatuses.contains(responseGetStatus)) {
+            } else {
                 return ResponseEntity.ok(responseGetStatus);
             }
-
-            return ResponseEntity.ok(responseGetStatus);
 
         } else if(action.equals("getSms")) {
             SmsDTO smsDTO = methodsHubService.getSms(apiKey, id.get());
 
             return ResponseEntity.ok(smsDTO);
+
+
+        } else if (action.equals("setStatus")) {
+
+//            String responseSetStatus = methodsHubService.setStatus(status, id);
+
+            return ResponseEntity.ok().build();
         }
 
         //"Consulta geral malformada"
@@ -154,69 +154,6 @@ public class SmsApi {
         ); //SmsModel
     }
 
-//    @GetMapping
-//    public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
-//                                          @RequestParam("country") String country, @RequestParam("operator") String operator) throws NoSuchMethodException {
-//
-////        @RequestParam("api_key") String api_key,
-//        ResponseEntity<Object> result = null;
-//
-//        if(action.equals("getBalance")){
-//            String methodName = action;
-//            Class[] parameterTypes = new Class[]{String.class};
-//            Object[] parameters = new Object[]{api_key};
-//
-//            Method method = null;
-//            try {
-//                method = SmsApi.this.getClass().getMethod(methodName, parameterTypes);
-//            } catch (NoSuchMethodException e) {
-//                e.printStackTrace();
-//            }
-//            try {
-//                result = (ResponseEntity<Object>) method.invoke(SmsApi.this, parameters);
-//            } catch (IllegalAccessException e) {
-//                e.printStackTrace();
-//            } catch (InvocationTargetException e) {
-//                e.printStackTrace();
-//            }
-//        } else if (action.equals("m1")){
-//            String methodName = action;
-//            Class[] parameterTypes = new Class[]{String.class};
-//            Object[] parameters = new Object[]{api_key};
-//
-//            Method method = SmsApi.this.getClass().getMethod(methodName, parameterTypes);
-//            try {
-//                result = (ResponseEntity<Object>) method.invoke(SmsApi.this, parameters);
-//            } catch (IllegalAccessException e) {
-//                e.printStackTrace();
-//            } catch (InvocationTargetException e) {
-//                e.printStackTrace();
-//            }
-//        } else if (action.equals("m2")){
-//            String methodName = action;
-//            Class[] parameterTypes = new Class[]{String.class};
-//            Object[] parameters = new Object[]{api_key};
-//
-//            Method method = SmsApi.this.getClass().getMethod(methodName, parameterTypes);
-//            try {
-//                result = (ResponseEntity<Object>) method.invoke(SmsApi.this, parameters);
-//            } catch (IllegalAccessException e) {
-//                e.printStackTrace();
-//            } catch (InvocationTargetException e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//            System.out.println("hhahhahahhahhahahahhah!");
-//        }
-//
-////        JSONObject myJson = new JSONObject();
-////        myJson.put("av_0", 99);
-////        return ResponseEntity.ok().body(myJson);
-//        return result;
-//    }
-
-
-
 
     /***
      * Todas as solicitações devem ter uma chave de API como parâmetro "api_key" "api_key"
@@ -228,7 +165,6 @@ public class SmsApi {
      * @param operator
      * @return
      */
-
     @GetMapping("/getNumberStatus")
     public ResponseEntity<?> numberStatus(@RequestParam("api_key") String api_key, @RequestParam("action") String action,
                                           @RequestParam("country") String country, @RequestParam("operator") String operator) {

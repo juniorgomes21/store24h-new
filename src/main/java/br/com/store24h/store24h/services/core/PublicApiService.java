@@ -84,7 +84,7 @@ public class PublicApiService {
     public String getNumber(String apiKey, Optional<String> service, Optional<String> operator, Optional<String> country ) {
 
         String responseAPI = "";
-//        https://apcodes.top:9081/stubs/handler_api?api_key=d750b75c9a683217a0ede2a8d2ca4cac&action=getNumber&service=wa&operator=VIVO&country=73
+
         // POSSÍVEIS ERROS
         if (!service.isPresent() || !country.isPresent()) { // BAD_ACTION
             //"Consulta geral malformada"
@@ -101,19 +101,18 @@ public class PublicApiService {
             return responseAPI;
         }
 
-//        if (false) { // ERROR_SQL
-//            myJson.put("ERROR_SQL", "Erro de banco de dados SQL Server");
-//            return ResponseEntity.badRequest().body(myJson);
-//        }
-
         Pageable pageable = PageRequest.of(0, 1);
         List<ChipModel> numeroDisponivelList = null;
-        if(operator.isPresent()) {
-            numeroDisponivelList = chipRepository.findByAlugadoAndAtivoAndOperadora(false, true, operator.get(), pageable);
-        } else {
-            numeroDisponivelList = chipRepository.findByAlugadoAndAtivo(false, true, pageable);
-        }
 
+        try {
+            if(operator.isPresent()) {
+                numeroDisponivelList = chipRepository.findByAlugadoAndAtivoAndOperadora(false, true, operator.get(), pageable);
+            } else {
+                numeroDisponivelList = chipRepository.findByAlugadoAndAtivo(false, true, pageable);
+            }
+        } catch (Exception e) {
+            return "ERROR_SQL";
+        }
 
         // RESPOSTAS DO SERVIDOR - BUZ
         if (numeroDisponivelList.isEmpty()) { // NO_NUMBERS
@@ -122,11 +121,6 @@ public class PublicApiService {
 
             return responseAPI;
         }
-
-//        if (false) { // WRONG_SERVICE
-//            myJson.put("WRONG_SERVICE", "Identificador de serviço inválido");
-//            return ResponseEntity.badRequest().body(myJson);
-//        }
 
         User user = userDbRepository.findByApiKey(apiKey).get();
 
@@ -138,19 +132,23 @@ public class PublicApiService {
             return responseAPI;
         }
 
-        Long idActivation = activationService.newActivation(user, servicoOptional.get(), numeroDisponivelList.get(0).getNumber());
-
-        if(idActivation == null) {
-            return "";
+        Long idActivation;
+        try {
+            idActivation = activationService.newActivation(user, servicoOptional.get(), numeroDisponivelList.get(0).getNumber());
+        } catch (Exception e) {
+            return "ERROR_SQL";
         }
 
-        //TODO fazer um DTO para ChipModel.
         responseAPI = "ACCESS_NUMBER:" + idActivation + ":" + numeroDisponivelList.get(0).getNumber();
 
-        ChipModel chipModel = chipRepository.findByNumber(numeroDisponivelList.get(0).getNumber());
-//        chipModel.setAlugado(true);
-        //Descomentar para salvar alugado true
-//        chipRepository.save(chipModel);
+        ChipModel chipModel;
+        try {
+            chipModel = chipRepository.findByNumber(numeroDisponivelList.get(0).getNumber());
+            chipModel.setAlugado(true);
+            chipRepository.save(chipModel);
+        } catch (Exception e) {
+            return "ERROR_SQL";
+        }
 
         return responseAPI;
     }
@@ -271,7 +269,7 @@ public class PublicApiService {
         return ResponseEntity.ok().body(myJson);
     }
 
-    public ResponseEntity<?> setStatus(String status, String id) {
+    public ResponseEntity<?> setStatus(Optional<String> status, Optional<Long> id) {
         JSONObject myJson = new JSONObject();
 
 
