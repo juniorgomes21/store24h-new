@@ -55,7 +55,7 @@ public class SmsApi {
     @GetMapping
     public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
                                              Optional<String> country, Optional<String> operator, Optional<String> service,
-                                             Optional<Long> id, Optional<String> status) throws NoSuchMethodException {
+                                             Optional<Long> idActivation, Optional<Integer> status) throws NoSuchMethodException {
 
         String responseAPI = "";
 
@@ -79,9 +79,9 @@ public class SmsApi {
 
             String responseGetNumber = methodsHubService.getNumber(apiKey, service, operator, country);
 
-            List<String> badStatuses = Arrays.asList("BAD_ACTION", "BAD_SERVICE", "ERROR_SQL");
+            List<String> badResponse = Arrays.asList("BAD_ACTION", "BAD_SERVICE", "ERROR_SQL");
 
-            if(badStatuses.contains(responseGetNumber)) {
+            if(badResponse.contains(responseGetNumber)) {
                 return ResponseEntity.badRequest().body(responseGetNumber);
             } else {
                 return ResponseEntity.ok(responseGetNumber);
@@ -90,27 +90,32 @@ public class SmsApi {
 
         } else if(action.equals("getStatus")){ // GET_STATUS
 
-            String responseGetStatus = methodsHubService.getStatus(id);
+            String responseGetStatus = methodsHubService.getStatus(idActivation);
 
-            List<String> badStatuses = Arrays.asList("BAD_ACTION", "NO_ACTIVATION", "ERROR_SQL");
+            List<String> badResponse = Arrays.asList("BAD_ACTION", "NO_ACTIVATION", "ERROR_SQL");
 
-            if(badStatuses.contains(responseGetStatus)) {
+            if(badResponse.contains(responseGetStatus)) {
                 return ResponseEntity.badRequest().body(responseGetStatus);
             } else {
                 return ResponseEntity.ok(responseGetStatus);
             }
 
         } else if(action.equals("getSms")) {
-            SmsDTO smsDTO = methodsHubService.getSms(apiKey, id.get());
+            SmsDTO smsDTO = methodsHubService.getSms(apiKey, idActivation.get());
 
             return ResponseEntity.ok(smsDTO);
 
 
         } else if (action.equals("setStatus")) {
 
-//            String responseSetStatus = methodsHubService.setStatus(status, id);
+            String responseSetStatus = methodsHubService.setStatus(status, idActivation);
 
-            return ResponseEntity.ok().build();
+            List<String> badResponse = Arrays.asList("ERROR_SQL", "BAD_SERVICE", "BAD_ACTION", "NO_ACTIVATION");
+            if(badResponse.contains(responseSetStatus)) {
+                return ResponseEntity.badRequest().body(responseSetStatus);
+            }
+
+            return ResponseEntity.ok(responseSetStatus);
         }
 
         //"Consulta geral malformada"

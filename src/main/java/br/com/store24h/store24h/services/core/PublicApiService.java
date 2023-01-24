@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -241,6 +242,90 @@ public class PublicApiService {
         }
     }
 
+    public String setStatus(Optional<Integer> status, Optional<Long> idActivation) {
+
+        // POSSÍVEIS ERROS
+        List<Integer> acceptedStatus = Arrays.asList(1, 3, 6, 8);
+        if(!acceptedStatus.contains(status) || !idActivation.isPresent()) { // BAD_ACTION
+//            1 - Notificar que o SMS foi enviado (optional)
+//            ACCESS_READY -- prontidão de espera SMS
+
+//            3 - Solicitar outro SMS
+//            ACCESS_RETRY_GET -- Esperamos um novo SMS
+
+//            6 - Confirme o código SMS e conclua a ativação
+//            ACCESS_ACTIVATION -- Ativação concluída com sucesso
+
+//            8 - Cancelar ativação
+//            ACCESS_CANCEL -- Ativação cancelada
+            return "BAD_ACTION";
+        }
+
+        int statusCode = status.get();
+
+        if(false) { // BAD_SERVICE
+            //nome de serviço incorreto
+
+            return "BAD_SERVICE";
+        }
+
+        Optional<Activation> activationOptional;
+        try {
+             activationOptional = activationRepository.findById(idActivation.get());
+             if(!activationOptional.isPresent()) {
+                 return "NO_ATIVATION";
+             }
+        } catch (Exception e) {
+            return "ERROR_SQL";
+        }
+
+        // RESPOSTAS DO SERVIDOR
+        Activation activation = activationOptional.get();
+        if (statusCode == 1) { // ACCESS_READY
+            // Prontidão de espera de SMS
+            try {
+                activation.setStatus(1);
+                activationRepository.save(activation);
+
+                return "ACCESS_READY";
+            } catch (Exception e) {
+                return "ERROR_SQL";
+            }
+
+        } else if (statusCode == 3) { // ACCESS_RETRY_GET
+            // Esperamos um novo SMS
+            try {
+                activation.setStatus(3);
+                activationRepository.save(activation);
+
+                return "ACCESS_RETRY_GET";
+            } catch (Exception e) {
+                return "ERROR_SQL";
+            }
+
+        } else if (statusCode == 8) { // ACCESS_CANCEL
+            // Ativação cancelada
+            try {
+                activation.setStatus(8);
+                activationRepository.save(activation);
+
+                return "ACCESS_CANCEL";
+            } catch (Exception e) {
+                return "ERROR_SQL";
+            }
+
+        } else { // ACCESS_ACTIVATION
+            try {
+                activation.setStatus(6);
+                activationRepository.save(activation);
+
+                return "ACCESS_ACTIVATION";
+            } catch (Exception e) {
+                return "ERROR_SQL";
+            }
+        }
+    }
+
     public ResponseEntity<Object> getNumberStatus(String country, String operator) {
         JSONObject myJson = new JSONObject();
 
@@ -267,49 +352,6 @@ public class PublicApiService {
         myJson.put("av_0", 99);
 
         return ResponseEntity.ok().body(myJson);
-    }
-
-    public ResponseEntity<?> setStatus(Optional<String> status, Optional<Long> id) {
-        JSONObject myJson = new JSONObject();
-
-
-        // POSSÍVEIS ERROS
-        if(false) { // BAD_ACTION
-//            1 - Notify that SMS has been sent (optional)
-//            3 - Request another SMS
-//            6 - Confirm SMS code and complete activation
-//            8 - Cancel activation
-            myJson.put("BAD_ACTION", "Consulta geral malformada");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if(false) { // BAD_SERVICE
-            myJson.put("BAD_SERVICE", "nome de serviço incorreto");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if(false) { // NO_ATIVATION
-            myJson.put("NO_ATIVATION", "ID de ativação não existe");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if(false) { // ERROR_SQL
-            myJson.put("ERROR_SQL", "Erro no banco de dados do servidor SQL, entre em contato com seu administrador");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-
-        // RESPOSTAS DO SERVIDOR
-        if (false) { // ACCESS_READY
-            myJson.put("ACCESS_READY", "Prontidão de espera de SMS");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if (false) { // ACCESS_RETRY_GET
-            myJson.put("ACCESS_RETRY_GET", "Esperamos um novo SMS");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if (false) { // ACCESS_CANCEL
-            myJson.put("ACCESS_CANCEL", "Ativação cancelada");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-
-        return ResponseEntity.ok().body("new StatusPost()");
     }
 
     public ResponseEntity<?> getPrices(String service, String country) {
