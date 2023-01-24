@@ -55,7 +55,7 @@ public class SmsApi {
     @GetMapping
     public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
                                              Optional<String> country, Optional<String> operator, Optional<String> service,
-                                             Optional<Long> idActivation, Optional<Integer> status) throws NoSuchMethodException {
+                                             Optional<Long> id, Optional<Integer> status) throws NoSuchMethodException {
 
         String responseAPI = "";
 
@@ -90,7 +90,7 @@ public class SmsApi {
 
         } else if(action.equals("getStatus")){ // GET_STATUS
 
-            String responseGetStatus = methodsHubService.getStatus(idActivation);
+            String responseGetStatus = methodsHubService.getStatus(id);
 
             List<String> badResponse = Arrays.asList("BAD_ACTION", "NO_ACTIVATION", "ERROR_SQL");
 
@@ -101,14 +101,14 @@ public class SmsApi {
             }
 
         } else if(action.equals("getSms")) {
-            SmsDTO smsDTO = methodsHubService.getSms(apiKey, idActivation.get());
+            SmsDTO smsDTO = methodsHubService.getSms(apiKey, id.get());
 
             return ResponseEntity.ok(smsDTO);
 
 
         } else if (action.equals("setStatus")) {
 
-            String responseSetStatus = methodsHubService.setStatus(status, idActivation);
+            String responseSetStatus = methodsHubService.setStatus(status, id);
 
             List<String> badResponse = Arrays.asList("ERROR_SQL", "BAD_SERVICE", "BAD_ACTION", "NO_ACTIVATION");
             if(badResponse.contains(responseSetStatus)) {
