@@ -3,10 +3,7 @@ package br.com.store24h.store24h.services.core;
 import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.dto.SmsDTO;
 import br.com.store24h.store24h.model.*;
-import br.com.store24h.store24h.repository.ActivationRepository;
-import br.com.store24h.store24h.repository.ChipRepository;
-import br.com.store24h.store24h.repository.SmsRepository;
-import br.com.store24h.store24h.repository.UserDbRepository;
+import br.com.store24h.store24h.repository.*;
 import br.com.store24h.store24h.services.CompraService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +51,9 @@ public class PublicApiService {
 
     @Autowired
     private ActivationService activationService;
+
+    @Autowired
+    private ServicosDbRepository servicosDbRepository;
 
     @Autowired
     private EntityManager em;
@@ -354,13 +354,28 @@ public class PublicApiService {
         return ResponseEntity.ok().body(myJson);
     }
 
-    public ResponseEntity<?> getPrices(String service, String country) {
-        JSONObject myJson = new JSONObject();
+    public List<Object> getPrices(Optional<String> service, Optional<String> country) {
+        List<Object> servicosPricesList = new ArrayList<>();
+//        {"Country":
+//            {"Service":
+//                {"Price": Quantity}
+//            }
+//        }
 
-        myJson.put("Price", "15,50");
-        myJson.put("Service", service);
-        myJson.put("country", country);
+        if(!service.isPresent() && !country.isPresent()) {
+            List<Servico> servicoList = servicosDbRepository.findAll();
+            for(Servico s: servicoList) {
+                JSONObject priceMyJson = new JSONObject();
+                Object priceJson = priceMyJson.put("Price", s.getPrice());
+                JSONObject serviceMyJson = new JSONObject();
+                Object serviceJson = serviceMyJson.put(s.getName(), priceJson);
+                JSONObject myJson = new JSONObject();
+                myJson.put("Brasil", serviceJson);
 
-        return ResponseEntity.ok().body(myJson);
+                servicosPricesList.add(myJson);
+            }
+        }
+
+        return servicosPricesList;
     }
 }
