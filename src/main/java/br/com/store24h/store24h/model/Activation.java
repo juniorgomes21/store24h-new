@@ -1,6 +1,7 @@
 package br.com.store24h.store24h.model;
 
 import br.com.store24h.store24h.services.StatusService;
+import br.com.store24h.store24h.services.core.ActivationStatus;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -22,12 +23,16 @@ public class Activation implements Serializable {
     private String serviceName;
     @NotBlank
     private String aliasService;
-//    @NotBlank
+    //    @NotBlank
     private String apiKey;
+    private String serviceNumber;
     private String chipNumber; // uma hora fica inválido e enquanto válido, segue abaixo. É o numero usado para esta ativação
-//    private String siteNumber; // numero usado pelo site onde se tenta realizar o serviço
-
-    private StatusService statusBuz = StatusService.SOLICITADA; // SOLICITADA e com ID fornecida | NUMERO_FORNECIDO |
+    //    private String siteNumber; // numero usado pelo site onde se tenta realizar o serviço
+//    SOLICITADA(2),
+//    AGUARDANDO_MENSAGENS(3),
+//    FINALIZADA(5),
+//    CANCELADA(7);
+    private ActivationStatus statusBuz = ActivationStatus.SOLICITADA; // SOLICITADA e com ID fornecida | NUMERO_FORNECIDO |
     // AGUARDANDO_MENSAGENS | FINALIZADA | CANCELADA
     @ElementCollection
     @CollectionTable(name = "sms_string_models", joinColumns = @JoinColumn(name = "activation_id"))
@@ -105,7 +110,7 @@ public class Activation implements Serializable {
 ////                    throw new RuntimeException(Activation.class.getName() + " : Para finalizar deve existir algum sms");
 //            resp = true;
 //            this.setEndTime(LocalDateTime.now());
-//            this.statusBuz = StatusService.FINALIZADA;
+//            this.statusBuz = ActivationStatus.FINALIZADA;
 //        }
 //        return resp;
 //    };
@@ -115,7 +120,7 @@ public class Activation implements Serializable {
      * @return
      */
     public boolean cancelService() {
-        statusBuz = StatusService.CANCELADA;
+        statusBuz = ActivationStatus.CANCELADA;
         return true;
     };
 
@@ -123,7 +128,7 @@ public class Activation implements Serializable {
     public String toString() {
         return "Activation{" +
                 "serviceName='" + serviceName + '\'' +
-                ", apiKey='" + apiKey + '\'' +
+                ", serviceNumber='" + serviceNumber + '\'' +
                 ", chipNumber='" + chipNumber + '\'' +
                 ", statusBuz=" + statusBuz +
                 ", smsStringModels=" + smsStringModels +
@@ -132,6 +137,26 @@ public class Activation implements Serializable {
                 ", endTime=" + endTime +
                 ", status=" + status +
                 '}';
+    }
+
+    public String getServiceNumber() {
+        return serviceNumber;
+    }
+
+    public void setServiceNumber(String serviceNumber) {
+        this.serviceNumber = serviceNumber;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public void setStatusBuz(ActivationStatus statusBuz) {
+        this.statusBuz = statusBuz;
     }
 
     public long getId() {
@@ -158,7 +183,7 @@ public class Activation implements Serializable {
         return chipNumber;
     }
 
-    public StatusService getStatusBuz() {
+    public ActivationStatus getStatusBuz() {
         return statusBuz;
     }
 
