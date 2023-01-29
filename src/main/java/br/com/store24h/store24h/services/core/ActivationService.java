@@ -2,7 +2,6 @@ package br.com.store24h.store24h.services.core;
 
 import br.com.store24h.store24h.model.Activation;
 import br.com.store24h.store24h.model.Servico;
-import br.com.store24h.store24h.model.SmsModel;
 import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.ActivationRepository;
 import br.com.store24h.store24h.repository.SmsRepository;
@@ -23,13 +22,17 @@ public class ActivationService {
     @Autowired
     private SmsRepository smsRepository;
 
+    @Autowired
+    private ServiceMapAlg serviceMapAlg;
+
     @Transactional
     public Long newActivation(User user, Servico servico, String chipNumber) {
         try {
 //            TODO tirar daqui
             compraService.buyService(user, servico, chipNumber);
             Activation activation = new Activation(servico.getName(), servico.getAlias(), chipNumber);
-
+            activation.setStatusBuz(ActivationStatus.AGUARDANDO_MENSAGENS);
+//            activation.setServiceNumber(serviceMapAlg.getRegxByAlias(servico.getAlias()));
             smsRepository.deleteByChipnumber(chipNumber);
             return activationRepository.save(activation).getId();
         } catch (Exception e) {
