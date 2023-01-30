@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface ActivationRepository extends JpaRepository<Activation, Long> {
 
     Optional<Activation> findById(Long id);
+    Optional<Activation> findByChipNumberAndAliasService(String chipNumber, String aliasService);
     List<Activation> findByChipNumber(String chipNumber);
     List<Activation> findByStatusBuz(ActivationStatus activationStatus);
     List<Activation> findAllByStatusBuzAndChipNumber(ActivationStatus activationStatus, String chipNumber);

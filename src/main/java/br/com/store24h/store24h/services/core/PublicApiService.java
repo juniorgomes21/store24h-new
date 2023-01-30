@@ -115,12 +115,27 @@ public class PublicApiService {
             return "ERROR_SQL";
         }
 
+        ChipModel chipModel = null;
+
         // RESPOSTAS DO SERVIDOR - BUZ
         if (numeroDisponivelList.isEmpty()) { // NO_NUMBERS
             // "Não há números com os parâmetros especificados, tente novamente mais tarde ou altere a operadora"
             responseAPI = "NO_NUMBERS";
 
             return responseAPI;
+        } else {
+            for(ChipModel cm: numeroDisponivelList) {
+                Optional<Activation> activationOptional = activationRepository.findByChipNumberAndAliasService(cm.getNumber(), service.get());
+                if(!activationOptional.isPresent()) {
+                    chipModel = cm;
+                    break;
+                }
+            }
+
+            if (chipModel == null) {
+                responseAPI = "NO_NUMBERS";
+                return responseAPI;
+            }
         }
 
         User user = userDbRepository.findByApiKey(apiKey).get();
@@ -135,21 +150,21 @@ public class PublicApiService {
 
         Long idActivation;
         try {
-            idActivation = activationService.newActivation(user, servicoOptional.get(), numeroDisponivelList.get(0).getNumber());
+            idActivation = activationService.newActivation(user, servicoOptional.get(), chipModel.getNumber());
         } catch (Exception e) {
             return "ERROR_SQL";
         }
 
-        responseAPI = "ACCESS_NUMBER:" + idActivation + ":" + numeroDisponivelList.get(0).getNumber();
+        responseAPI = "ACCESS_NUMBER:" + idActivation + ":" + chipModel.getNumber();
 
-        ChipModel chipModel;
-        try {
-            chipModel = chipRepository.findByNumber(numeroDisponivelList.get(0).getNumber());
-            chipModel.setAlugado(true);
-            chipRepository.save(chipModel);
-        } catch (Exception e) {
-            return "ERROR_SQL";
-        }
+        // Coloca o chip como alugado.
+//        try {
+//            chipModel = chipRepository.findByNumber(chipModel.getNumber());
+//            chipModel.setAlugado(true);
+//            chipRepository.save(chipModel);
+//        } catch (Exception e) {
+//            return "ERROR_SQL";
+//        }
 
         return responseAPI;
     }

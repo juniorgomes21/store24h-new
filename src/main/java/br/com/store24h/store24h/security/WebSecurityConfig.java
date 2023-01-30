@@ -56,6 +56,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                 .and()
                     .authorizeRequests()
+                //Auxiliar
+                .antMatchers("/aux/delete/registros/acivations&chipModelFalse").permitAll()
                 //Padrão API ADM
                 .antMatchers("/stubs/handler_api/ping").permitAll()
                 .antMatchers("/stubs/handler_api/getSms").permitAll()

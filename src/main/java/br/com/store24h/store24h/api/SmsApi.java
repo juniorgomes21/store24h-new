@@ -137,7 +137,9 @@ public class SmsApi {
             if(!userService.isValidApiKey(apiKey)) {
                 return ResponseEntity.badRequest().build();
             }
+
             Activation activation = activationRepository.findById(id).get();
+            activation.setAliasService(activation.getAliasService() + "_cancel");
             activation.setStatus(8);
             activationRepository.save(activation);
 
