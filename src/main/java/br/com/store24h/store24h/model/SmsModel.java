@@ -20,11 +20,12 @@ import java.util.Objects;
         @Index(name = "idx_chipnumber", columnList = "chipnumber")})
 public class SmsModel implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	@Id
+    private static final long serialVersionUID = 1L;
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(unique = true, nullable = false)
+    private Long idActivation;
     private String msg;
     @Column(nullable = false)
     private String emissor;
@@ -47,6 +48,14 @@ public class SmsModel implements Serializable {
 
     public SmsModel() {
 
+    }
+
+    public Long getIdActivation() {
+        return idActivation;
+    }
+
+    public void setIdActivation(Long idActivation) {
+        this.idActivation = idActivation;
     }
 
     public String getChipnumber() {
