@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public interface SmsRepository extends JpaRepository<SmsModel, Long>{
     Optional<List<SmsModel>> findByChipnumber(String chipnumber);
+    Optional<SmsModel> findByChipnumberAndIdActivation(String chipnumber, Long idActivation);
+
     Optional<List<SmsModel>> findByChipnumber(String chipnumber, Pageable pageable);
     Optional<List<SmsModel>> findByMsgContaining(String parteNome);
     void deleteByChipnumber(String chipNumber);

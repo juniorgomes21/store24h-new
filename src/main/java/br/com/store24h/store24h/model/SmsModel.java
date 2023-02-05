@@ -16,8 +16,8 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "sms_model", indexes = {
-        @Index(name = "idx_emissor", columnList = "emissor"),
-        @Index(name = "idx_chipnumber", columnList = "chipnumber")})
+@Index(name = "idx_emissor", columnList = "emissor"),
+@Index(name = "idx_chipnumber", columnList = "chipnumber")})
 public class SmsModel implements Serializable {
 
     private static final long serialVersionUID = 1L;

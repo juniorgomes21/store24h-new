@@ -20,9 +20,8 @@ public interface ChipRepository extends JpaRepository<ChipModel, Long> {
     ChipModel findByNumber(String number);
     Optional<List<ChipModel>> findByAlugado(Boolean value);
     Optional<List<ChipModel>> findByAtivo(Boolean value);
-    Optional<List<ChipModel>> findByAlugadoAndAtivo(Boolean alugado, Boolean ativo);
-    List<ChipModel> findByAlugadoAndAtivo(Boolean alugado, Boolean ativo, Pageable pageable);
-    Optional<List<ChipModel>> findByAlugadoAndAtivoAndOperadora(Boolean alugado, Boolean ativo, String operator);
+    List<ChipModel> findByAlugadoAndAtivo(Boolean alugado, Boolean ativo);
+    List<ChipModel> findByAlugadoAndAtivoAndOperadora(Boolean alugado, Boolean ativo, String operator);
     List<ChipModel> findByAlugadoAndAtivoAndOperadora(Boolean alugado, Boolean ativo, String operator, Pageable pageable);
 
 }

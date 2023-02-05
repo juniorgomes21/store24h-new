@@ -102,14 +102,13 @@ public class PublicApiService {
             return responseAPI;
         }
 
-        Pageable pageable = PageRequest.of(0, 1);
         List<ChipModel> numeroDisponivelList = null;
 
         try {
             if(operator.isPresent()) {
-                numeroDisponivelList = chipRepository.findByAlugadoAndAtivoAndOperadora(false, true, operator.get(), pageable);
+                numeroDisponivelList = chipRepository.findByAlugadoAndAtivoAndOperadora(false, true, operator.get());
             } else {
-                numeroDisponivelList = chipRepository.findByAlugadoAndAtivo(false, true, pageable);
+                numeroDisponivelList = chipRepository.findByAlugadoAndAtivo(false, true);
             }
         } catch (Exception e) {
             return "ERROR_SQL";
@@ -171,21 +170,18 @@ public class PublicApiService {
 
     public SmsDTO getSms(String apiKey, Long idActivation) {
         Activation activation = activationRepository.getById(idActivation);
-//        Optional<List<SmsModel>> smsModelList = smsRepository.findByDateAfter(activation.getInitialTime());
-        Optional<List<SmsModel>> smsModelList = Optional.of(new ArrayList<>());
+//        Optional<List<SmsModel>> smsModel = smsRepository.findByDateAfter(activation.getInitialTime());
+        Optional<SmsModel> smsModel = Optional.of(new SmsModel());
         if(activation.getSmsStringModels().size() == 0) {
-            Pageable pageable = PageRequest.of(0, 1, Sort.by("date").descending());
             String num = activation.getChipNumber();
-
-            System.out.println(activation);
-            smsModelList = smsRepository.findByChipnumber(activation.getChipNumber(), pageable);
+            smsModel = smsRepository.findByChipnumberAndIdActivation(activation.getChipNumber(), idActivation);
         }
 
         SmsDTO smsDTO = new SmsDTO();
 
-        if(smsModelList.get().size() != 0) {
+        if(smsModel.isPresent() && !smsModel.get().getMsg().isEmpty()) {
             activation.setStatus(7);
-            String ss = smsModelList.get().get(0).getMsg();
+            String ss = smsModel.get().getMsg();
             activation.getSmsStringModels().add(ss);
 
             //TODO criar uma função para timeZone
@@ -196,9 +192,9 @@ public class PublicApiService {
 
             activationRepository.save(activation);
 
-            ChipModel chip = chipRepository.findByNumber(activation.getChipNumber());
-            chip.setAlugado(false);
-            chipRepository.save(chip);
+//            ChipModel chip = chipRepository.findByNumber(activation.getChipNumber());
+//            chip.setAlugado(false);
+//            chipRepository.save(chip);
 
             smsDTO.getSmsList().add(ss);
             smsDTO.setNameService(activation.getServiceName());
