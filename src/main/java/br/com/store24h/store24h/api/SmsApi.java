@@ -4,6 +4,7 @@ import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.dto.SmsDTO;
 import br.com.store24h.store24h.model.*;
 import br.com.store24h.store24h.repository.*;
+import br.com.store24h.store24h.services.core.ActivationStatus;
 import br.com.store24h.store24h.services.core.PublicApiService;
 import br.com.store24h.store24h.services.UserService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -119,9 +120,11 @@ public class SmsApi {
             }
 
             return ResponseEntity.ok(responseSetStatus);
-        } else if (action.equals("getPrice")) {
-            List<Object> responseGetPrice = methodsHubService.getPrices(service, country);
-
+        } else if (action.equals("getPrices")) {
+            Object responseGetPrice = methodsHubService.getPrices(service, country);
+            if(responseGetPrice == null) {
+                return ResponseEntity.badRequest().build();
+            }
             return ResponseEntity.ok(responseGetPrice);
         }
 
@@ -129,6 +132,25 @@ public class SmsApi {
         responseAPI = "BAD_ACTION";
 
         return ResponseEntity.badRequest().body(responseAPI);
+    }
+
+    @PostMapping("/conclude/activation/{id}")
+    public ResponseEntity<Object> concludeActivation(@RequestParam("api_key") String apiKey, @PathVariable Long id) {
+        try {
+            if(!userService.isValidApiKey(apiKey)) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            Activation activation = activationRepository.findById(id).get();
+            activation.setAliasService(activation.getAliasService() + "_finalizada");
+            activation.setStatus(6);
+            activation.setStatusBuz(ActivationStatus.FINALIZADA);
+            activationRepository.save(activation);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/cancel/activation/{id}")
@@ -142,10 +164,6 @@ public class SmsApi {
             activation.setAliasService(activation.getAliasService() + "_cancel");
             activation.setStatus(8);
             activationRepository.save(activation);
-
-            ChipModel chipModel = chipRepository.findByNumber(activation.getChipNumber());
-            chipModel.setAlugado(false);
-            chipRepository.save(chipModel);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {

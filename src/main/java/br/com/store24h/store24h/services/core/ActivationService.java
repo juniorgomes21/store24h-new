@@ -32,9 +32,9 @@ public class ActivationService {
             compraService.buyService(user, servico, chipNumber);
             Activation activation = new Activation(servico.getName(), servico.getAlias(), chipNumber);
             activation.setStatusBuz(ActivationStatus.AGUARDANDO_MENSAGENS);
-//            activation.setServiceNumber(serviceMapAlg.getRegxByAlias(servico.getAlias()));
             smsRepository.deleteByChipnumber(chipNumber);
             return activationRepository.save(activation).getId();
+
         } catch (Exception e) {
             e.printStackTrace();
             return null;

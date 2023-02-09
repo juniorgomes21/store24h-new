@@ -365,28 +365,34 @@ public class PublicApiService {
         return ResponseEntity.ok().body(myJson);
     }
 
-    public List<Object> getPrices(Optional<String> service, Optional<String> country) {
-        List<Object> servicosPricesList = new ArrayList<>();
-//        {"Country":
-//            {"Service":
-//                {"Price": Quantity}
-//            }
-//        }
+    public Object getPrices(Optional<String> service, Optional<String> country) {
+        if(service.isPresent()) {
+            JSONObject myJson = new JSONObject();
+            Optional<Servico> servicoOptional = servicosDbRepository.findByAlias(service.get());
+            JSONObject serviceMyJson = new JSONObject();
+            if(servicoOptional.isPresent()) {
+                Servico s = servicoOptional.get();
+                JSONObject priceMyJson = new JSONObject();
+                priceMyJson.put("cost", s.getPrice());
+                priceMyJson.put("count", s.getTotalQuantity());
+                serviceMyJson.put(s.getAlias(), priceMyJson);
+                myJson.put("73", serviceMyJson);
+            }
 
-        if(!service.isPresent() && !country.isPresent()) {
+            return myJson;
+        } else {
             List<Servico> servicoList = servicosDbRepository.findAll();
+            JSONObject myJson = new JSONObject();
+            JSONObject serviceMyJson = new JSONObject();
             for(Servico s: servicoList) {
                 JSONObject priceMyJson = new JSONObject();
-                Object priceJson = priceMyJson.put("Price", s.getPrice());
-                JSONObject serviceMyJson = new JSONObject();
-                Object serviceJson = serviceMyJson.put(s.getName(), priceJson);
-                JSONObject myJson = new JSONObject();
-                myJson.put("Brasil", serviceJson);
-
-                servicosPricesList.add(myJson);
+                priceMyJson.put("cost", s.getPrice());
+                priceMyJson.put("count", s.getTotalQuantity());
+                serviceMyJson.put(s.getAlias(), priceMyJson);
             }
-        }
+            myJson.put("73", serviceMyJson);
 
-        return servicosPricesList;
+            return myJson;
+        }
     }
 }
