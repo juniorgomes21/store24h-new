@@ -1,8 +1,7 @@
 package br.com.store24h.store24h.services;
 
-import br.com.store24h.store24h.model.Servico;
 import br.com.store24h.store24h.model.User;
-import br.com.store24h.store24h.repository.ServicosDbRepository;
+import br.com.store24h.store24h.repository.ServicosRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -16,7 +15,7 @@ public class UserService {
     private UserDbRepository userDbRepository;
 
     @Autowired
-    private ServicosDbRepository servicosDbRepository;
+    private ServicosRepository servicosRepository;
 
     public User userLogado(Authentication authentication) {
         User user = null;
@@ -36,6 +35,7 @@ public class UserService {
 
         userDbRepository.save(user);
     }
+
     public boolean testPassword(String password, Authentication authentication) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         User user = this.userLogado(authentication);

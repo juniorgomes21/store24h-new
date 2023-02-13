@@ -2,8 +2,11 @@ package br.com.store24h.store24h.api;
 
 import br.com.store24h.store24h.model.Activation;
 import br.com.store24h.store24h.model.ChipModel;
+import br.com.store24h.store24h.model.Servico;
 import br.com.store24h.store24h.repository.ActivationRepository;
 import br.com.store24h.store24h.repository.ChipRepository;
+import br.com.store24h.store24h.repository.ServicosRepository;
+import br.com.store24h.store24h.services.SvsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/aux")
+@RequestMapping("/stubs/handler_api/aux")
 public class Auxiliar {
 
     @Autowired
@@ -23,6 +26,12 @@ public class Auxiliar {
 
     @Autowired
     private ChipRepository chipRepository;
+
+    @Autowired
+    private ServicosRepository servicosRepository;
+
+    @Autowired
+    private SvsService svsService;
 
     @Transactional
     @PostMapping("/delete/registros/acivations&chipModelFalse")
@@ -44,5 +53,26 @@ public class Auxiliar {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @PostMapping("/setQuantityFor0AllService")
+    public ResponseEntity<Object> setQuantityFor0AllService() {
+        List<Servico> servicoList = servicosRepository.findAll();
+
+        servicoList.forEach( servico -> {
+            servico.setTotalQuantity(0);
+        });
+
+        servicosRepository.saveAll(servicoList);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/verifyNewChipNumber")
+    public ResponseEntity<Object> verifyNewChipNumber() {
+
+        svsService.countService();
+
+        return ResponseEntity.ok().build();
     }
 }

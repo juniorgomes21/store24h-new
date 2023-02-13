@@ -19,7 +19,7 @@ import java.util.Optional;
 public interface ChipRepository extends JpaRepository<ChipModel, Long> {
     ChipModel findByNumber(String number);
     Optional<List<ChipModel>> findByAlugado(Boolean value);
-    Optional<List<ChipModel>> findByAtivo(Boolean value);
+    List<ChipModel> findByAtivo(Boolean value);
     List<ChipModel> findByAlugadoAndAtivo(Boolean alugado, Boolean ativo);
     List<ChipModel> findByAlugadoAndAtivoAndOperadora(Boolean alugado, Boolean ativo, String operator);
     List<ChipModel> findByAlugadoAndAtivoAndOperadora(Boolean alugado, Boolean ativo, String operator, Pageable pageable);

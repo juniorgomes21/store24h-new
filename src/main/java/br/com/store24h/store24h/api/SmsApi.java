@@ -4,23 +4,15 @@ import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.dto.SmsDTO;
 import br.com.store24h.store24h.model.*;
 import br.com.store24h.store24h.repository.*;
+import br.com.store24h.store24h.services.SvsService;
 import br.com.store24h.store24h.services.core.ActivationStatus;
 import br.com.store24h.store24h.services.core.PublicApiService;
 import br.com.store24h.store24h.services.UserService;
-import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/stubs/handler_api")
@@ -36,7 +28,7 @@ public class SmsApi {
     private PaisOperadorasDbRepository paisRepository;
 
     @Autowired
-    private ServicosDbRepository servicosRepository;
+    private ServicosRepository servicosRepository;
 
     @Autowired
     private Funcionalidades funcionalidades;
@@ -55,6 +47,9 @@ public class SmsApi {
 
     @Autowired
     private ChipRepository chipRepository;
+
+    @Autowired
+    private SvsService svsService;
 
     @GetMapping
     public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
@@ -164,6 +159,8 @@ public class SmsApi {
             activation.setAliasService(activation.getAliasService() + "_cancel");
             activation.setStatus(8);
             activationRepository.save(activation);
+
+            svsService.addQuantity(activation.getServiceName());
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {

@@ -1,18 +1,15 @@
 package br.com.store24h.store24h.api;
 
-import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
 import br.com.store24h.store24h.Requisicoes.RequisicaoUpdateService;
 import br.com.store24h.store24h.dto.ErrorResponseDto;
-import br.com.store24h.store24h.dto.ServicoDto;
 import br.com.store24h.store24h.dto.ServicoDtoJunior;
 import br.com.store24h.store24h.model.CompraServiso;
 import br.com.store24h.store24h.model.Servico;
 import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.CompraServicoRepository;
-import br.com.store24h.store24h.repository.ServicosDbRepository;
+import br.com.store24h.store24h.repository.ServicosRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
-import br.com.store24h.store24h.response.ServiceResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,7 +26,7 @@ import java.util.*;
 @RequestMapping("/stubs/handler_api/apiServicos")
 public class ServicoApi {
     @Autowired
-    private ServicosDbRepository servicosRepository;
+    private ServicosRepository servicosRepository;
 
     @Autowired
     private UserDbRepository userDbRepository;

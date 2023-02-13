@@ -4,23 +4,19 @@ import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.dto.SmsDTO;
 import br.com.store24h.store24h.model.*;
 import br.com.store24h.store24h.repository.*;
+import br.com.store24h.store24h.services.ChipNumberControlService;
 import br.com.store24h.store24h.services.CompraService;
+import br.com.store24h.store24h.services.SvsService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,10 +28,7 @@ public class PublicApiService {
     private CompraService compraService;
 
     @Autowired
-    private UserDbRepository userDbRepository;
-
-    @Autowired
-    private ChipRepository chipRepository;
+    private ActivationService activationService;
 
     @Autowired
     private ServicesHubService servicesHubService;
@@ -44,16 +37,26 @@ public class PublicApiService {
     private Funcionalidades funcionalidades;
 
     @Autowired
+    private ChipNumberControlService controlService;
+
+    @Autowired
+    private SvsService svsService;
+
+    @Autowired
+    private UserDbRepository userDbRepository;
+
+    @Autowired
+    private ChipRepository chipRepository;
+
+
+    @Autowired
     private ActivationRepository activationRepository;
 
     @Autowired
     private SmsRepository smsRepository;
 
     @Autowired
-    private ActivationService activationService;
-
-    @Autowired
-    private ServicosDbRepository servicosDbRepository;
+    private ServicosRepository servicosRepository;
 
     @Autowired
     private EntityManager em;
@@ -126,6 +129,8 @@ public class PublicApiService {
             for(ChipModel cm: numeroDisponivelList) {
                 Optional<Activation> activationOptional = activationRepository.findByChipNumberAndAliasService(cm.getNumber(), service.get());
                 if(!activationOptional.isPresent()) {
+                    controlService.addServiceInNumber(cm.getNumber(), servicoOptional.get());
+                    svsService.subtractQuantity(servicoOptional.get());
                     chipModel = cm;
                     break;
                 }
@@ -368,7 +373,7 @@ public class PublicApiService {
     public Object getPrices(Optional<String> service, Optional<String> country) {
         if(service.isPresent()) {
             JSONObject myJson = new JSONObject();
-            Optional<Servico> servicoOptional = servicosDbRepository.findByAlias(service.get());
+            Optional<Servico> servicoOptional = servicosRepository.findByAlias(service.get());
             JSONObject serviceMyJson = new JSONObject();
             if(servicoOptional.isPresent()) {
                 Servico s = servicoOptional.get();
@@ -381,7 +386,7 @@ public class PublicApiService {
 
             return myJson;
         } else {
-            List<Servico> servicoList = servicosDbRepository.findAll();
+            List<Servico> servicoList = servicosRepository.findAll();
             JSONObject myJson = new JSONObject();
             JSONObject serviceMyJson = new JSONObject();
             for(Servico s: servicoList) {
