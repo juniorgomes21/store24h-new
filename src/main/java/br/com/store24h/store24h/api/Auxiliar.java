@@ -1,6 +1,5 @@
 package br.com.store24h.store24h.api;
 
-import br.com.store24h.store24h.model.Activation;
 import br.com.store24h.store24h.model.ChipModel;
 import br.com.store24h.store24h.model.Servico;
 import br.com.store24h.store24h.repository.ActivationRepository;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/stubs/handler_api/aux")
+@RequestMapping("/aux")
 public class Auxiliar {
 
     @Autowired
@@ -71,7 +70,7 @@ public class Auxiliar {
     @PostMapping("/verifyNewChipNumber")
     public ResponseEntity<Object> verifyNewChipNumber() {
 
-        svsService.countService();
+        svsService.countServiceAdd();
 
         return ResponseEntity.ok().build();
     }
