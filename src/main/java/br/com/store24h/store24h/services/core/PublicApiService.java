@@ -48,6 +48,8 @@ public class PublicApiService {
     @Autowired
     private ChipRepository chipRepository;
 
+    @Autowired
+    private ChipNumberControlRepository chipNumberControlRepository;
 
     @Autowired
     private ActivationRepository activationRepository;
@@ -127,8 +129,9 @@ public class PublicApiService {
             return responseAPI;
         } else {
             for(ChipModel cm: numeroDisponivelList) {
-                Optional<Activation> activationOptional = activationRepository.findByChipNumberAndAliasService(cm.getNumber(), service.get());
-                if(!activationOptional.isPresent()) {
+//                Optional<Activation> activationOptional = activationRepository.findByChipNumberAndAliasService(cm.getNumber(), service.get());
+                Optional<ChipNumberControl> chipNumberControlOptional = chipNumberControlRepository.findByChipNumberAndAliasService(cm.getNumber(), service.get());
+                if(!chipNumberControlOptional.isPresent()) {
                     controlService.addServiceInNumber(cm.getNumber(), servicoOptional.get());
                     svsService.subtractQuantity(servicoOptional.get());
                     chipModel = cm;

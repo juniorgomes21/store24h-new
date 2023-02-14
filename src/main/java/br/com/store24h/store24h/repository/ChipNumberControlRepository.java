@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ChipNumberControlRepository extends JpaRepository<ChipNumberControl, Long> {
     Optional<ChipNumberControl> findByChipNumber(String chipNumber);
+
+    Optional<ChipNumberControl> findByChipNumberAndAliasService(String chipNumber, String aliasService);
 }

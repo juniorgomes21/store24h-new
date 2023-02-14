@@ -152,4 +152,5 @@ public class Servico implements Serializable {
     public void setWork(boolean work) {
         this.work = work;
     }
+
 }

@@ -59,6 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //Auxiliar
                 .antMatchers("/aux/delete/registros/acivations&chipModelFalse").permitAll()
                 .antMatchers("/aux/setQuantityFor0AllService").permitAll()
+                .antMatchers("/aux/verifyInvalidChipNumber").permitAll()
                 .antMatchers("/aux/verifyNewChipNumber").permitAll()
 
                 //Padrão API ADM

@@ -1,8 +1,8 @@
 package br.com.store24h.store24h.api;
 
 import br.com.store24h.store24h.model.ChipModel;
-import br.com.store24h.store24h.model.Servico;
 import br.com.store24h.store24h.repository.ActivationRepository;
+import br.com.store24h.store24h.repository.ChipNumberControlRepository;
 import br.com.store24h.store24h.repository.ChipRepository;
 import br.com.store24h.store24h.repository.ServicosRepository;
 import br.com.store24h.store24h.services.SvsService;
@@ -30,6 +30,9 @@ public class Auxiliar {
     private ServicosRepository servicosRepository;
 
     @Autowired
+    private ChipNumberControlRepository controlRepository;
+
+    @Autowired
     private SvsService svsService;
 
     @Transactional
@@ -42,11 +45,19 @@ public class Auxiliar {
             List<ChipModel> chipModels = new ArrayList<>();
 
             for(ChipModel cm: chipModelList) {
-                cm.setAlugado(false);
-                chipModels.add(cm);
+                if(cm.getAtivo() == true) {
+                    cm.setAlugado(false);
+                    cm.setAtivo(false);
+                    chipModels.add(cm);
+                }
             }
 
             chipRepository.saveAll(chipModels);
+
+            svsService.subtractQuantityFor0All();
+            svsService.countServiceAddForAll();
+
+            controlRepository.deleteAll();
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -56,13 +67,8 @@ public class Auxiliar {
 
     @PostMapping("/setQuantityFor0AllService")
     public ResponseEntity<Object> setQuantityFor0AllService() {
-        List<Servico> servicoList = servicosRepository.findAll();
 
-        servicoList.forEach( servico -> {
-            servico.setTotalQuantity(0);
-        });
-
-        servicosRepository.saveAll(servicoList);
+        svsService.subtractQuantityFor0All();
 
         return ResponseEntity.ok().build();
     }
@@ -70,7 +76,15 @@ public class Auxiliar {
     @PostMapping("/verifyNewChipNumber")
     public ResponseEntity<Object> verifyNewChipNumber() {
 
-        svsService.countServiceAdd();
+        svsService.countServiceAddForAll();
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/verifyInvalidChipNumber")
+    public ResponseEntity<Object> verifyInvalidChipNumber() {
+
+        svsService.countServiceSubtract();
 
         return ResponseEntity.ok().build();
     }

@@ -18,6 +18,7 @@ import java.util.Optional;
  */
 public interface ChipRepository extends JpaRepository<ChipModel, Long> {
     List<ChipModel> findByStatus(int status);
+    List<ChipModel> findByAtivoAndStatus(boolean ativo, int status);
     ChipModel findByNumber(String number);
     Optional<List<ChipModel>> findByAlugado(Boolean value);
     List<ChipModel> findByAtivo(Boolean value);

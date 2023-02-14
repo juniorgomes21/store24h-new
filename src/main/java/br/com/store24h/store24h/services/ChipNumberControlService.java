@@ -27,7 +27,7 @@ public class ChipNumberControlService {
             chipNumberControl = new ChipNumberControl();
             chipNumberControl.setChipNumber(chipNumber);
         }
-        chipNumberControl.getServicos().add(servico);
+        chipNumberControl.getAliasService().add(servico.getAlias());
         controlRepository.save(chipNumberControl);
     }
 }

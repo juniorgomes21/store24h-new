@@ -28,11 +28,13 @@ public class SvsService {
     @Autowired
     private ServicosRepository servicosRepository;
 
+    @Autowired
+    private ChipService chipService;
 
     @Scheduled(fixedRate = 240000) // 4min
-    public void countServiceAdd() {
+    public void countServiceAddForAll() {
 
-        List<ChipModel> chipModels = chipRepository.findByAtivo(false);
+        List<ChipModel> chipModels = chipRepository.findByAtivoAndStatus(false, 0);
         if(chipModels.isEmpty()) {
             return;
         }
@@ -46,12 +48,12 @@ public class SvsService {
             if(chipNumberControlOptional.isPresent()) {
                 ChipNumberControl chipNumberControl = chipNumberControlOptional.get();
 
-                List<Servico> chipNumberServicosList = chipNumberControl.getServicos();
+                List<String> chipNumberServicosList = chipNumberControl.getAliasService();
 
                 if(servicoList.size() > chipNumberServicosList.size()) {
                     // lógica para count +1 em serviço
                     servicoList.forEach( service -> {
-                        if(!chipNumberServicosList.contains(service)) {
+                        if(!chipNumberServicosList.contains(service.getAlias())) {
                             service.setTotalQuantity(service.getTotalQuantity() + 1);
                         }
                     });
@@ -64,12 +66,15 @@ public class SvsService {
                 servicoList.forEach(service -> {
                     service.setTotalQuantity(service.getTotalQuantity() + 1);
                 });
+
                 chipModel.setAtivo(true);
+                chipModel.setStatus(StatusChipModel.ACTIVITY.getStatus());
                 chipModelModify.add(chipModel);
             }
 
         });
 
+        chipRepository.saveAll(chipModelModify);
         servicosRepository.saveAll(servicoList);
 
     }
@@ -92,10 +97,10 @@ public class SvsService {
 
             if (controlOptional.isPresent()) {
                 ChipNumberControl control = controlOptional.get();
-                List<Servico> servicosControl = control.getServicos();
+                List<String> servicosControl = control.getAliasService();
                 List<Servico> servicosFiltered = servicos.stream().filter(servico ->
                                 servicosControl.stream().noneMatch(servicoControl ->
-                                        servicoControl.getAlias().equals(servico.getAlias())))
+                                        servicoControl.equals(servico.getAlias())))
                         .collect(Collectors.toList());
 
                 servicosFiltered.forEach( servicoFiltered -> {
@@ -122,6 +127,18 @@ public class SvsService {
         });
 
         servicosRepository.saveAll(servicos);
+    }
+
+    public void subtractQuantityFor0All() {
+        List<Servico> servicoList = servicosRepository.findAll();
+
+        servicoList.forEach( servico -> {
+            servico.setTotalQuantity(0);
+        });
+
+        servicosRepository.saveAll(servicoList);
+
+        chipService.reset();
     }
 
     public void subtractQuantity(Servico service) {

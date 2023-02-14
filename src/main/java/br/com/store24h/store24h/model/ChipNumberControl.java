@@ -9,10 +9,11 @@ public class ChipNumberControl {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
     private String chipNumber;
-    @OneToMany
-    private List<Servico> servicos = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "chip_number_control_alias_service", joinColumns = @JoinColumn(name = "chip_number_control_id"))
+    @Column(name = "alias_service")
+    private List<String> aliasService = new ArrayList<>();
 
     public ChipNumberControl() {
     }
@@ -29,11 +30,11 @@ public class ChipNumberControl {
         this.chipNumber = chipNumber;
     }
 
-    public List<Servico> getServicos() {
-        return servicos;
+    public List<String> getAliasService() {
+        return aliasService;
     }
 
-    public void setServicos(List<Servico> servicos) {
-        this.servicos = servicos;
+    public void setAliasService(List<String> aliasService) {
+        this.aliasService = aliasService;
     }
 }
