@@ -4,6 +4,7 @@ import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.dto.SmsDTO;
 import br.com.store24h.store24h.model.*;
 import br.com.store24h.store24h.repository.*;
+import br.com.store24h.store24h.services.ChipNumberControlService;
 import br.com.store24h.store24h.services.SvsService;
 import br.com.store24h.store24h.services.core.ActivationStatus;
 import br.com.store24h.store24h.services.core.PublicApiService;
@@ -50,6 +51,9 @@ public class SmsApi {
 
     @Autowired
     private SvsService svsService;
+
+    @Autowired
+    private ChipNumberControlService controlService;
 
     @GetMapping
     public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
@@ -154,10 +158,13 @@ public class SmsApi {
             if(!userService.isValidApiKey(apiKey)) {
                 return ResponseEntity.badRequest().build();
             }
-
             Activation activation = activationRepository.findById(id).get();
+
+            controlService.removeService(activation.getChipNumber(), activation.getAliasService());
+
             activation.setAliasService(activation.getAliasService() + "_cancel");
             activation.setStatus(8);
+//            activation.setStatusBuz(Activa);
             activationRepository.save(activation);
 
             svsService.addQuantity(activation.getServiceName());

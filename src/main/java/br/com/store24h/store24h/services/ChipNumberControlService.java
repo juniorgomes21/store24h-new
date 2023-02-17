@@ -30,4 +30,12 @@ public class ChipNumberControlService {
         chipNumberControl.getAliasService().add(servico.getAlias());
         controlRepository.save(chipNumberControl);
     }
+
+    public void removeService(String chipNumber, String aliasService) {
+        ChipNumberControl chipNumberControl = controlRepository.findByChipNumber(chipNumber).get();
+
+        chipNumberControl.getAliasService().remove(aliasService);
+
+        controlRepository.save(chipNumberControl);
+    }
 }
