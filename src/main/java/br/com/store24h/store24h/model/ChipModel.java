@@ -27,9 +27,9 @@ public class ChipModel implements Serializable {
     private String operadora;
     @Column(unique = true, nullable = false)
     private String number;
-    private Boolean ativo = true;
+    private Boolean ativo = false;
     private Boolean alugado = false;
-    private int status = -1;
+    private int status = 0;
 
     // TODO por campos de negócios como Boolean inUse
 
