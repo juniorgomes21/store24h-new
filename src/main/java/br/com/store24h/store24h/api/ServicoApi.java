@@ -3,6 +3,7 @@ package br.com.store24h.store24h.api;
 import br.com.store24h.store24h.Requisicoes.ParamActivity;
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
 import br.com.store24h.store24h.Requisicoes.RequisicaoUpdateService;
+import br.com.store24h.store24h.Requisicoes.services.ParamEditPriceSevice;
 import br.com.store24h.store24h.dto.ErrorResponseDto;
 import br.com.store24h.store24h.dto.ServicoDtoJunior;
 import br.com.store24h.store24h.model.CompraServiso;
@@ -14,10 +15,8 @@ import br.com.store24h.store24h.repository.UserDbRepository;
 import br.com.store24h.store24h.services.SvsService;
 import br.com.store24h.store24h.services.UserService;
 import com.nimbusds.jose.shaded.json.JSONObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -61,11 +60,24 @@ public class ServicoApi {
     @GetMapping("/getAllServicesX")
     public ResponseEntity<Object> getAllServicesX() {
         try {
-            List<Servico> servicoPage = servicosRepository.findAll();
+            Sort sort = Sort.by("name");
+            List<Servico> servicoPage = servicosRepository.findAll(sort);
 
             return ResponseEntity.ok(servicoPage);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponseDto("sua senha é imcompátivel!"));
+        }
+    }
+
+    @PostMapping("/edit/price/{id}")
+    public ResponseEntity<Object> editPrice(@PathVariable Long id, @RequestBody ParamEditPriceSevice paramEditPrice) {
+        try {
+
+            svsService.editPriceService(id, paramEditPrice.getNewPrice());
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponseDto());
         }
     }
 
@@ -95,23 +107,11 @@ public class ServicoApi {
         }
     }
 
-    @GetMapping("/testList")
-    public ResponseEntity<Object> testList() {
-        JSONObject jsonObject = new JSONObject();
-        List<String> strings = new ArrayList<>();
-        strings.add("sm");
-        strings.add("wa");
-        jsonObject.put("teste", strings);
-
-        return ResponseEntity.ok(jsonObject);
-    }
-
-
     @PostMapping("/setActivityServices/hub")
     public ResponseEntity<Object> setActivityServices(@RequestParam String api_key, @RequestBody ParamActivity paramActivity) {
         try {
             if(userService.isValidApiKey(api_key)) {
-                svsService.setActivityServices(paramActivity.getAliasServices());
+                svsService.editActivityServices(paramActivity.getAliasServices());
 
                 return ResponseEntity.ok().build();
             }
@@ -169,7 +169,7 @@ public class ServicoApi {
     }
 
     @CacheEvict("services")
-    @PostMapping("/editService/{id}")
+    @PostMapping("/editService/{id}") //TODO apagar
     public ResponseEntity<Object> editService(@PathVariable Long id, @RequestBody RequisicaoUpdateService requisicaoUpdateService) {
         try {
             Optional<Servico> servicoOptional = servicosRepository.findById(id);
@@ -235,7 +235,4 @@ public class ServicoApi {
 
         return ResponseEntity.ok(compraServisoPage);
     }
-
-//    @CacheEvict(value="services", allEntries=true)
-
 }

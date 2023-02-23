@@ -69,7 +69,7 @@ public class SmsApi {
             return ResponseEntity.badRequest().body(responseAPI);
         }
 
-        if(action.equals("getBalancer")){ // GET_BALANCER
+        if(action.equals("getBalance")){ // GET_BALANCER
             String responseGetBalancer = methodsHubService.getBalancer(apiKey);
             if(responseGetBalancer.equals("BAD_ACTION")) {
                 return ResponseEntity.badRequest().body(responseGetBalancer);

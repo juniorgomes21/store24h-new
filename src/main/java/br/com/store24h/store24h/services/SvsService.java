@@ -1,31 +1,21 @@
 package br.com.store24h.store24h.services;
 
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
-import br.com.store24h.store24h.dto.ErrorResponseDto;
-import br.com.store24h.store24h.model.ChipModel;
-import br.com.store24h.store24h.model.ChipNumberControl;
 import br.com.store24h.store24h.model.Servico;
-import br.com.store24h.store24h.model.StatusChipModel;
-import br.com.store24h.store24h.repository.ChipNumberControlRepository;
-import br.com.store24h.store24h.repository.ChipRepository;
 import br.com.store24h.store24h.repository.ServicosRepository;
 import br.com.store24h.store24h.task.service.ServiceTask;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class SvsService {
@@ -82,7 +72,7 @@ public class SvsService {
     }
 
     @CacheEvict(value="servicesHub", allEntries=true)
-    public void setActivityServices(List<String> aliasServices) {
+    public void editActivityServices(List<String> aliasServices) {
         List<Servico> servicoList = servicosRepository.findByAliasIn(aliasServices);
 
         servicoList.forEach( servico -> {
@@ -90,6 +80,14 @@ public class SvsService {
         });
 
         servicosRepository.saveAll(servicoList);
+    }
+
+    @CacheEvict(value="servicesHub", allEntries=true)
+    public void editPriceService(Long id, BigDecimal newPrice) {
+        Servico servico = servicosRepository.findById(id).get();
+        servico.setPrice(newPrice);
+
+        servicosRepository.save(servico);
     }
 
     public void subtractQuantityFor0All() {

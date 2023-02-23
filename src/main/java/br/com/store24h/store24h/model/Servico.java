@@ -27,7 +27,7 @@ public class Servico implements Serializable {
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, Integer> priceMap;
     private boolean random;
-    private int quantityForMaxPrice;
+    private int quantityForMaxPrice = 30;
     private boolean activity = true;
     private int totalQuantity;
     private boolean canAuction;

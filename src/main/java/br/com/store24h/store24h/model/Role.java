@@ -2,7 +2,7 @@ package br.com.store24h.store24h.model;
 
 public enum Role {
     USER("USER"),
-    ADMINISTRADO("ADMINISTRADO"),
+    ADMINISTRADOR("ADMINISTRADOR"),
     DESCONHECIDO("DESCONHECIDO");
 
     private String nome;

@@ -69,7 +69,7 @@ public class Login {
 
         adm.setNome("fernando");
         adm.setEmail("fernando@fernando.com");
-        adm.setPerfil(Role.ADMINISTRADO.getNome());
+        adm.setPerfil(Role.ADMINISTRADOR.getNome());
         adm.setSenha(new BCryptPasswordEncoder().encode("123"));
 
         return ResponseEntity.ok("ok");
