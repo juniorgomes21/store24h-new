@@ -54,10 +54,8 @@ public class ApiKey {
     public ResponseEntity<Object> getApiKey(Authentication authentication) {
         try {
             User user = funcionalidades.userLogado(authentication);
-            Optional<User> userOptional = userDbRepository.findByEmail(user.getEmail());
-            String apiKey = userOptional.get().getApiKey();
 
-            return ResponseEntity.ok().body(new ApiKeyDTO(apiKey));
+            return ResponseEntity.ok().body(new ApiKeyDTO(user.getApiKey()));
         } catch (Exception e) {
 
             return ResponseEntity.badRequest().body(new ErrorResponseDto("Ops, algo deu errado!"));

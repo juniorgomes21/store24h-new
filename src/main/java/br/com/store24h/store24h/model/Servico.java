@@ -28,6 +28,7 @@ public class Servico implements Serializable {
     private Map<String, Integer> priceMap;
     private boolean random;
     private int quantityForMaxPrice;
+    private boolean activity = true;
     private int totalQuantity;
     private boolean canAuction;
     private ArrayList<Object> auctionMap = new ArrayList<>();
@@ -107,6 +108,14 @@ public class Servico implements Serializable {
 
     public boolean isRandom() {
         return random;
+    }
+
+    public boolean isActivity() {
+        return activity;
+    }
+
+    public void setActivity(boolean activity) {
+        this.activity = activity;
     }
 
     public void setRandom(boolean random) {

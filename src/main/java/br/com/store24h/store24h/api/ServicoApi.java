@@ -1,5 +1,6 @@
 package br.com.store24h.store24h.api;
 
+import br.com.store24h.store24h.Requisicoes.ParamActivity;
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
 import br.com.store24h.store24h.Requisicoes.RequisicaoUpdateService;
 import br.com.store24h.store24h.dto.ErrorResponseDto;
@@ -10,8 +11,13 @@ import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.CompraServicoRepository;
 import br.com.store24h.store24h.repository.ServicosRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
+import br.com.store24h.store24h.services.SvsService;
+import br.com.store24h.store24h.services.UserService;
+import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -33,6 +39,12 @@ public class ServicoApi {
 
     @Autowired
     private CompraServicoRepository compraServicoRepository;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private SvsService svsService;
 
 //    @PostMapping("/newService")
 //    public ResponseEntity<ServiceResponse<ServicoDto>> newService(@RequestBody @Valid RequisicaoNovoServico requisicaoNovoServico) {
@@ -68,11 +80,54 @@ public class ServicoApi {
         }
     }
 
+    @GetMapping("/getAllServices/hub")
+    public ResponseEntity<Object> getAllServicesHub(@RequestParam String api_key) {
+        try {
+            if(userService.isValidApiKey(api_key)) {
+                List<Servico> servicoList = svsService.getAllServices();
+
+                return ResponseEntity.ok(servicoList);
+            }
+
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/testList")
+    public ResponseEntity<Object> testList() {
+        JSONObject jsonObject = new JSONObject();
+        List<String> strings = new ArrayList<>();
+        strings.add("sm");
+        strings.add("wa");
+        jsonObject.put("teste", strings);
+
+        return ResponseEntity.ok(jsonObject);
+    }
+
+
+    @PostMapping("/setActivityServices/hub")
+    public ResponseEntity<Object> setActivityServices(@RequestParam String api_key, @RequestBody ParamActivity paramActivity) {
+        try {
+            if(userService.isValidApiKey(api_key)) {
+                svsService.setActivityServices(paramActivity.getAliasServices());
+
+                return ResponseEntity.ok().build();
+            }
+
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     /***
      * Cira um novo serviço
      * @param requisicaoNovoServico
      * @return
      */
+    @CacheEvict("services")
     @PostMapping("/newService")
     public ResponseEntity<Object> newServiceJunior(@RequestBody @Valid RequisicaoNovoServico requisicaoNovoServico) {
         try {
@@ -113,6 +168,7 @@ public class ServicoApi {
         }
     }
 
+    @CacheEvict("services")
     @PostMapping("/editService/{id}")
     public ResponseEntity<Object> editService(@PathVariable Long id, @RequestBody RequisicaoUpdateService requisicaoUpdateService) {
         try {
@@ -136,17 +192,28 @@ public class ServicoApi {
     @DeleteMapping("/deleteService/{id}")
     public ResponseEntity<Object> deleteService(@PathVariable Long id) {
         try {
-            Optional<Servico> servicoOptional = servicosRepository.findById(id);
-            if(!servicoOptional.isPresent()) {
+            String response = svsService.deleteService(id);
+
+            if(response == null) {
                 return ResponseEntity.badRequest().body(new ErrorResponseDto("Serviço não encontrado!"));
             }
-
-            servicosRepository.deleteById(servicoOptional.get().getId());
 
             return ResponseEntity.ok().build();
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponseDto("Ops! algo deu errado."));
+        }
+    }
+
+    @PostMapping("/loadService")
+    public ResponseEntity<Object> loadService(@RequestBody Map<String, Servico> requisicaoNovoServicoList) {
+        try {
+
+            List<Servico> list = svsService.loadService(requisicaoNovoServicoList);
+
+            return ResponseEntity.ok().body(list);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -169,21 +236,6 @@ public class ServicoApi {
         return ResponseEntity.ok(compraServisoPage);
     }
 
-    @PostMapping("/loadService")
-    public ResponseEntity<Object> loadService(@RequestBody Map<String, Servico> requisicaoNovoServicoList) {
-        try {
-            ArrayList<Servico> list = new ArrayList<>(requisicaoNovoServicoList.size());
-            for(Servico ls: requisicaoNovoServicoList.values()) {
-                RequisicaoNovoServico lol = new RequisicaoNovoServico();
-                BeanUtils.copyProperties(ls, lol);
-                list.add(ls);
-            }
+//    @CacheEvict(value="services", allEntries=true)
 
-            servicosRepository.saveAll(list);
-
-            return ResponseEntity.ok().body(list);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 }

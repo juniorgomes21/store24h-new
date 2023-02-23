@@ -1,5 +1,7 @@
 package br.com.store24h.store24h.services;
 
+import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
+import br.com.store24h.store24h.dto.ErrorResponseDto;
 import br.com.store24h.store24h.model.ChipModel;
 import br.com.store24h.store24h.model.ChipNumberControl;
 import br.com.store24h.store24h.model.Servico;
@@ -7,12 +9,21 @@ import br.com.store24h.store24h.model.StatusChipModel;
 import br.com.store24h.store24h.repository.ChipNumberControlRepository;
 import br.com.store24h.store24h.repository.ChipRepository;
 import br.com.store24h.store24h.repository.ServicosRepository;
+import br.com.store24h.store24h.task.service.ServiceTask;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,113 +31,65 @@ import java.util.stream.Collectors;
 public class SvsService {
 
     @Autowired
-    private ChipNumberControlRepository controlRepository;
-
-    @Autowired
-    private ChipRepository chipRepository;
-
-    @Autowired
     private ServicosRepository servicosRepository;
 
     @Autowired
     private ChipService chipService;
 
-    @Scheduled(fixedRate = 240000) // 4min
+    @Autowired
+    private ServiceTask serviceTask;
+
     public void countServiceAddForAll() {
-
-        List<ChipModel> chipModels = chipRepository.findByAtivoAndStatus(false, 0);
-        if(chipModels.isEmpty()) {
-            return;
-        }
-
-        List<Servico> servicoList = servicosRepository.findAll();
-        List<ChipModel> chipModelModify = new ArrayList<>();
-
-        chipModels.forEach( chipModel -> {
-            Optional<ChipNumberControl> chipNumberControlOptional = controlRepository.findByChipNumber(chipModel.getNumber());
-
-            if(chipNumberControlOptional.isPresent()) {
-                ChipNumberControl chipNumberControl = chipNumberControlOptional.get();
-
-                List<String> chipNumberServicosList = chipNumberControl.getAliasService();
-
-                if(servicoList.size() > chipNumberServicosList.size()) {
-                    // lógica para count +1 em serviço
-                    servicoList.forEach( service -> {
-                        if(!chipNumberServicosList.contains(service.getAlias())) {
-                            service.setTotalQuantity(service.getTotalQuantity() + 1);
-                        }
-                    });
-
-                    chipModel.setAtivo(true);
-                    chipModel.setStatus(StatusChipModel.ACTIVITY.getStatus());
-                    chipModelModify.add(chipModel);
-                }
-            } else {
-                servicoList.forEach(service -> {
-                    service.setTotalQuantity(service.getTotalQuantity() + 1);
-                });
-
-                chipModel.setAtivo(true);
-                chipModel.setStatus(StatusChipModel.ACTIVITY.getStatus());
-                chipModelModify.add(chipModel);
-            }
-
-        });
-
-        chipRepository.saveAll(chipModelModify);
-        servicosRepository.saveAll(servicoList);
-
+        serviceTask.countServiceAddForAll();
     }
 
-    @Scheduled(fixedRate = 300000)  // 5min
     public void countServiceSubtract() {
+        serviceTask.countServiceSubtract();
+    }
 
-        List<ChipModel> chipModels = chipRepository.findByStatus(StatusChipModel.INVALID.getStatus());
-        if(chipModels.isEmpty()) {
-            return;
+    @Cacheable(value="servicesHub")
+    public List<Servico> getAllServices() {
+        Sort sort = Sort.by("name");
+        List<Servico> servicoList = servicosRepository.findAll(sort);
+
+        return servicoList;
+    }
+
+    @CacheEvict(value="servicesHub", allEntries=true)
+    public String deleteService(Long id) {
+        Optional<Servico> servicoOptional = servicosRepository.findById(id);
+        if(!servicoOptional.isPresent()) {
+            return null;
         }
 
-        List<ChipNumberControl> chipNumberControls = controlRepository.findAll();
-        List<Servico> servicos = servicosRepository.findAll();
+        servicosRepository.deleteById(servicoOptional.get().getId());
 
-        chipModels.forEach( chipModel -> {
-            Optional<ChipNumberControl> controlOptional = chipNumberControls.stream()
-                    .filter(control -> control.getChipNumber().equals(chipModel.getNumber()))
-                    .findFirst();
+        return "ok";
+    }
 
-            if (controlOptional.isPresent()) {
-                ChipNumberControl control = controlOptional.get();
-                List<String> servicosControl = control.getAliasService();
-                List<Servico> servicosFiltered = servicos.stream().filter(servico ->
-                                servicosControl.stream().noneMatch(servicoControl ->
-                                        servicoControl.equals(servico.getAlias())))
-                        .collect(Collectors.toList());
+    @CacheEvict(value="servicesHub", allEntries=true)
+    public List<Servico> loadService(Map<String, Servico> requisicaoNovoServicoList) {
+        ArrayList<Servico> list = new ArrayList<>(requisicaoNovoServicoList.size());
+        for(Servico ls: requisicaoNovoServicoList.values()) {
+            RequisicaoNovoServico lol = new RequisicaoNovoServico();
+            BeanUtils.copyProperties(ls, lol);
+            list.add(ls);
+        }
 
-                servicosFiltered.forEach( servicoFiltered -> {
-                    Optional<Servico> servicoOptinal = servicos.stream()
-                            .filter(servico -> servico.getAlias().equals(servicoFiltered.getAlias()))
-                            .findFirst();
+        servicosRepository.saveAll(list);
 
-                    if (servicoOptinal.isPresent()) {
-                        Servico s = servicoOptinal.get();
-                        int quantity = s.getTotalQuantity();
-                        if(quantity > 0) {
-                            s.setTotalQuantity(quantity - 1);
-                        }
-                    }
-                });
-            } else {
-                servicos.forEach(servico -> {
-                    int quantity = servico.getTotalQuantity();
-                    if(quantity > 0) {
-                        servico.setTotalQuantity(quantity - 1);
-                    }
-                });
-            }
+        return list;
+    }
+
+    @CacheEvict(value="servicesHub", allEntries=true)
+    public void setActivityServices(List<String> aliasServices) {
+        List<Servico> servicoList = servicosRepository.findByAliasIn(aliasServices);
+
+        servicoList.forEach( servico -> {
+            servico.setActivity(!servico.isActivity());
         });
 
-        servicosRepository.saveAll(servicos);
+        servicosRepository.saveAll(servicoList);
     }
 
     public void subtractQuantityFor0All() {
@@ -151,4 +114,5 @@ public class SvsService {
         service.setTotalQuantity(service.getTotalQuantity() + 1);
         servicosRepository.save(service);
     }
+
 }
