@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -345,32 +346,44 @@ public class PublicApiService {
         }
     }
 
-    public ResponseEntity<Object> getNumberStatus(String country, String operator) {
+    public JSONObject getNumberStatus(Optional<String> country, Optional<String> operator) {
         JSONObject myJson = new JSONObject();
 
-        // POSSÍVEIS ERROS
-        if (false) { // ERROR_SQL
+        List<Servico> servicoList = new ArrayList<>();
+        try {
+            servicoList = servicosRepository.findAll();
+
+            if(operator.isPresent()) {
+                List<ChipModel> chipModelList = chipRepository.findByOperadora(operator.get());
+                List<String> numbers = new ArrayList<>();
+                chipModelList.forEach( chipModel -> {
+                    numbers.add(chipModel.getNumber());
+                });
+
+                List<ChipNumberControl> chipNumberControlList = chipNumberControlRepository.findByChipNumberIn(numbers);
+
+                servicoList.forEach( servico -> {
+                    servico.setTotalQuantity(0);
+                    chipNumberControlList.forEach( chipNumberControl -> {
+                        List<String> aliasService = chipNumberControl.getAliasService();
+                        int index = aliasService.indexOf(servico.getAlias());
+                        if(!(index > -1)) {
+                            servico.setTotalQuantity(servico.getTotalQuantity() + 1);
+                        }
+                    });
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             myJson.put("ERROR_SQL", "erro SQL-server");
-            return ResponseEntity.badRequest().body(myJson);
-        }
-        if(false) { // BAD_ACTION
-            myJson.put("BAD_ACTION", "Consulta geral malformada");
-            return ResponseEntity.badRequest().body(myJson);
+            return myJson;
         }
 
-        //RESPOSTA DO SERVIDOR
-        myJson.put("vk_0", 185);
-        myJson.put("ok_0", 131);
-        myJson.put("wa_0", 96);
-        myJson.put("vi_0", 49);
-        myJson.put("tg_0", 118);
-        myJson.put("wb_0", 74);
-        myJson.put("go_0", 99);
-        myJson.put("fb_0", 128);
-        myJson.put("tw_0", 244);
-        myJson.put("av_0", 99);
+        servicoList.forEach( servico -> {
+            myJson.put(servico.getAlias() + "_0", servico.getTotalQuantity());
+        });
 
-        return ResponseEntity.ok().body(myJson);
+        return myJson;
     }
 
     public Object getPrices(Optional<String> service, Optional<String> country) {

@@ -9,6 +9,7 @@ import br.com.store24h.store24h.services.SvsService;
 import br.com.store24h.store24h.services.core.ActivationStatus;
 import br.com.store24h.store24h.services.core.PublicApiService;
 import br.com.store24h.store24h.services.UserService;
+import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -125,6 +126,10 @@ public class SmsApi {
                 return ResponseEntity.badRequest().build();
             }
             return ResponseEntity.ok(responseGetPrice);
+        } else if (action.equals("getNumbersStatus")) {
+            JSONObject response = methodsHubService.getNumberStatus(country, operator);
+
+            return ResponseEntity.ok(response);
         }
 
         //"Consulta geral malformada"
