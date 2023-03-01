@@ -1,5 +1,8 @@
 package br.com.store24h.store24h.model;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +16,7 @@ public class ChipNumberControl {
     @ElementCollection
     @CollectionTable(name = "chip_number_control_alias_service", joinColumns = @JoinColumn(name = "chip_number_control_id"))
     @Column(name = "alias_service")
+    @Fetch(FetchMode.JOIN)
     private List<String> aliasService = new ArrayList<>();
 
     public ChipNumberControl() {

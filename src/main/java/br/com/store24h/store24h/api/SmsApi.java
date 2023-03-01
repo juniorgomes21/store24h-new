@@ -6,6 +6,7 @@ import br.com.store24h.store24h.model.*;
 import br.com.store24h.store24h.repository.*;
 import br.com.store24h.store24h.services.ChipNumberControlService;
 import br.com.store24h.store24h.services.SvsService;
+import br.com.store24h.store24h.services.core.ActivationService;
 import br.com.store24h.store24h.services.core.ActivationStatus;
 import br.com.store24h.store24h.services.core.PublicApiService;
 import br.com.store24h.store24h.services.UserService;
@@ -33,16 +34,7 @@ public class SmsApi {
     private ServicosRepository servicosRepository;
 
     @Autowired
-    private Funcionalidades funcionalidades;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
     private SmsRepository smsRepository;
-
-    @Autowired
-    private PublicApiService methodsHubService;
 
     @Autowired
     private ActivationRepository activationRepository;
@@ -55,6 +47,18 @@ public class SmsApi {
 
     @Autowired
     private ChipNumberControlService controlService;
+
+    @Autowired
+    private Funcionalidades funcionalidades;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PublicApiService methodsHubService;
+
+    @Autowired
+    private ActivationService activationService;
 
     @GetMapping
     public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
@@ -163,16 +167,8 @@ public class SmsApi {
             if(!userService.isValidApiKey(apiKey)) {
                 return ResponseEntity.badRequest().build();
             }
-            Activation activation = activationRepository.findById(id).get();
 
-            controlService.removeService(activation.getChipNumber(), activation.getAliasService());
-
-            activation.setAliasService(activation.getAliasService() + "_cancel");
-            activation.setStatus(8);
-//            activation.setStatusBuz(Activa);
-            activationRepository.save(activation);
-
-            svsService.addQuantity(activation.getServiceName());
+            activationService.cancelActivation(id);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {

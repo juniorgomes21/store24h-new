@@ -61,6 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/aux/setQuantityFor0AllService").permitAll()
                 .antMatchers("/aux/verifyInvalidChipNumber").permitAll()
                 .antMatchers("/aux/verifyNewChipNumber").permitAll()
+                .antMatchers("/aux/cancelAPI").permitAll()
 
                 //Padrão API ADM
                 .antMatchers("/stubs/handler_api/ping").permitAll()

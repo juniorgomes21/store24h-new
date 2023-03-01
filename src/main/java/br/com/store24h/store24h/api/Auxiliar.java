@@ -6,6 +6,7 @@ import br.com.store24h.store24h.repository.ChipNumberControlRepository;
 import br.com.store24h.store24h.repository.ChipRepository;
 import br.com.store24h.store24h.repository.ServicosRepository;
 import br.com.store24h.store24h.services.SvsService;
+import br.com.store24h.store24h.task.service.ActivationTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,9 @@ public class Auxiliar {
 
     @Autowired
     private SvsService svsService;
+
+    @Autowired
+    private ActivationTask activationTask;
 
     @Transactional
     @PostMapping("/delete/registros/acivations&chipModelFalse")
@@ -85,6 +89,14 @@ public class Auxiliar {
     public ResponseEntity<Object> verifyInvalidChipNumber() {
 
         svsService.countServiceSubtract();
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/cancelAPI")
+    public ResponseEntity<Object> cancelAPI() {
+
+        activationTask.cancelActivations();
 
         return ResponseEntity.ok().build();
     }

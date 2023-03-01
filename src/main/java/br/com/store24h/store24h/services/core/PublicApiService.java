@@ -88,7 +88,7 @@ public class PublicApiService {
         return responseAPI;
     }
 
-    public String getNumber(String apiKey, Optional<String> service, Optional<String> operator, Optional<String> country ) {
+    public String getNumber(String apiKey, Optional<String> service, Optional<String> operator, Optional<String> country) {
 
         String responseAPI = "";
 
@@ -165,14 +165,7 @@ public class PublicApiService {
 
         responseAPI = "ACCESS_NUMBER:" + idActivation + ":" + chipModel.getNumber();
 
-        // Coloca o chip como alugado.
-//        try {
-//            chipModel = chipRepository.findByNumber(chipModel.getNumber());
-//            chipModel.setAlugado(true);
-//            chipRepository.save(chipModel);
-//        } catch (Exception e) {
-//            return "ERROR_SQL";
-//        }
+
 
         return responseAPI;
     }
@@ -326,8 +319,8 @@ public class PublicApiService {
         } else if (statusCode == 8) { // ACCESS_CANCEL
             // Ativação cancelada
             try {
-                activation.setStatus(8);
-                activationRepository.save(activation);
+
+                activationService.cancelActivation(activation.getId());
 
                 return "ACCESS_CANCEL";
             } catch (Exception e) {

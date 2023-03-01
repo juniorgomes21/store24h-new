@@ -7,12 +7,15 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
 import javax.sql.DataSource;
 import java.util.ArrayList;
 
 @EnableCaching
 @SpringBootApplication
 @EnableSpringDataWebSupport
+@EnableScheduling
 public class Store24hApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(Store24hApplication.class, args);

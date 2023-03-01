@@ -2,6 +2,8 @@ package br.com.store24h.store24h.model;
 
 import br.com.store24h.store24h.services.StatusService;
 import br.com.store24h.store24h.services.core.ActivationStatus;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -37,6 +39,7 @@ public class Activation implements Serializable {
     @ElementCollection
     @CollectionTable(name = "sms_string_models", joinColumns = @JoinColumn(name = "activation_id"))
     @Column(name = "sms_string_models")
+    @Fetch(FetchMode.JOIN)
     private final List<String> smsStringModels = new ArrayList<>();
     private Integer neededSmsToFinalize = 1;
     private LocalDateTime initialTime = LocalDateTime.now();
