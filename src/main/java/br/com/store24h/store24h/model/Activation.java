@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class Activation implements Serializable {
     @Fetch(FetchMode.JOIN)
     private final List<String> smsStringModels = new ArrayList<>();
     private Integer neededSmsToFinalize = 1;
-    private LocalDateTime initialTime = LocalDateTime.now();
+    private LocalDateTime initialTime = LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone()));
     private LocalDateTime endTime;
 
 //            Significa que o cadastro começou e um codigo já chegou do site que o usuário final
@@ -92,7 +93,7 @@ public class Activation implements Serializable {
 
     public boolean reserveNumber() {
         boolean resp = false;
-        this.setInitialTime(LocalDateTime.now());
+        this.setInitialTime(LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())));
 //        TODO
 //        tempNumber
 //        setTempNumber();
@@ -112,7 +113,7 @@ public class Activation implements Serializable {
 //        if (smsModels.size() > 0) {
 ////                    throw new RuntimeException(Activation.class.getName() + " : Para finalizar deve existir algum sms");
 //            resp = true;
-//            this.setEndTime(LocalDateTime.now());
+//            this.setEndTime(LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())));
 //            this.statusBuz = ActivationStatus.FINALIZADA;
 //        }
 //        return resp;

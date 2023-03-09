@@ -109,7 +109,7 @@
 		<repository>
 			<id>spring-snnapshot</id>
 			<name>Spring Maven SNAPSHOT Repository</name>
-			<url>https://maven.springframework.org/snapshot</url>
+				<url>https://maven.springframework.org/snapshot</url>
 		</repository>
 	</repositories>
 	<build>

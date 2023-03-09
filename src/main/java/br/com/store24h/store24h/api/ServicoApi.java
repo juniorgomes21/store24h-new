@@ -45,18 +45,6 @@ public class ServicoApi {
     @Autowired
     private SvsService svsService;
 
-//    @PostMapping("/newService")
-//    public ResponseEntity<ServiceResponse<ServicoDto>> newService(@RequestBody @Valid RequisicaoNovoServico requisicaoNovoServico) {
-//        try {
-//            Servico serv = requisicaoNovoServico.toServico();
-//            return ResponseEntity.ok( { msg: "mensagens", seriv: serv});
-//        } catch (Exception e) {
-//            ServicoDto lol = new ServicoDto(null);
-//            lol.setMsg("Ops! algo deu errado.");
-//            return ResponseEntity.badRequest().body(lol);
-//        }
-//    }
-
     @GetMapping("/getAllServicesX")
     public ResponseEntity<Object> getAllServicesX() {
         try {

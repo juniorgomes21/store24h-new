@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 public class CompraServiso {
@@ -21,7 +22,7 @@ public class CompraServiso {
     public CompraServiso(String servico, String chipNumber) {
         this.servico = servico;
         this.chipNumber = chipNumber;
-        this.localDateTime = LocalDateTime.now();
+        this.localDateTime = LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone()));
     }
 
     public Long getId() {

@@ -34,9 +34,6 @@ public class SmsApi {
     private ServicosRepository servicosRepository;
 
     @Autowired
-    private SmsRepository smsRepository;
-
-    @Autowired
     private ActivationRepository activationRepository;
 
     @Autowired
@@ -109,10 +106,14 @@ public class SmsApi {
             }
 
         } else if(action.equals("getSms")) {
-            SmsDTO smsDTO = methodsHubService.getSms(apiKey, id.get());
+            SmsDTO smsDTO = methodsHubService.getSms(id.get());
 
             return ResponseEntity.ok(smsDTO);
 
+        }else if(action.equals("getSmsRetry")) {
+            SmsDTO smsDTO = methodsHubService.getSmsRetry(id.get());
+
+            return ResponseEntity.ok(smsDTO);
 
         } else if (action.equals("setStatus")) {
 
@@ -149,11 +150,7 @@ public class SmsApi {
                 return ResponseEntity.badRequest().build();
             }
 
-            Activation activation = activationRepository.findById(id).get();
-            activation.setAliasService(activation.getAliasService() + "_finalizada");
-            activation.setStatus(6);
-            activation.setStatusBuz(ActivationStatus.FINALIZADA);
-            activationRepository.save(activation);
+            activationService.conclude(id);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package br.com.store24h.store24h.services.core;
 
 import br.com.store24h.store24h.model.Activation;
 import br.com.store24h.store24h.model.Servico;
+import br.com.store24h.store24h.model.TimeZone;
 import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.ActivationRepository;
 import br.com.store24h.store24h.repository.SmsRepository;
@@ -11,6 +12,9 @@ import br.com.store24h.store24h.services.SvsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Service
 public class ActivationService {
@@ -40,7 +44,7 @@ public class ActivationService {
             compraService.buyService(user, servico, chipNumber);
             Activation activation = new Activation(servico.getName(), servico.getAlias(), chipNumber);
             activation.setStatusBuz(ActivationStatus.AGUARDANDO_MENSAGENS);
-            smsRepository.deleteByChipnumber(chipNumber);
+//            smsRepository.deleteByChipnumber(chipNumber);
             return activationRepository.save(activation).getId();
 
         } catch (Exception e) {
@@ -49,6 +53,7 @@ public class ActivationService {
         }
     }
 
+    @Transactional
     public void cancelActivation(Long id) {
         Activation activation = activationRepository.findById(id).get();
 
@@ -60,5 +65,30 @@ public class ActivationService {
         activationRepository.save(activation);
 
         svsService.addQuantity(activation.getServiceName());
+    }
+
+    public void conclude(Long id) {
+        Activation activation = activationRepository.findById(id).get();
+
+        activation.setAliasService(activation.getAliasService() + "_finalizada");
+        activation.setStatus(6);
+        activation.setStatusBuz(ActivationStatus.FINALIZADA);
+        activationRepository.save(activation);
+    }
+
+    @Transactional
+    public boolean awaitNewCode(Long id) {
+        Activation activation = activationRepository.findById(id).get();
+
+        if (activation.getStatus() == 8) {
+            return false;
+        }
+
+        activation.setStatus(3);
+        activation.setInitialTime(LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())));
+        activation.setStatusBuz(ActivationStatus.AGUARDANDO_MENSAGENS);
+        activationRepository.save(activation);
+
+        return true;
     }
 }

@@ -1,6 +1,7 @@
 package br.com.store24h.store24h.Funcionalidades;
 
 import br.com.store24h.store24h.model.Administrador;
+import br.com.store24h.store24h.model.TimeZone;
 import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.UserDbRepository;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,7 +37,7 @@ public class Funcionalidades {
 
     public String gerarKeyApi(String nomeUser) {
         String userName = nomeUser;
-        LocalDate dateObj = LocalDate.now();
+        LocalDate dateObj = LocalDate.now(ZoneId.of(TimeZone.BR.getZone()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String date = dateObj.format(formatter);
 

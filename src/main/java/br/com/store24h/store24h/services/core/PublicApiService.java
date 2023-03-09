@@ -9,6 +9,7 @@ import br.com.store24h.store24h.services.CompraService;
 import br.com.store24h.store24h.services.SvsService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -170,9 +171,8 @@ public class PublicApiService {
         return responseAPI;
     }
 
-    public SmsDTO getSms(String apiKey, Long idActivation) {
+    public SmsDTO getSms(Long idActivation) {
         Activation activation = activationRepository.getById(idActivation);
-//        Optional<List<SmsModel>> smsModel = smsRepository.findByDateAfter(activation.getInitialTime());
         Optional<SmsModel> smsModel = Optional.of(new SmsModel());
         if(activation.getSmsStringModels().size() == 0) {
             String num = activation.getChipNumber();
@@ -187,16 +187,12 @@ public class PublicApiService {
             activation.getSmsStringModels().add(ss);
 
             //TODO criar uma função para timeZone
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone()));
             ZoneId brasiliaZone = ZoneId.of("America/Sao_Paulo");
             ZonedDateTime brasiliaNow = now.atZone(brasiliaZone);
             activation.setEndTime(brasiliaNow.toLocalDateTime());
 
             activationRepository.save(activation);
-
-//            ChipModel chip = chipRepository.findByNumber(activation.getChipNumber());
-//            chip.setAlugado(false);
-//            chipRepository.save(chip);
 
             smsDTO.getSmsList().add(ss);
             smsDTO.setNameService(activation.getServiceName());
@@ -209,6 +205,48 @@ public class PublicApiService {
         smsDTO.setNameService(activation.getServiceName());
         smsDTO.setAliasService(activation.getAliasService());
         smsDTO.setSmsList(activation.getSmsStringModels());
+        smsDTO.setNumberActivation(activation.getChipNumber());
+
+        return smsDTO;
+    }
+
+    public SmsDTO getSmsRetry(Long idActivation) {
+        Activation activation = activationRepository.getById(idActivation);
+        int size = activation.getSmsStringModels().size() - 1;
+        SmsModel lastSmsModel = smsRepository.findByMsgAndIdActivation(activation.getSmsStringModels().get(size), activation.getId());
+
+        Optional<SmsModel> newSmsModel = smsRepository.findByDateGreaterThanAndIdActivation(lastSmsModel.getDate(), activation.getId());
+//        Sort sort = Sort.by("date").descending();
+//        Optional<SmsModel> newSmsModel = smsRepository.findByIdActivation(lastSmsModel.getDate(), lastSmsModel.getId(), sort);
+
+        SmsDTO smsDTO = new SmsDTO();
+
+        if(newSmsModel.isPresent() && !newSmsModel.get().getMsg().isEmpty()) {
+            activation.setStatus(7);
+            String ss = newSmsModel.get().getMsg();
+            activation.getSmsStringModels().remove(0);
+            activation.getSmsStringModels().add(ss);
+
+            LocalDateTime now = LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone()));
+            ZoneId brasiliaZone = ZoneId.of("America/Sao_Paulo");
+            ZonedDateTime brasiliaNow = now.atZone(brasiliaZone);
+
+            activation.setEndTime(brasiliaNow.toLocalDateTime());
+
+            activationRepository.save(activation);
+
+            smsDTO.setNameService(activation.getServiceName());
+            smsDTO.setAliasService(activation.getAliasService());
+            smsDTO.getSmsList().add(ss);
+            smsDTO.setNumberActivation(activation.getChipNumber());
+
+            return smsDTO;
+        }
+        List<String> smsStringModels = new ArrayList<>();
+
+        smsDTO.setNameService(activation.getServiceName());
+        smsDTO.setAliasService(activation.getAliasService());
+        smsDTO.setSmsList(smsStringModels);
         smsDTO.setNumberActivation(activation.getChipNumber());
 
         return smsDTO;
@@ -234,7 +272,7 @@ public class PublicApiService {
 
         if(!activationOptional.isPresent()) {
             // ID de ativação não existe
-            return "NO_ATIVATION";
+            return "NO_ACTIVATION";
         }
 
         Activation activation = activationOptional.get();
@@ -244,14 +282,23 @@ public class PublicApiService {
         if(statusCode == -1) {
             return "STATUS_WAIT_CODE";
         }
-        if(false) {
-            return "STATUS_WAIT_RETRY:LASTCODE";
+
+        int index = activation.getSmsStringModels().size();
+
+        if(statusCode == 3) {
+            SmsModel smsModel = smsRepository.findFirstByIdActivationOrderByDateDesc(activation.getId()).get();
+
+            return "STATUS_WAIT_RETRY:" + smsModel.getMsg();
         }
+
         if(statusCode == 8) {
             return "STATUS_CANCEL";
         }
+
         else {
-            return "STATUS_OK:" + activation.getId();
+            SmsModel smsModel = smsRepository.findFirstByIdActivationOrderByDateDesc(activation.getId()).get();
+
+            return "STATUS_OK:" + smsModel.getMsg();
         }
     }
 
@@ -259,7 +306,7 @@ public class PublicApiService {
 
         // POSSÍVEIS ERROS
         List<Integer> acceptedStatus = Arrays.asList(1, 3, 6, 8);
-        if(!acceptedStatus.contains(status) || !idActivation.isPresent()) { // BAD_ACTION
+        if(!status.isPresent() || !acceptedStatus.contains(status.get()) || !idActivation.isPresent()) { // BAD_ACTION
 //            1 - Notificar que o SMS foi enviado (optional)
 //            ACCESS_READY -- prontidão de espera SMS
 
@@ -286,7 +333,7 @@ public class PublicApiService {
         try {
              activationOptional = activationRepository.findById(idActivation.get());
              if(!activationOptional.isPresent()) {
-                 return "NO_ATIVATION";
+                 return "NO_ACTIVATION";
              }
         } catch (Exception e) {
             return "ERROR_SQL";
@@ -308,10 +355,12 @@ public class PublicApiService {
         } else if (statusCode == 3) { // ACCESS_RETRY_GET
             // Esperamos um novo SMS
             try {
-                activation.setStatus(3);
-                activationRepository.save(activation);
+                if(activationService.awaitNewCode(activation.getId())) {
+                    return "ACCESS_RETRY_GET";
+                }
 
-                return "ACCESS_RETRY_GET";
+                return "BAD_ACTION";
+
             } catch (Exception e) {
                 return "ERROR_SQL";
             }
@@ -319,7 +368,6 @@ public class PublicApiService {
         } else if (statusCode == 8) { // ACCESS_CANCEL
             // Ativação cancelada
             try {
-
                 activationService.cancelActivation(activation.getId());
 
                 return "ACCESS_CANCEL";
@@ -329,8 +377,7 @@ public class PublicApiService {
 
         } else { // ACCESS_ACTIVATION
             try {
-                activation.setStatus(6);
-                activationRepository.save(activation);
+                activationService.conclude(activation.getId());
 
                 return "ACCESS_ACTIVATION";
             } catch (Exception e) {

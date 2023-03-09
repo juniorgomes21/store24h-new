@@ -5,6 +5,7 @@ import br.com.store24h.store24h.Requisicoes.RequisicaoCredito;
 import br.com.store24h.store24h.dto.CreditoDTO;
 import br.com.store24h.store24h.dto.ErrorResponseDto;
 import br.com.store24h.store24h.model.ComprasCredito;
+import br.com.store24h.store24h.model.TimeZone;
 import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.ComprasCreditoRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @RestController
 @RequestMapping("/stubs/handler_api")
@@ -50,7 +52,7 @@ public class CreditoApi {
 
             funcionalidades.addCredito(userDbRepository, credito, authentication);
 
-            ComprasCredito comprasCredito = new ComprasCredito(LocalDateTime.now(), credito);
+            ComprasCredito comprasCredito = new ComprasCredito(LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())), credito);
             comprasCreditoRepository.save(comprasCredito);
 
             return ResponseEntity.ok().build();
