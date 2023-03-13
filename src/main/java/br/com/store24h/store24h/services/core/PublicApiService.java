@@ -9,6 +9,7 @@ import br.com.store24h.store24h.services.CompraService;
 import br.com.store24h.store24h.services.SvsService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

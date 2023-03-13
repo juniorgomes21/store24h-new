@@ -37,7 +37,6 @@ public class SvsService {
         serviceTask.countServiceSubtract();
     }
 
-    @Cacheable(value="servicesHub")
     public List<Servico> getAllServices() {
         Sort sort = Sort.by("name");
         List<Servico> servicoList = servicosRepository.findAll(sort);
@@ -45,7 +44,6 @@ public class SvsService {
         return servicoList;
     }
 
-    @CacheEvict(value="servicesHub", allEntries=true)
     public String deleteService(Long id) {
         Optional<Servico> servicoOptional = servicosRepository.findById(id);
         if(!servicoOptional.isPresent()) {
@@ -57,7 +55,6 @@ public class SvsService {
         return "ok";
     }
 
-    @CacheEvict(value="servicesHub", allEntries=true)
     public List<Servico> loadService(Map<String, Servico> requisicaoNovoServicoList) {
         ArrayList<Servico> list = new ArrayList<>(requisicaoNovoServicoList.size());
         for(Servico ls: requisicaoNovoServicoList.values()) {
@@ -71,7 +68,6 @@ public class SvsService {
         return list;
     }
 
-    @CacheEvict(value="servicesHub", allEntries=true)
     public void editActivityServices(List<String> aliasServices) {
         List<Servico> servicoList = servicosRepository.findByAliasIn(aliasServices);
 
@@ -82,7 +78,6 @@ public class SvsService {
         servicosRepository.saveAll(servicoList);
     }
 
-    @CacheEvict(value="servicesHub", allEntries=true)
     public void editPriceService(Long id, BigDecimal newPrice) {
         Servico servico = servicosRepository.findById(id).get();
         servico.setPrice(newPrice);
