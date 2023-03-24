@@ -6,7 +6,8 @@ import br.com.store24h.store24h.repository.ChipNumberControlRepository;
 import br.com.store24h.store24h.repository.ChipRepository;
 import br.com.store24h.store24h.repository.ServicosRepository;
 import br.com.store24h.store24h.services.SvsService;
-import br.com.store24h.store24h.task.service.ActivationTask;
+import br.com.store24h.store24h.task.ActivationTask;
+import br.com.store24h.store24h.task.ServiceTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,9 @@ public class Auxiliar {
     @Autowired
     private ActivationTask activationTask;
 
+    @Autowired
+    private ServiceTask serviceTask;
+
     @Transactional
     @PostMapping("/delete/registros/acivations&chipModelFalse")
     public ResponseEntity<Object> delete() {
@@ -59,7 +63,7 @@ public class Auxiliar {
             chipRepository.saveAll(chipModels);
 
             svsService.subtractQuantityFor0All();
-            svsService.countServiceAddForAll();
+            serviceTask.countServiceAddForAll();
 
             controlRepository.deleteAll();
 
@@ -80,7 +84,7 @@ public class Auxiliar {
     @PostMapping("/verifyNewChipNumber")
     public ResponseEntity<Object> verifyNewChipNumber() {
 
-        svsService.countServiceAddForAll();
+        serviceTask.countServiceAddForAll();
 
         return ResponseEntity.ok().build();
     }
@@ -88,7 +92,7 @@ public class Auxiliar {
     @PostMapping("/verifyInvalidChipNumber")
     public ResponseEntity<Object> verifyInvalidChipNumber() {
 
-        svsService.countServiceSubtract();
+        serviceTask.countServiceSubtract();
 
         return ResponseEntity.ok().build();
     }

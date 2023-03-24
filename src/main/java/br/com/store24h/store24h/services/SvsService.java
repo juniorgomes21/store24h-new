@@ -3,11 +3,8 @@ package br.com.store24h.store24h.services;
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
 import br.com.store24h.store24h.model.Servico;
 import br.com.store24h.store24h.repository.ServicosRepository;
-import br.com.store24h.store24h.task.service.ServiceTask;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -25,17 +22,6 @@ public class SvsService {
 
     @Autowired
     private ChipService chipService;
-
-    @Autowired
-    private ServiceTask serviceTask;
-
-    public void countServiceAddForAll() {
-        serviceTask.countServiceAddForAll();
-    }
-
-    public void countServiceSubtract() {
-        serviceTask.countServiceSubtract();
-    }
 
     public List<Servico> getAllServices() {
         Sort sort = Sort.by("name");
@@ -108,4 +94,11 @@ public class SvsService {
         servicosRepository.save(service);
     }
 
+    public void addQuantityAllService(List<Servico> servicoList) {
+        servicoList.forEach( service -> {
+            service.setTotalQuantity(service.getTotalQuantity() + 1);
+        });
+
+        servicosRepository.saveAll(servicoList);
+    }
 }

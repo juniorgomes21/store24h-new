@@ -4,10 +4,12 @@ import br.com.store24h.store24h.services.StatusService;
 import br.com.store24h.store24h.services.core.ActivationStatus;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -23,12 +25,14 @@ public class Activation implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotBlank
+    @Column(unique = true)
     private String serviceName;
     @NotBlank
     private String aliasService;
     //    @NotBlank
     private String apiKey;
     private String serviceNumber;
+    private BigDecimal servicePrice;
     private String chipNumber; // uma hora fica inválido e enquanto válido, segue abaixo. É o numero usado para esta ativação
     //    private String siteNumber; // numero usado pelo site onde se tenta realizar o serviço
 //    SOLICITADA(2),
@@ -73,10 +77,12 @@ public class Activation implements Serializable {
 
     public Activation() {
     }
-    public Activation(String serviceName, String aliasService, String chipNumber) {
-        this.aliasService = aliasService;
-        this.serviceName = serviceName;
+    public Activation(Servico service, String chipNumber, String apiKey) {
+        this.aliasService = service.getAlias();
+        this.serviceName = service.getName();
+        this.servicePrice = service.getPrice();
         this.chipNumber = chipNumber;
+        this.apiKey = apiKey;
 //        this.siteNumber = siteNumber;
         // this.status = status;
     }
@@ -181,6 +187,14 @@ public class Activation implements Serializable {
 
     public String getApiKey() {
         return apiKey;
+    }
+
+    public BigDecimal getServicePrice() {
+        return servicePrice;
+    }
+
+    public void setServicePrice(BigDecimal servicePrice) {
+        this.servicePrice = servicePrice;
     }
 
     public String getChipNumber() {

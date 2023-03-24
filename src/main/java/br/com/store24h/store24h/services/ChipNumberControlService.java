@@ -19,15 +19,16 @@ public class ChipNumberControlService {
     private ServicosRepository servicosRepository;
 
     public void addServiceInNumber(String chipNumber, Servico servico) {
-        Optional<ChipNumberControl> chipNumberControlOptional = controlRepository.findByChipNumber(chipNumber);
-        ChipNumberControl chipNumberControl;
-        if(chipNumberControlOptional.isPresent()) {
-            chipNumberControl = chipNumberControlOptional.get();
-        } else {
-            chipNumberControl = new ChipNumberControl();
-            chipNumberControl.setChipNumber(chipNumber);
-        }
+        ChipNumberControl chipNumberControl = controlRepository.findByChipNumber(chipNumber).get();
+
         chipNumberControl.getAliasService().add(servico.getAlias());
+
+        controlRepository.save(chipNumberControl);
+    }
+
+    public void newChipNumberControl(String chipNumber) {
+        ChipNumberControl chipNumberControl = new ChipNumberControl(chipNumber);
+
         controlRepository.save(chipNumberControl);
     }
 

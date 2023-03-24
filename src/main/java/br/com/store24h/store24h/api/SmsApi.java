@@ -117,7 +117,7 @@ public class SmsApi {
 
         } else if (action.equals("setStatus")) {
 
-            String responseSetStatus = methodsHubService.setStatus(status, id);
+            String responseSetStatus = methodsHubService.setStatus(status, id, apiKey);
 
             List<String> badResponse = Arrays.asList("ERROR_SQL", "BAD_SERVICE", "BAD_ACTION", "NO_ACTIVATION");
             if(badResponse.contains(responseSetStatus)) {
@@ -165,7 +165,7 @@ public class SmsApi {
                 return ResponseEntity.badRequest().build();
             }
 
-            activationService.cancelActivation(id);
+            activationService.cancelActivation(id, apiKey);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {

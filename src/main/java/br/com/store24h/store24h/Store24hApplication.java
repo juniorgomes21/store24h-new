@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 @SpringBootApplication
 @EnableSpringDataWebSupport
 @EnableScheduling
+@EnableTransactionManagement
 public class Store24hApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(Store24hApplication.class, args);

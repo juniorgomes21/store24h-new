@@ -29,6 +29,7 @@ public class ChipModel implements Serializable {
     private String number;
     private Boolean ativo = false;
     private Boolean alugado = false;
+    private Boolean checked = false;
     private int status = 0;
 
     // TODO por campos de negócios como Boolean inUse
@@ -75,6 +76,14 @@ public class ChipModel implements Serializable {
 
     public int getStatus() {
         return status;
+    }
+
+    public Boolean getChecked() {
+        return checked;
+    }
+
+    public void setChecked(Boolean checked) {
+        this.checked = checked;
     }
 
     public void setStatus(int status) {

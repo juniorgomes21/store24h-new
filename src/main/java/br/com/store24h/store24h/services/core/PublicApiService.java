@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
@@ -90,6 +91,7 @@ public class PublicApiService {
         return responseAPI;
     }
 
+    @Transactional
     public String getNumber(String apiKey, Optional<String> service, Optional<String> operator, Optional<String> country) {
 
         String responseAPI = "";
@@ -160,7 +162,7 @@ public class PublicApiService {
 
         Long idActivation;
         try {
-            idActivation = activationService.newActivation(user, servicoOptional.get(), chipModel.getNumber());
+            idActivation = activationService.newActivation(user, servicoOptional.get(), chipModel.getNumber(), apiKey);
         } catch (Exception e) {
             return "ERROR_SQL";
         }
@@ -303,7 +305,7 @@ public class PublicApiService {
         }
     }
 
-    public String setStatus(Optional<Integer> status, Optional<Long> idActivation) {
+    public String setStatus(Optional<Integer> status, Optional<Long> idActivation, String apiKey) {
 
         // POSSÍVEIS ERROS
         List<Integer> acceptedStatus = Arrays.asList(1, 3, 6, 8);
@@ -369,7 +371,7 @@ public class PublicApiService {
         } else if (statusCode == 8) { // ACCESS_CANCEL
             // Ativação cancelada
             try {
-                activationService.cancelActivation(activation.getId());
+                activationService.cancelActivation(activation.getId(), apiKey);
 
                 return "ACCESS_CANCEL";
             } catch (Exception e) {

@@ -19,9 +19,6 @@ public class CompraService {
     private CompraServicoRepository compraServicoRepository;
 
     public String virifyCredit(User user, Servico servicoDb) {
-
-
-
         if(user.getCredito().compareTo(servicoDb.getPrice()) >= 0) {
             return "true";
         } else {
@@ -36,5 +33,13 @@ public class CompraService {
 
         CompraServiso compraServiso = new CompraServiso(servico.getName(), chipNumber);
         compraServicoRepository.save(compraServiso);
+    }
+
+    public void devolution(String apiKey, BigDecimal price) {
+        User user = userDbRepository.findByApiKey(apiKey).get();
+        BigDecimal bd = user.getCredito().add(price);
+        user.setCredito(bd);
+
+        userDbRepository.save(user);
     }
 }

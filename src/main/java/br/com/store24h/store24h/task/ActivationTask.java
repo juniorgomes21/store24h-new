@@ -1,4 +1,4 @@
-package br.com.store24h.store24h.task.service;
+package br.com.store24h.store24h.task;
 
 import br.com.store24h.store24h.model.Activation;
 import br.com.store24h.store24h.model.TimeZone;
@@ -27,7 +27,7 @@ public class ActivationTask {
         List<Activation> activations = activationRepository.findByStatusAndInitialTimeBefore(3, currentTimeMinus20Minutes);
 
         activations.forEach( activation -> {
-            activationService.cancelActivation(activation.getId());
+            activationService.cancelActivation(activation.getId(), activation.getApiKey());
         });
     }
 }

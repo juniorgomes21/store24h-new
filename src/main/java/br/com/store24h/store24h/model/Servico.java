@@ -1,6 +1,7 @@
 package br.com.store24h.store24h.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Map;
@@ -29,6 +30,7 @@ public class Servico implements Serializable {
     private boolean random;
     private int quantityForMaxPrice = 30;
     private boolean activity = true;
+    @PositiveOrZero
     private int totalQuantity;
     private boolean canAuction;
     private ArrayList<Object> auctionMap = new ArrayList<>();

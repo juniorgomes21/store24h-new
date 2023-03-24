@@ -22,6 +22,10 @@ public class ChipNumberControl {
     public ChipNumberControl() {
     }
 
+    public ChipNumberControl(String chipNumber) {
+        this.chipNumber = chipNumber;
+    }
+
     public Long getId() {
         return id;
     }
