@@ -1,7 +1,9 @@
 package br.com.store24h.store24h.services;
 
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
+import br.com.store24h.store24h.model.CompraServiso;
 import br.com.store24h.store24h.model.Servico;
+import br.com.store24h.store24h.repository.BuyServiceRepository;
 import br.com.store24h.store24h.repository.ServicosRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ public class SvsService {
 
     @Autowired
     private ServicosRepository servicosRepository;
+
+    @Autowired
+    private BuyServiceRepository buyServiceRepository;
 
     @Autowired
     private ChipService chipService;
@@ -100,5 +105,10 @@ public class SvsService {
         });
 
         servicosRepository.saveAll(servicoList);
+    }
+
+    public void saveRegisterBuy(Long idActivation, Servico servico, String number, Long idUser) {
+        CompraServiso compraServiso = new CompraServiso(idActivation, servico.getAlias(), number, servico.getPrice(), idUser);
+        buyServiceRepository.save(compraServiso);
     }
 }

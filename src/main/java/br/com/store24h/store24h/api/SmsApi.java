@@ -82,11 +82,16 @@ public class SmsApi {
 
         } else if(action.equals("getNumber")){ // GET_NUMBER
 
+            if(country.isPresent() && !country.get().equals("73")) {
+                return ResponseEntity.badRequest().body("BAD_SERVICE");
+            }
+
             String responseGetNumber = methodsHubService.getNumber(apiKey, service, operator, country);
 
             List<String> badResponse = Arrays.asList("BAD_ACTION", "BAD_SERVICE", "ERROR_SQL");
 
             if(badResponse.contains(responseGetNumber)) {
+                // chamada syncrona
                 return ResponseEntity.badRequest().body(responseGetNumber);
             } else {
                 return ResponseEntity.ok(responseGetNumber);
@@ -126,12 +131,21 @@ public class SmsApi {
 
             return ResponseEntity.ok(responseSetStatus);
         } else if (action.equals("getPrices")) {
+
+            if(country.isPresent() && !country.get().equals("73")) {
+                return ResponseEntity.badRequest().build();
+            }
+
             Object responseGetPrice = methodsHubService.getPrices(service, country);
+
             if(responseGetPrice == null) {
                 return ResponseEntity.badRequest().build();
             }
+
             return ResponseEntity.ok(responseGetPrice);
+
         } else if (action.equals("getNumbersStatus")) {
+
             JSONObject response = methodsHubService.getNumberStatus(country, operator);
 
             return ResponseEntity.ok(response);

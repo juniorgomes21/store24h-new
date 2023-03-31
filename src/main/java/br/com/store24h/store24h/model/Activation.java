@@ -110,24 +110,6 @@ public class Activation implements Serializable {
     /**
      * Seta valores internos apropriadamente
      * @return
-     * @TODO Ver depois
-     */
-//    public boolean finalizeService() {
-//        throw Un
-//        boolean resp = false;
-//        // é importante tratar este estado, pois ele influencia na contabilidade
-//        if (smsModels.size() > 0) {
-////                    throw new RuntimeException(Activation.class.getName() + " : Para finalizar deve existir algum sms");
-//            resp = true;
-//            this.setEndTime(LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())));
-//            this.statusBuz = ActivationStatus.FINALIZADA;
-//        }
-//        return resp;
-//    };
-
-    /**
-     * Seta valores internos apropriadamente
-     * @return
      */
     public boolean cancelService() {
         statusBuz = ActivationStatus.CANCELADA;

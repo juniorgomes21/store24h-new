@@ -1,10 +1,8 @@
 package br.com.store24h.store24h.services.core;
 
-import br.com.store24h.store24h.model.Activation;
-import br.com.store24h.store24h.model.Servico;
-import br.com.store24h.store24h.model.TimeZone;
-import br.com.store24h.store24h.model.User;
+import br.com.store24h.store24h.model.*;
 import br.com.store24h.store24h.repository.ActivationRepository;
+import br.com.store24h.store24h.repository.BuyServiceRepository;
 import br.com.store24h.store24h.repository.SmsRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
 import br.com.store24h.store24h.services.ChipNumberControlService;
@@ -16,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class ActivationService {
@@ -41,15 +41,19 @@ public class ActivationService {
     @Autowired
     private SvsService svsService;
 
+    @Autowired
+    private BuyServiceRepository buyServiceRepository;
+
     @Transactional
     public Long newActivation(User user, Servico servico, String chipNumber, String apiKey) {
         try {
-//            TODO tirar daqui
-            compraService.buyService(user, servico, chipNumber);
             Activation activation = new Activation(servico, chipNumber, apiKey);
             activation.setStatusBuz(ActivationStatus.AGUARDANDO_MENSAGENS);
+            Long id = activationRepository.save(activation).getId();
 
-            return activationRepository.save(activation).getId();
+            compraService.subtractAndSave(user, servico, chipNumber, id);
+
+            return id;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,19 +62,29 @@ public class ActivationService {
     }
 
     @Transactional
-    public void cancelActivation(Long id, String apiKey) {
+    public String cancelActivation(Long id, String apiKey) {
         Activation activation = activationRepository.findById(id).get();
 
-        controlService.removeService(activation.getChipNumber(), activation.getAliasService());
+        if(activation.getSmsStringModels().isEmpty()) {
+            controlService.removeService(activation.getChipNumber(), activation.getAliasService());
 
-        activation.setStatus(8);
-        activation.setAliasService(activation.getAliasService() + "_cancel");
-        activation.setStatusBuz(ActivationStatus.CANCELADA);
-        activationRepository.save(activation);
+            activation.setStatus(8);
+            activation.setAliasService(activation.getAliasService() + "_cancel");
+            activation.setStatusBuz(ActivationStatus.CANCELADA);
+            activationRepository.save(activation);
 
-        svsService.addQuantity(activation.getServiceName());
+            saveStatusBuy(activation.getId(), 8, null);
 
-        compraService.devolution(apiKey, activation.getServicePrice());
+            svsService.addQuantity(activation.getServiceName());
+
+            compraService.devolution(apiKey, activation.getServicePrice());
+
+            return "ACCESS_CANCEL";
+        } else {
+            this.conclude(id);
+
+            return "ACCESS_ACTIVATION";
+        }
     }
 
     public void conclude(Long id) {
@@ -79,7 +93,32 @@ public class ActivationService {
         activation.setAliasService(activation.getAliasService() + "_finalizada");
         activation.setStatus(6);
         activation.setStatusBuz(ActivationStatus.FINALIZADA);
+
+
         activationRepository.save(activation);
+    }
+
+    public Activation saveSms(Activation a, String sms) {
+        a.setEndTime(LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())));
+        a.getSmsStringModels().add(sms);
+        a.setStatus(7);
+        a.setStatusBuz(ActivationStatus.RECEBIDA);
+
+        saveStatusBuy(a.getId(), 7, sms);
+
+        return a;
+    }
+
+    public Activation saveSmsRetry(Activation a, String sms) {
+        a.setEndTime(LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())));
+        a.getSmsStringModels().remove(0);
+        a.getSmsStringModels().add(sms);
+        a.setStatus(7);
+        a.setStatusBuz(ActivationStatus.RECEBIDA);
+
+        saveStatusBuy(a.getId(), 7, sms);
+
+        return a;
     }
 
     @Transactional
@@ -91,10 +130,36 @@ public class ActivationService {
         }
 
         activation.setStatus(3);
-        activation.setInitialTime(LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())));
+//        activation.setInitialTime(LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())));
         activation.setStatusBuz(ActivationStatus.AGUARDANDO_MENSAGENS);
         activationRepository.save(activation);
 
+        saveStatusBuy(activation.getId(), 3, null);
+
         return true;
     }
+
+    public List<Activation> getActivationsValids(String apiKey) {
+        LocalDateTime date = LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())).minusMinutes(20);
+        List<Integer> statusList = Arrays.asList(8, 6);
+        List<Activation> activationList = activationRepository.findByApiKeyAndInitialTimeAfterAndStatusNotIn(apiKey, date, statusList);
+
+        return activationList;
+    }
+
+    public List<Activation> getAllActivationsApiKey(String apiKey) {
+        List<Activation> activationList = activationRepository.findByApiKey(apiKey);
+
+        return activationList;
+    }
+
+    private void saveStatusBuy(Long idActivation, int status, String sms) {
+        CompraServiso compraServico = buyServiceRepository.findByIdActivation(idActivation);
+        if(sms != null) {
+            compraServico.setSms(sms);
+        }
+        compraServico.setStatus(status);
+        buyServiceRepository.save(compraServico);
+    }
+
 }

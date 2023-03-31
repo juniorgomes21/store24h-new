@@ -16,5 +16,10 @@ public interface ActivationRepository extends JpaRepository<Activation, Long> {
     List<Activation> findByStatusBuz(ActivationStatus activationStatus);
     List<Activation> findAllByStatusBuzAndChipNumber(ActivationStatus activationStatus, String chipNumber);
     List<Activation> findByStatusBuzAndChipNumberAndAliasService(ActivationStatus activationStatus, String chipNumber, String aliasService);
-    List<Activation> findByStatusAndInitialTimeBefore(int i, LocalDateTime currentTimeMinus20Minutes);
+    List<Activation> findByStatusInAndInitialTimeBefore(List<Integer> list, LocalDateTime currentTimeMinus20Minutes);
+    List<Activation> findByStatusInAndInitialTimeAfter(List<Integer> list, LocalDateTime currentTimeMinus20Minutes);
+
+    List<Activation> findByApiKeyAndInitialTimeAfterAndStatusNotIn(String apiKey, LocalDateTime date, List<Integer> status);
+
+    List<Activation> findByApiKey(String apiKey);
 }

@@ -4,17 +4,17 @@ import br.com.store24h.store24h.Requisicoes.ParamActivity;
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
 import br.com.store24h.store24h.Requisicoes.RequisicaoUpdateService;
 import br.com.store24h.store24h.Requisicoes.services.ParamEditPriceSevice;
+import br.com.store24h.store24h.dto.CompraServisoDTO;
 import br.com.store24h.store24h.dto.ErrorResponseDto;
 import br.com.store24h.store24h.dto.ServicoDtoJunior;
 import br.com.store24h.store24h.model.CompraServiso;
 import br.com.store24h.store24h.model.Servico;
 import br.com.store24h.store24h.model.User;
-import br.com.store24h.store24h.repository.CompraServicoRepository;
+import br.com.store24h.store24h.repository.BuyServiceRepository;
 import br.com.store24h.store24h.repository.ServicosRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
 import br.com.store24h.store24h.services.SvsService;
 import br.com.store24h.store24h.services.UserService;
-import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -37,13 +37,14 @@ public class ServicoApi {
     private UserDbRepository userDbRepository;
 
     @Autowired
-    private CompraServicoRepository compraServicoRepository;
+    private BuyServiceRepository buyServiceRepository;
 
     @Autowired
     private UserService userService;
 
     @Autowired
     private SvsService svsService;
+
 
     @GetMapping("/getAllServicesX")
     public ResponseEntity<Object> getAllServicesX() {
@@ -217,10 +218,20 @@ public class ServicoApi {
     }
 
     @GetMapping("/getComprasFeitas")
-    public ResponseEntity<Object> comprasFeitas(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 3) Pageable pageable) {
+    public ResponseEntity<Object> comprasFeitas(@RequestParam String api_key, @PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable) {
 
-        Page<CompraServiso> compraServisoPage = compraServicoRepository.findAll(pageable);
+        if(!userService.isValidApiKey(api_key)) {
+            return ResponseEntity.badRequest().build();
+        }
 
-        return ResponseEntity.ok(compraServisoPage);
+        Page<CompraServiso> compraServisoPage = buyServiceRepository.findAll(pageable);
+        List<CompraServisoDTO> compraServisoDTOS = new ArrayList<>();
+
+        compraServisoPage.getContent().forEach( compraServiso -> {
+            CompraServisoDTO compraServisoDTO = new CompraServisoDTO(compraServiso, compraServisoPage.getTotalElements(), compraServisoPage.getTotalPages(), compraServisoPage.getNumberOfElements());
+            compraServisoDTOS.add(compraServisoDTO);
+        });
+
+        return ResponseEntity.ok(compraServisoDTOS);
     }
 }

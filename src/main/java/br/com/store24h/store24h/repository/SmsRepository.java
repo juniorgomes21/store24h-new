@@ -13,6 +13,7 @@ public interface SmsRepository extends JpaRepository<SmsModel, Long>{
     Optional<SmsModel> findByChipnumberAndIdActivation(String chipnumber, Long idActivation);
     Optional<SmsModel> findByIdActivation(Long idActivation, Sort sort);
     Optional<SmsModel> findFirstByIdActivationOrderByDateDesc(Long idActivation);
+    Optional<SmsModel> findFirstByChipnumberAndIdActivationOrderByDateDesc(String chipNumber, Long idActivation);
     SmsModel findByMsgAndIdActivation(String msg, Long idActivation);
     Optional<SmsModel> findByDateAfterAndIdActivation(LocalDateTime time, Long id);
     List<SmsModel> findByDateBefore(LocalDateTime dateBefore);

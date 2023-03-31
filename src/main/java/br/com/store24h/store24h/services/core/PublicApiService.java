@@ -47,6 +47,9 @@ public class PublicApiService {
     private SvsService svsService;
 
     @Autowired
+    private BuyServiceRepository buyServiceRepository;
+
+    @Autowired
     private UserDbRepository userDbRepository;
 
     @Autowired
@@ -333,11 +336,13 @@ public class PublicApiService {
         }
 
         Optional<Activation> activationOptional;
+        CompraServiso compraServico;
         try {
              activationOptional = activationRepository.findById(idActivation.get());
              if(!activationOptional.isPresent()) {
                  return "NO_ACTIVATION";
              }
+             compraServico = buyServiceRepository.findByIdActivation(activationOptional.get().getId());
         } catch (Exception e) {
             return "ERROR_SQL";
         }
@@ -350,6 +355,9 @@ public class PublicApiService {
                 activation.setStatus(1);
                 activationRepository.save(activation);
 
+                compraServico.setStatus(1);
+                buyServiceRepository.save(compraServico);
+
                 return "ACCESS_READY";
             } catch (Exception e) {
                 return "ERROR_SQL";
@@ -359,6 +367,7 @@ public class PublicApiService {
             // Esperamos um novo SMS
             try {
                 if(activationService.awaitNewCode(activation.getId())) {
+
                     return "ACCESS_RETRY_GET";
                 }
 
@@ -371,9 +380,10 @@ public class PublicApiService {
         } else if (statusCode == 8) { // ACCESS_CANCEL
             // Ativação cancelada
             try {
-                activationService.cancelActivation(activation.getId(), apiKey);
+                String response = activationService.cancelActivation(activation.getId(), apiKey);
 
-                return "ACCESS_CANCEL";
+                return response;
+
             } catch (Exception e) {
                 return "ERROR_SQL";
             }
@@ -381,6 +391,9 @@ public class PublicApiService {
         } else { // ACCESS_ACTIVATION
             try {
                 activationService.conclude(activation.getId());
+
+                compraServico.setStatus(6);
+                buyServiceRepository.save(compraServico);
 
                 return "ACCESS_ACTIVATION";
             } catch (Exception e) {
@@ -393,6 +406,17 @@ public class PublicApiService {
         JSONObject myJson = new JSONObject();
 
         List<Servico> servicoList = new ArrayList<>();
+
+        if(country.isPresent() && !country.get().equals("73")) {
+            servicoList = servicosRepository.findAll();
+
+            servicoList.forEach( servico -> {
+                myJson.put(servico.getAlias() + "_0", 0);
+            });
+
+            return myJson;
+        }
+
         try {
             servicoList = servicosRepository.findAll();
 

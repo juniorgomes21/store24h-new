@@ -1,9 +1,8 @@
 package br.com.store24h.store24h.services;
 
-import br.com.store24h.store24h.model.CompraServiso;
 import br.com.store24h.store24h.model.Servico;
 import br.com.store24h.store24h.model.User;
-import br.com.store24h.store24h.repository.CompraServicoRepository;
+import br.com.store24h.store24h.repository.BuyServiceRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,10 @@ public class CompraService {
     private UserDbRepository userDbRepository;
 
     @Autowired
-    private CompraServicoRepository compraServicoRepository;
+    private BuyServiceRepository buyServiceRepository;
+
+    @Autowired
+    private SvsService svsService;
 
     public String virifyCredit(User user, Servico servicoDb) {
         if(user.getCredito().compareTo(servicoDb.getPrice()) >= 0) {
@@ -26,13 +28,12 @@ public class CompraService {
         }
     }
 
-    public void buyService(User user, Servico servico, String chipNumber) {
+    public void subtractAndSave(User user, Servico servico, String chipNumber, Long idActivation) {
         BigDecimal bd = user.getCredito().subtract(servico.getPrice());
         user.setCredito(bd);
         userDbRepository.save(user);
 
-        CompraServiso compraServiso = new CompraServiso(servico.getName(), chipNumber);
-        compraServicoRepository.save(compraServiso);
+        svsService.saveRegisterBuy(idActivation, servico, chipNumber, user.getId());
     }
 
     public void devolution(String apiKey, BigDecimal price) {

@@ -1,32 +1,47 @@
 package br.com.store24h.store24h.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Entity
+@Table(name = "registro_de_compras")
 public class CompraServiso {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long idActivation;
     private LocalDateTime localDateTime;
-    private String chipNumber;
-    private String servico;
+    private String aliasService;
+    private String number;
+    private String sms = "";
+    private BigDecimal cost;
+    private int status = 1;
+    private Long idUser;
 
     public CompraServiso() {
     }
 
-    public CompraServiso(String servico, String chipNumber) {
-        this.servico = servico;
-        this.chipNumber = chipNumber;
+    public CompraServiso(Long idActivation, String aliasService, String number, BigDecimal cost, Long idUser) {
+        this.idActivation = idActivation;
         this.localDateTime = LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone()));
+        this.aliasService = aliasService;
+        this.number = number;
+        this.cost = cost;
+        this.idUser = idUser;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getAliasService() {
+        return aliasService;
+    }
+
+    public void setAliasService(String aliasService) {
+        this.aliasService = aliasService;
     }
 
     public LocalDateTime getLocalDateTime() {
@@ -37,19 +52,51 @@ public class CompraServiso {
         this.localDateTime = localDateTime;
     }
 
-    public String getChipNumber() {
-        return chipNumber;
+    public String getNumber() {
+        return number;
     }
 
-    public void setChipNumber(String chipNumber) {
-        this.chipNumber = chipNumber;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
-    public String getServico() {
-        return servico;
+    public Long getIdActivation() {
+        return idActivation;
     }
 
-    public void setServico(String servico) {
-        this.servico = servico;
+    public void setIdActivation(Long idActivation) {
+        this.idActivation = idActivation;
+    }
+
+    public String getSms() {
+        return sms;
+    }
+
+    public void setSms(String sms) {
+        this.sms = sms;
+    }
+
+    public BigDecimal getCost() {
+        return cost;
+    }
+
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public Long getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(Long idUser) {
+        this.idUser = idUser;
     }
 }
