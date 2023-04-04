@@ -133,7 +133,8 @@ public class SmsApi {
         } else if (action.equals("getPrices")) {
 
             if(country.isPresent() && !country.get().equals("73")) {
-                return ResponseEntity.badRequest().build();
+                JSONObject myJson = new JSONObject();
+                return ResponseEntity.badRequest().body(myJson);
             }
 
             Object responseGetPrice = methodsHubService.getPrices(service, country);

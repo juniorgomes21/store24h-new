@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -87,6 +89,31 @@ public class ActivationService {
         }
     }
 
+    @Transactional
+    public String cancelActivation(Activation activation, String apiKey) {
+
+        if(activation.getSmsStringModels().isEmpty()) {
+            controlService.removeService(activation.getChipNumber(), activation.getAliasService());
+
+            activation.setStatus(8);
+            activation.setAliasService(activation.getAliasService() + "_cancel");
+            activation.setStatusBuz(ActivationStatus.CANCELADA);
+            activationRepository.save(activation);
+
+            saveStatusBuy(activation.getId(), 8, null);
+
+            svsService.addQuantity(activation.getServiceName());
+
+            compraService.devolution(apiKey, activation.getServicePrice());
+
+            return "ACCESS_CANCEL";
+        } else {
+            this.conclude(activation.getId());
+
+            return "ACCESS_ACTIVATION";
+        }
+    }
+
     public void conclude(Long id) {
         Activation activation = activationRepository.findById(id).get();
 
@@ -94,6 +121,18 @@ public class ActivationService {
         activation.setStatus(6);
         activation.setStatusBuz(ActivationStatus.FINALIZADA);
 
+        saveStatusBuy(activation.getId(), 6, null);
+
+        activationRepository.save(activation);
+    }
+
+    public void conclude(Activation activation, CompraServiso compraServico) {
+
+        activation.setAliasService(activation.getAliasService() + "_finalizada");
+        activation.setStatus(6);
+        activation.setStatusBuz(ActivationStatus.FINALIZADA);
+
+        saveStatusBuy(activation.getId(), 6, null);
 
         activationRepository.save(activation);
     }
@@ -122,10 +161,20 @@ public class ActivationService {
     }
 
     @Transactional
-    public boolean awaitNewCode(Long id) {
-        Activation activation = activationRepository.findById(id).get();
+    public boolean initialStatus(Activation activation) {
+        if(activation.getStatus() == -1) {
 
-        if (activation.getStatus() == 8) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Transactional
+    public boolean awaitNewCode(Activation activation) {
+
+        List<Integer> numberInvalids = Arrays.asList(-1, 6, 8);
+        if (numberInvalids.contains(activation.getStatus())) {
             return false;
         }
 

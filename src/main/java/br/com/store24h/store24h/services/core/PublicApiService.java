@@ -352,13 +352,17 @@ public class PublicApiService {
         if (statusCode == 1) { // ACCESS_READY
             // Prontidão de espera de SMS
             try {
-                activation.setStatus(1);
-                activationRepository.save(activation);
 
-                compraServico.setStatus(1);
-                buyServiceRepository.save(compraServico);
+//                activation.setStatus(1);
+//                activationRepository.save(activation);
 
-                return "ACCESS_READY";
+                if(activationService.initialStatus(activation)) {
+//                    compraServico.setStatus(1);
+//                    buyServiceRepository.save(compraServico);
+                    return "ACCESS_READY";
+                }
+
+                return "BAD_ACTION";
             } catch (Exception e) {
                 return "ERROR_SQL";
             }
@@ -366,7 +370,7 @@ public class PublicApiService {
         } else if (statusCode == 3) { // ACCESS_RETRY_GET
             // Esperamos um novo SMS
             try {
-                if(activationService.awaitNewCode(activation.getId())) {
+                if(activationService.awaitNewCode(activation)) {
 
                     return "ACCESS_RETRY_GET";
                 }
@@ -380,7 +384,7 @@ public class PublicApiService {
         } else if (statusCode == 8) { // ACCESS_CANCEL
             // Ativação cancelada
             try {
-                String response = activationService.cancelActivation(activation.getId(), apiKey);
+                String response = activationService.cancelActivation(activation, apiKey);
 
                 return response;
 
@@ -390,10 +394,7 @@ public class PublicApiService {
 
         } else { // ACCESS_ACTIVATION
             try {
-                activationService.conclude(activation.getId());
-
-                compraServico.setStatus(6);
-                buyServiceRepository.save(compraServico);
+                activationService.conclude(activation, compraServico);
 
                 return "ACCESS_ACTIVATION";
             } catch (Exception e) {
