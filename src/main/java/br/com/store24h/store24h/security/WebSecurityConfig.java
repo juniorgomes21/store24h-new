@@ -82,6 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/stubs/handler_api/prices").permitAll()
                 .antMatchers("/stubs/handler_api/listaDePaisesOperadoras/**").permitAll()
                 .antMatchers("/stubs/handler_api/listServicos").permitAll()
+                .antMatchers("/stubs/handler_api/activations/status").permitAll()
                 .antMatchers("/stubs/handler_api/activations/valids").permitAll()
                 .antMatchers("/stubs/handler_api/activations/history").permitAll()
 

@@ -20,5 +20,5 @@ public interface SmsRepository extends JpaRepository<SmsModel, Long>{
     Optional<SmsModel> findByDateGreaterThanAndIdActivation(LocalDateTime date, Long idActivation);
     void deleteByChipnumber(String chipNumber);
     void deleteByIdActivation(Long id);
-
+    SmsModel findFirstByIdActivation(long id, Sort sort);
 }

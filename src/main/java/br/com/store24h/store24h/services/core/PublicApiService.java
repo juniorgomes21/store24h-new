@@ -20,10 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PublicApiService {
@@ -118,7 +115,7 @@ public class PublicApiService {
         List<ChipModel> numeroDisponivelList = null;
 
         try {
-            if(operator.isPresent()) {
+            if(operator.isPresent() && !operator.get().toUpperCase().equals("ANY")) {
                 numeroDisponivelList = chipRepository.findByAlugadoAndAtivoAndOperadora(false, true, operator.get());
             } else {
                 numeroDisponivelList = chipRepository.findByAlugadoAndAtivo(false, true);
@@ -136,8 +133,10 @@ public class PublicApiService {
 
             return responseAPI;
         } else {
+
+            Collections.shuffle(numeroDisponivelList);
+
             for(ChipModel cm: numeroDisponivelList) {
-//                Optional<Activation> activationOptional = activationRepository.findByChipNumberAndAliasService(cm.getNumber(), service.get());
                 Optional<ChipNumberControl> chipNumberControlOptional = chipNumberControlRepository.findByChipNumberAndAliasService(cm.getNumber(), service.get());
                 if(!chipNumberControlOptional.isPresent()) {
                     controlService.addServiceInNumber(cm.getNumber(), servicoOptional.get());
@@ -179,86 +178,42 @@ public class PublicApiService {
 
     public SmsDTO getSms(Long idActivation) {
         Activation activation = activationRepository.getById(idActivation);
-        Optional<SmsModel> smsModel = Optional.of(new SmsModel());
-        if(activation.getSmsStringModels().size() == 0) {
-            String num = activation.getChipNumber();
-            smsModel = smsRepository.findByChipnumberAndIdActivation(activation.getChipNumber(), idActivation);
-        }
 
         SmsDTO smsDTO = new SmsDTO();
+        smsDTO.setNameService(activation.getServiceName());
+        smsDTO.setStatus(activation.getStatus());
+        smsDTO.setAliasService(activation.getAliasService());
+        smsDTO.setNumberActivation(activation.getChipNumber());
 
-        if(smsModel.isPresent() && !smsModel.get().getMsg().isEmpty()) {
-            activation.setStatus(7);
-            String ss = smsModel.get().getMsg();
-            activation.getSmsStringModels().add(ss);
+        String sms;
+        try {
+            sms = activation.getSmsStringModels().get(0);
+        } catch (IndexOutOfBoundsException e) {
 
-            //TODO criar uma função para timeZone
-            LocalDateTime now = LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone()));
-            ZoneId brasiliaZone = ZoneId.of("America/Sao_Paulo");
-            ZonedDateTime brasiliaNow = now.atZone(brasiliaZone);
-            activation.setEndTime(brasiliaNow.toLocalDateTime());
+            smsDTO.setSmsList(activation.getSmsStringModels());
 
-            activationRepository.save(activation);
-
-            smsDTO.getSmsList().add(ss);
-            smsDTO.setNameService(activation.getServiceName());
-            smsDTO.setAliasService(activation.getAliasService());
-            smsDTO.setNumberActivation(activation.getChipNumber());
-
-            //Todo ver se lista ou SmsModel
             return smsDTO;
         }
-        smsDTO.setNameService(activation.getServiceName());
-        smsDTO.setAliasService(activation.getAliasService());
-        smsDTO.setSmsList(activation.getSmsStringModels());
-        smsDTO.setNumberActivation(activation.getChipNumber());
+
+        smsDTO.getSmsList().add(sms);
 
         return smsDTO;
     }
 
     public SmsDTO getSmsRetry(Long idActivation) {
         Activation activation = activationRepository.getById(idActivation);
-        int size = activation.getSmsStringModels().size() - 1;
-        SmsModel lastSmsModel = smsRepository.findByMsgAndIdActivation(activation.getSmsStringModels().get(size), activation.getId());
-
-        Optional<SmsModel> newSmsModel = smsRepository.findByDateGreaterThanAndIdActivation(lastSmsModel.getDate(), activation.getId());
-//        Sort sort = Sort.by("date").descending();
-//        Optional<SmsModel> newSmsModel = smsRepository.findByIdActivation(lastSmsModel.getDate(), lastSmsModel.getId(), sort);
 
         SmsDTO smsDTO = new SmsDTO();
-
-        if(newSmsModel.isPresent() && !newSmsModel.get().getMsg().isEmpty()) {
-            activation.setStatus(7);
-            String ss = newSmsModel.get().getMsg();
-            activation.getSmsStringModels().remove(0);
-            activation.getSmsStringModels().add(ss);
-
-            LocalDateTime now = LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone()));
-            ZoneId brasiliaZone = ZoneId.of("America/Sao_Paulo");
-            ZonedDateTime brasiliaNow = now.atZone(brasiliaZone);
-
-            activation.setEndTime(brasiliaNow.toLocalDateTime());
-
-            activationRepository.save(activation);
-
-            smsDTO.setNameService(activation.getServiceName());
-            smsDTO.setAliasService(activation.getAliasService());
-            smsDTO.getSmsList().add(ss);
-            smsDTO.setNumberActivation(activation.getChipNumber());
-
-            return smsDTO;
-        }
-        List<String> smsStringModels = new ArrayList<>();
-
+        smsDTO.setStatus(activation.getStatus());
         smsDTO.setNameService(activation.getServiceName());
         smsDTO.setAliasService(activation.getAliasService());
-        smsDTO.setSmsList(smsStringModels);
         smsDTO.setNumberActivation(activation.getChipNumber());
+        smsDTO.getSmsList().add(activation.getSmsStringModels().get(0));
 
         return smsDTO;
     }
 
-    public String getStatus(Optional<Long> id) {
+    public String getStatus(Optional<Long> id, String apiKey) {
         JSONObject myJson = new JSONObject();
 
         // POSSÍVEIS ERROS
@@ -276,7 +231,7 @@ public class PublicApiService {
             return "ERROR_SQL";
         }
 
-        if(!activationOptional.isPresent()) {
+        if(!activationOptional.isPresent() || !activationOptional.get().getApiKey().equals(apiKey)) {
             // ID de ativação não existe
             return "NO_ACTIVATION";
         }
@@ -339,7 +294,7 @@ public class PublicApiService {
         CompraServiso compraServico;
         try {
              activationOptional = activationRepository.findById(idActivation.get());
-             if(!activationOptional.isPresent()) {
+             if(!activationOptional.isPresent() || !activationOptional.get().getApiKey().equals(apiKey)) {
                  return "NO_ACTIVATION";
              }
              compraServico = buyServiceRepository.findByIdActivation(activationOptional.get().getId());
@@ -422,7 +377,12 @@ public class PublicApiService {
             servicoList = servicosRepository.findAll();
 
             if(operator.isPresent()) {
-                List<ChipModel> chipModelList = chipRepository.findByOperadora(operator.get());
+                List<ChipModel> chipModelList;
+                if(operator.get().toUpperCase().equals("ANY")) {
+                    chipModelList = chipRepository.findAll();
+                } else {
+                    chipModelList = chipRepository.findByOperadora(operator.get());
+                }
                 List<String> numbers = new ArrayList<>();
                 chipModelList.forEach( chipModel -> {
                     numbers.add(chipModel.getNumber());

@@ -7,6 +7,7 @@ import java.util.List;
 
 public class SmsDTO {
     private String nameService;
+    private int status;
     private String aliasService;
     private String numberActivation;
     private List<String> smsList = new ArrayList<>();
@@ -28,6 +29,14 @@ public class SmsDTO {
 
     public void setAliasService(String aliasService) {
         this.aliasService = aliasService;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public String getNumberActivation() {

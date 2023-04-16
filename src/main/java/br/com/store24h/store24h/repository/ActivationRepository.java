@@ -22,4 +22,6 @@ public interface ActivationRepository extends JpaRepository<Activation, Long> {
     List<Activation> findByApiKeyAndInitialTimeAfterAndStatusNotIn(String apiKey, LocalDateTime date, List<Integer> status);
 
     List<Activation> findByApiKey(String apiKey);
+
+    List<Activation> findAllByIdIn(List<Long> idActivations);
 }

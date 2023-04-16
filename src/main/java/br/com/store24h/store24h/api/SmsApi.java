@@ -100,7 +100,7 @@ public class SmsApi {
 
         } else if(action.equals("getStatus")){ // GET_STATUS
 
-            String responseGetStatus = methodsHubService.getStatus(id);
+            String responseGetStatus = methodsHubService.getStatus(id, apiKey);
 
             List<String> badResponse = Arrays.asList("BAD_ACTION", "NO_ACTIVATION", "ERROR_SQL");
 
