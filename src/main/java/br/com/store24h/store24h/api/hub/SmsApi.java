@@ -1,4 +1,4 @@
-package br.com.store24h.store24h.api;
+package br.com.store24h.store24h.api.hub;
 
 import br.com.store24h.store24h.Funcionalidades.Funcionalidades;
 import br.com.store24h.store24h.dto.SmsDTO;

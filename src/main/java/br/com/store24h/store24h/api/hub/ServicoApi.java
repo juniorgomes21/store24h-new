@@ -1,6 +1,7 @@
-package br.com.store24h.store24h.api;
+package br.com.store24h.store24h.api.hub;
 
 import br.com.store24h.store24h.Requisicoes.ParamActivity;
+import br.com.store24h.store24h.Requisicoes.ParamDate;
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
 import br.com.store24h.store24h.Requisicoes.RequisicaoUpdateService;
 import br.com.store24h.store24h.Requisicoes.services.ParamEditPriceSevice;
@@ -22,9 +23,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -65,6 +70,17 @@ public class ServicoApi {
             svsService.editPriceService(id, paramEditPrice.getNewPrice());
 
             return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponseDto());
+        }
+    }
+
+    @GetMapping("/activity")
+    public ResponseEntity<Object> getAllServicesActivity(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 12) Pageable pageable) {
+        try {
+            List<Servico> servicoPage = servicosRepository.findAll();
+
+            return ResponseEntity.ok(servicoPage);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponseDto());
         }
@@ -233,5 +249,62 @@ public class ServicoApi {
         });
 
         return ResponseEntity.ok(compraServisoDTOS);
+    }
+
+    @GetMapping("/getComprasFeitas/hub")
+    public ResponseEntity<Object> comprasFeitasHub(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable, Authentication authentication) {
+
+        Page<CompraServiso> compraServisoPage = buyServiceRepository.findAll(pageable);
+
+        return ResponseEntity.ok(compraServisoPage);
+    }
+
+    @PostMapping("/getComprasFeitas/hub/filter")
+    public ResponseEntity<Object> comprasFeitasFilter(@RequestBody ParamDate paramDate, @PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable) {
+
+        LocalDateTime dateInitial = this.auxDate(paramDate.getDateInitial());
+        LocalDateTime datefinal = this.auxDate(paramDate.getDateFinal());
+
+        Page<CompraServiso> compraServisoPage = buyServiceRepository.findByLocalDateTimeBetween(dateInitial, datefinal, pageable);
+
+        return ResponseEntity.ok(compraServisoPage);
+    }
+
+    private LocalDateTime auxDate(String date) {
+        int year = Integer.parseInt(date.substring(11, 15));
+        String monthStrig = date.substring(4, 7).toUpperCase();
+        if(monthStrig.equals("JAN")) {
+            monthStrig = "JANUARY";
+        } else if (monthStrig.equals("FEB")) {
+            monthStrig = "FEBRUARY";
+        } else if (monthStrig.equals("MAR")) {
+            monthStrig = "MARCH";
+        } else if (monthStrig.equals("APR")) {
+            monthStrig = "APRIL";
+        } else if (monthStrig.equals("MAY")) {
+            monthStrig = "MAY";
+        } else if (monthStrig.equals("JUN")) {
+            monthStrig = "JUNE";
+        } else if (monthStrig.equals("JUL")) {
+            monthStrig = "JULY";
+        } else if (monthStrig.equals("AUG")) {
+            monthStrig = "AUGUST";
+        } else if (monthStrig.equals("SEP")) {
+            monthStrig = "SEPTEMBER";
+        }else if (monthStrig.equals("OCT")) {
+            monthStrig = "OCTOBER";
+        } else if (monthStrig.equals("NOV")) {
+            monthStrig = "NOVEMBER";
+        } else {
+            monthStrig = "DECEMBER";
+        }
+        Month month = Month.valueOf(monthStrig);
+        int day = Integer.parseInt(date.substring(8, 10));
+        int hours = Integer.parseInt(date.substring(16, 18));
+        int minutes = Integer.parseInt(date.substring(19, 21));
+
+        LocalDateTime dateOk = LocalDateTime.of(year, month, day, hours, minutes);
+
+        return dateOk;
     }
 }

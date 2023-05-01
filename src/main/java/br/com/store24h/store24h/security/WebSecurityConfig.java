@@ -62,6 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/aux/verifyInvalidChipNumber").permitAll()
                 .antMatchers("/aux/verifyNewChipNumber").permitAll()
                 .antMatchers("/aux/cancelAPI").permitAll()
+                .antMatchers("/stubs/handler_api/apiServicos/loadService").permitAll()
 
                 //Padrão API ADM
                 .antMatchers("/stubs/handler_api/ping").permitAll()
@@ -82,18 +83,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/stubs/handler_api/prices").permitAll()
                 .antMatchers("/stubs/handler_api/listaDePaisesOperadoras/**").permitAll()
                 .antMatchers("/stubs/handler_api/listServicos").permitAll()
-                .antMatchers("/stubs/handler_api/activations/status").permitAll()
-                .antMatchers("/stubs/handler_api/activations/valids").permitAll()
-                .antMatchers("/stubs/handler_api/activations/history").permitAll()
+                //Activations User
+                .antMatchers("/stubs/handler_api/activations").hasAuthority(Role.USER.getNome())
+                .antMatchers("/stubs/handler_api/activations/**").hasAuthority(Role.USER.getNome())
 
                 .antMatchers("/stubs/handler_api/testartoken").hasAuthority(Role.USER.getNome())
                 .antMatchers("/stubs/handler_api/userDetails").hasAuthority(Role.USER.getNome())
                 .antMatchers("/stubs/handler_api/criarChaveApi").hasAuthority(Role.USER.getNome())
 
                 //services
+                .antMatchers("/stubs/handler_api/apiServicos/activity").permitAll()
+                //Old
                 .antMatchers("/stubs/handler_api/apiServicos/newService").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/edit/price/**").hasAuthority(Role.USER.getNome())
-                .antMatchers("/stubs/handler_api/apiServicos/loadService").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/getAllServices").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/getAllServices/hub").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/setActivityServices/hub").permitAll()
@@ -101,9 +103,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/stubs/handler_api/apiServicos/getService/**").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/editService/**").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/deleteService/**").permitAll()
-                .antMatchers("/stubs/handler_api/apiServicos/comprarServico/**").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/getComprasFeitas").permitAll()
+                //User
+                .antMatchers("/stubs/handler_api/apiServicos/comprarServico/**").permitAll()
+                .antMatchers("/stubs/handler_api/apiServicos/getComprasFeitas/hub").hasAuthority(Role.USER.getNome())
+                .antMatchers("/stubs/handler_api/apiServicos/getComprasFeitas/hub/filter").hasAuthority(Role.USER.getNome())
 
+                //Config
                 .antMatchers("/stubs/handler_api/getTableCredito").permitAll()
                 .antMatchers("/stubs/handler_api/getCredito").hasAuthority(Role.USER.getNome())
                 .antMatchers("/stubs/handler_api/comprarCredito").hasAuthority(Role.USER.getNome())

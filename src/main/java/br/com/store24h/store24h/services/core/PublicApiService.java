@@ -247,9 +247,9 @@ public class PublicApiService {
         int index = activation.getSmsStringModels().size();
 
         if(statusCode == 3) {
-            SmsModel smsModel = smsRepository.findFirstByIdActivationOrderByDateDesc(activation.getId()).get();
+//            SmsModel smsModel = smsRepository.findFirstByIdActivationOrderByDateDesc(activation.getId()).get();
 
-            return "STATUS_WAIT_RETRY:" + smsModel.getMsg();
+            return "STATUS_WAIT_RETRY:" + activation.getSmsStringModels().get(0);
         }
 
         if(statusCode == 8) {
@@ -257,9 +257,9 @@ public class PublicApiService {
         }
 
         else {
-            SmsModel smsModel = smsRepository.findFirstByIdActivationOrderByDateDesc(activation.getId()).get();
+//            SmsModel smsModel = smsRepository.findFirstByIdActivationOrderByDateDesc(activation.getId()).get();
 
-            return "STATUS_OK:" + smsModel.getMsg();
+            return "STATUS_OK:" + activation.getSmsStringModels().get(0);
         }
     }
 
