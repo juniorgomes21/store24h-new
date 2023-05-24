@@ -104,4 +104,16 @@ public class Auxiliar {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/delete/all/chipnumber")
+    public ResponseEntity<Object> deleteAllChipNumber() {
+        try {
+
+            chipRepository.deleteAll();
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

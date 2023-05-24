@@ -57,12 +57,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .authorizeRequests()
                 //Auxiliar
-                .antMatchers("/aux/delete/registros/acivations&chipModelFalse").permitAll()
-                .antMatchers("/aux/setQuantityFor0AllService").permitAll()
-                .antMatchers("/aux/verifyInvalidChipNumber").permitAll()
-                .antMatchers("/aux/verifyNewChipNumber").permitAll()
-                .antMatchers("/aux/cancelAPI").permitAll()
-                .antMatchers("/stubs/handler_api/apiServicos/loadService").permitAll()
+                .antMatchers("/aux/**").permitAll()
+//                .antMatchers("/aux/delete/registros/acivations&chipModelFalse").permitAll()
+//                .antMatchers("/aux/setQuantityFor0AllService").permitAll()
+//                .antMatchers("/aux/verifyInvalidChipNumber").permitAll()
+//                .antMatchers("/aux/verifyNewChipNumber").permitAll()
+//                .antMatchers("/aux/cancelAPI").permitAll()
+//                .antMatchers("/stubs/handler_api/apiServicos/loadService").permitAll()
 
                 //Padrão API ADM
                 .antMatchers("/stubs/handler_api/ping").permitAll()
