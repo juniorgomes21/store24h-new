@@ -114,7 +114,7 @@ public class ActivationService {
         }
     }
 
-    public void conclude(Long id) {
+    public Activation conclude(Long id) {
         Activation activation = activationRepository.findById(id).get();
 
         activation.setAliasService(activation.getAliasService() + "_finalizada");
@@ -124,6 +124,8 @@ public class ActivationService {
         saveStatusBuy(activation.getId(), 6, null);
 
         activationRepository.save(activation);
+
+        return activation;
     }
 
     public void conclude(Activation activation, CompraServiso compraServico) {

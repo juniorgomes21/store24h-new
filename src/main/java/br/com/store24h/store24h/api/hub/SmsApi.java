@@ -5,6 +5,7 @@ import br.com.store24h.store24h.dto.SmsDTO;
 import br.com.store24h.store24h.model.*;
 import br.com.store24h.store24h.repository.*;
 import br.com.store24h.store24h.services.ChipNumberControlService;
+import br.com.store24h.store24h.services.OtherService;
 import br.com.store24h.store24h.services.SvsService;
 import br.com.store24h.store24h.services.core.ActivationService;
 import br.com.store24h.store24h.services.core.ActivationStatus;
@@ -56,6 +57,9 @@ public class SmsApi {
 
     @Autowired
     private ActivationService activationService;
+
+    @Autowired
+    private OtherService outherService;
 
     @GetMapping
     public ResponseEntity<Object> entryPoint(@RequestParam("api_key") String apiKey, @RequestParam("action") String action,
@@ -165,7 +169,8 @@ public class SmsApi {
                 return ResponseEntity.badRequest().build();
             }
 
-            activationService.conclude(id);
+            Activation activation = activationService.conclude(id);
+            outherService.remove(activation.getChipNumber());
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -180,7 +185,9 @@ public class SmsApi {
                 return ResponseEntity.badRequest().build();
             }
 
-            activationService.cancelActivation(id, apiKey);
+            Activation activation = activationRepository.findById(id).get();
+            activationService.cancelActivation(activation, apiKey);
+            outherService.remove(activation.getChipNumber());
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {

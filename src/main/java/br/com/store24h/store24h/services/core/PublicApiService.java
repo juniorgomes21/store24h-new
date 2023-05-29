@@ -6,6 +6,7 @@ import br.com.store24h.store24h.model.*;
 import br.com.store24h.store24h.repository.*;
 import br.com.store24h.store24h.services.ChipNumberControlService;
 import br.com.store24h.store24h.services.CompraService;
+import br.com.store24h.store24h.services.OtherService;
 import br.com.store24h.store24h.services.SvsService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,9 @@ public class PublicApiService {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private OtherService otherService;
+
     public String getBalancer(String api_key) {
         String responseAPI = "";
 
@@ -115,7 +119,7 @@ public class PublicApiService {
         List<ChipModel> numeroDisponivelList = null;
 
         try {
-            if(operator.isPresent() && !operator.get().toUpperCase().equals("ANY")) {
+            if(operator.isPresent() && !operator.get().equalsIgnoreCase("ANY")) {
                 numeroDisponivelList = chipRepository.findByAlugadoAndAtivoAndOperadora(false, true, operator.get());
             } else {
                 numeroDisponivelList = chipRepository.findByAlugadoAndAtivo(false, true);
@@ -139,10 +143,13 @@ public class PublicApiService {
             for(ChipModel cm: numeroDisponivelList) {
                 Optional<ChipNumberControl> chipNumberControlOptional = chipNumberControlRepository.findByChipNumberAndAliasService(cm.getNumber(), service.get());
                 if(!chipNumberControlOptional.isPresent()) {
-                    controlService.addServiceInNumber(cm.getNumber(), servicoOptional.get());
-                    svsService.subtractQuantity(servicoOptional.get());
-                    chipModel = cm;
-                    break;
+                    if(!otherService.isIn(cm.getNumber())) {
+                        controlService.addServiceInNumber(cm.getNumber(), servicoOptional.get());
+                        svsService.subtractQuantity(servicoOptional.get());
+                        otherService.save(cm.getNumber());
+                        chipModel = cm;
+                        break;
+                    }
                 }
             }
 
