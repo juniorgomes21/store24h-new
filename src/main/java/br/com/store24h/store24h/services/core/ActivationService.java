@@ -7,6 +7,7 @@ import br.com.store24h.store24h.repository.SmsRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
 import br.com.store24h.store24h.services.ChipNumberControlService;
 import br.com.store24h.store24h.services.CompraService;
+import br.com.store24h.store24h.services.OtherService;
 import br.com.store24h.store24h.services.SvsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,9 @@ public class ActivationService {
 
     @Autowired
     private SvsService svsService;
+
+    @Autowired
+    private OtherService otherService;
 
     @Autowired
     private BuyServiceRepository buyServiceRepository;
@@ -81,6 +85,8 @@ public class ActivationService {
 
             compraService.devolution(apiKey, activation.getServicePrice());
 
+            otherService.remove(activation.getChipNumber());
+
             return "ACCESS_CANCEL";
         } else {
             this.conclude(id);
@@ -106,6 +112,8 @@ public class ActivationService {
 
             compraService.devolution(apiKey, activation.getServicePrice());
 
+            otherService.remove(activation.getChipNumber());
+
             return "ACCESS_CANCEL";
         } else {
             this.conclude(activation.getId());
@@ -125,6 +133,8 @@ public class ActivationService {
 
         activationRepository.save(activation);
 
+        otherService.remove(activation.getChipNumber());
+
         return activation;
     }
 
@@ -135,6 +145,8 @@ public class ActivationService {
         activation.setStatusBuz(ActivationStatus.FINALIZADA);
 
         saveStatusBuy(activation.getId(), 6, null);
+
+        otherService.remove(activation.getChipNumber());
 
         activationRepository.save(activation);
     }

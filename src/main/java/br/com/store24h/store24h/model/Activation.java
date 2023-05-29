@@ -25,7 +25,6 @@ public class Activation implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotBlank
-    @Column(unique = true)
     private String serviceName;
     @NotBlank
     private String aliasService;
