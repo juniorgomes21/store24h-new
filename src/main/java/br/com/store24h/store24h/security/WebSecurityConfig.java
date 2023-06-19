@@ -100,7 +100,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/stubs/handler_api/apiServicos/getAllServices").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/getAllServices/hub").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/setActivityServices/hub").permitAll()
-                .antMatchers("/stubs/handler_api/apiServicos/getAllServicesX").permitAll()
+                .antMatchers("/stubs/handler_api/apiServicos/get/all/services").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/getService/**").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/editService/**").permitAll()
                 .antMatchers("/stubs/handler_api/apiServicos/deleteService/**").permitAll()

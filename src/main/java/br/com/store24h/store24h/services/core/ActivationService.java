@@ -51,7 +51,7 @@ public class ActivationService {
     private BuyServiceRepository buyServiceRepository;
 
     @Transactional
-    public Long newActivation(User user, Servico servico, String chipNumber, String apiKey) {
+    public Activation newActivation(User user, Servico servico, String chipNumber, String apiKey) {
         try {
             Activation activation = new Activation(servico, chipNumber, apiKey);
             activation.setStatusBuz(ActivationStatus.AGUARDANDO_MENSAGENS);
@@ -59,7 +59,7 @@ public class ActivationService {
 
             compraService.subtractAndSave(user, servico, chipNumber, id);
 
-            return id;
+            return activation;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,7 +174,7 @@ public class ActivationService {
         return a;
     }
 
-    @Transactional
+
     public boolean initialStatus(Activation activation) {
         if(activation.getStatus() == -1) {
 
@@ -183,6 +183,7 @@ public class ActivationService {
             return false;
         }
     }
+
 
     @Transactional
     public boolean awaitNewCode(Activation activation) {

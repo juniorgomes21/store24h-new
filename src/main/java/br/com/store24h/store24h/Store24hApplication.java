@@ -14,10 +14,10 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 
 @EnableCaching
-@SpringBootApplication
-@EnableSpringDataWebSupport
 @EnableScheduling
+@EnableSpringDataWebSupport
 @EnableTransactionManagement
+@SpringBootApplication
 public class Store24hApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(Store24hApplication.class, args);

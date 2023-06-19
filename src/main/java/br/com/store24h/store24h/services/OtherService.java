@@ -4,6 +4,7 @@ import br.com.store24h.store24h.model.ChipOther;
 import br.com.store24h.store24h.repository.ChipOtherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ public class OtherService {
         return otherOptional.isPresent();
     }
 
+    @Transactional
     public void remove(String chipNumber) {
         otherRepository.deleteByNumber(chipNumber);
     }

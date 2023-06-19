@@ -51,7 +51,19 @@ public class ServicoApi {
     private SvsService svsService;
 
 
-    @GetMapping("/getAllServicesX")
+    @GetMapping("/activity")
+    public ResponseEntity<Object> getAllServicesActivity() {
+        try {
+            List<Servico> servicoPage = servicosRepository.findByActivity(true, Sort.by(Sort.Direction.ASC, "name"));
+
+            return ResponseEntity.ok(servicoPage);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponseDto());
+        }
+    }
+
+
+    @GetMapping("/get/all/services")
     public ResponseEntity<Object> getAllServicesX() {
         try {
             Sort sort = Sort.by("name");
@@ -62,6 +74,7 @@ public class ServicoApi {
             return ResponseEntity.badRequest().body(new ErrorResponseDto("sua senha é imcompátivel!"));
         }
     }
+
 
     @PostMapping("/edit/price/{id}")
     public ResponseEntity<Object> editPrice(@PathVariable Long id, @RequestBody ParamEditPriceSevice paramEditPrice) {
@@ -75,57 +88,20 @@ public class ServicoApi {
         }
     }
 
-    @GetMapping("/activity")
-    public ResponseEntity<Object> getAllServicesActivity(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 12) Pageable pageable) {
+
+    @PostMapping("/setActivity/services")
+    public ResponseEntity<Object> setActivityServices(@RequestBody ParamActivity paramActivity) {
         try {
-            List<Servico> servicoPage = servicosRepository.findAll();
+            svsService.editActivityServices(paramActivity.getAliasServices());
 
-            return ResponseEntity.ok(servicoPage);
+            return ResponseEntity.ok().build();
+
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponseDto());
-        }
-    }
 
-    @GetMapping("/getAllServices")
-    public ResponseEntity<Object> getAllServices(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 12) Pageable pageable) {
-        try {
-            Page<Servico> servicoPage = servicosRepository.findAll(pageable);
-
-            return ResponseEntity.ok(servicoPage);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponseDto("sua senha é imcompátivel!"));
-        }
-    }
-
-    @GetMapping("/getAllServices/hub")
-    public ResponseEntity<Object> getAllServicesHub(@RequestParam String api_key) {
-        try {
-            if(userService.isValidApiKey(api_key)) {
-                List<Servico> servicoList = svsService.getAllServices();
-
-                return ResponseEntity.ok(servicoList);
-            }
-
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PostMapping("/setActivityServices/hub")
-    public ResponseEntity<Object> setActivityServices(@RequestParam String api_key, @RequestBody ParamActivity paramActivity) {
-        try {
-            if(userService.isValidApiKey(api_key)) {
-                svsService.editActivityServices(paramActivity.getAliasServices());
-
-                return ResponseEntity.ok().build();
-            }
-
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 
     /***
      * Cira um novo serviço
@@ -136,7 +112,6 @@ public class ServicoApi {
     @PostMapping("/newService")
     public ResponseEntity<Object> newServiceJunior(@RequestBody @Valid RequisicaoNovoServico requisicaoNovoServico) {
         try {
-            // caso a senha não seja igaul
             if(false) {
                 return ResponseEntity.badRequest().body(new ErrorResponseDto("sua senha é imcompátivel!"));
             }
@@ -222,36 +197,7 @@ public class ServicoApi {
         }
     }
 
-    @PostMapping("/comprarServico/{id}")
-    public ResponseEntity<Object> comprarServico(@PathVariable Long id) {
-        Servico servico = servicosRepository.findById(id).get();
-        User user = userDbRepository.findByEmail("fernando@fernando.com").get();
-
-//        CompraServiso compraServiso = new CompraServiso(servico.getName());
-//        compraServicoRepository.save(compraServiso);
-
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/getComprasFeitas")
-    public ResponseEntity<Object> comprasFeitas(@RequestParam String api_key, @PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable) {
-
-        if(!userService.isValidApiKey(api_key)) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Page<CompraServiso> compraServisoPage = buyServiceRepository.findAll(pageable);
-        List<CompraServisoDTO> compraServisoDTOS = new ArrayList<>();
-
-        compraServisoPage.getContent().forEach( compraServiso -> {
-            CompraServisoDTO compraServisoDTO = new CompraServisoDTO(compraServiso, compraServisoPage.getTotalElements(), compraServisoPage.getTotalPages(), compraServisoPage.getNumberOfElements());
-            compraServisoDTOS.add(compraServisoDTO);
-        });
-
-        return ResponseEntity.ok(compraServisoDTOS);
-    }
-
-    @GetMapping("/getComprasFeitas/hub")
     public ResponseEntity<Object> comprasFeitasHub(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable, Authentication authentication) {
 
         Page<CompraServiso> compraServisoPage = buyServiceRepository.findAll(pageable);

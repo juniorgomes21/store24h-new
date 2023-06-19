@@ -109,7 +109,7 @@ public class PublicApiService {
         }
 
         Optional<Servico> servicoOptional = servicesHubService.getService(service.get());
-        if (!servicoOptional.isPresent()) { // BAD_SERVICE
+        if (!servicoOptional.isPresent() || !servicoOptional.get().isActivity()) { // BAD_SERVICE
             //"nome de serviço incorreto"
             responseAPI = "BAD_SERVICE";
 
@@ -146,7 +146,6 @@ public class PublicApiService {
                     if(!otherService.isIn(cm.getNumber())) {
                         controlService.addServiceInNumber(cm.getNumber(), servicoOptional.get());
                         svsService.subtractQuantity(servicoOptional.get());
-                        otherService.save(cm.getNumber());
                         chipModel = cm;
                         break;
                     }
@@ -169,14 +168,17 @@ public class PublicApiService {
             return responseAPI;
         }
 
-        Long idActivation;
+        Activation activation;
         try {
-            idActivation = activationService.newActivation(user, servicoOptional.get(), chipModel.getNumber(), apiKey);
+            activation = activationService.newActivation(user, servicoOptional.get(), chipModel.getNumber(), apiKey);
+            if(activation.getAliasService().equals("ot")) {
+                otherService.save(activation.getChipNumber());
+            }
         } catch (Exception e) {
             return "ERROR_SQL";
         }
 
-        responseAPI = "ACCESS_NUMBER:" + idActivation + ":" + chipModel.getNumber();
+        responseAPI = "ACCESS_NUMBER:" + activation.getId() + ":" + chipModel.getNumber();
 
 
 
