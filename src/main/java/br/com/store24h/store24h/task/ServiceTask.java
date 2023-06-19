@@ -34,9 +34,7 @@ public class ServiceTask {
     @Autowired
     private ChipNumberControlService chipNumberControlService;
 
-    /**
-     * Faz a contagem dos números no banco de dados
-     */
+
     @Scheduled(fixedRate = 120000) // 2min
     public void retellQuantity() {
         List<Servico> servicoList = servicosRepository.findAll();
@@ -60,6 +58,7 @@ public class ServiceTask {
 
         servicosRepository.saveAll(servicoList);
     }
+
 
     @Scheduled(fixedRate = 240000) // 4min
     public void countServiceAddForAll() {
@@ -103,6 +102,7 @@ public class ServiceTask {
 
         chipRepository.saveAll(chipModelModify);
     }
+
 
     @Scheduled(fixedRate = 300000)  // 5min
     public void countServiceSubtract() {

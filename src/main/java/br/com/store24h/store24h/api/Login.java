@@ -26,10 +26,6 @@ public class Login {
     @Autowired
     private TokenApp tokenApp;
 
-    @GetMapping("/ping")
-    public ResponseEntity<Object> ping() {
-        return ResponseEntity.ok().body("pong");
-    }
 
     @PostMapping("/auth/login")
     public ResponseEntity<TokenDTO> autenticarAdm(@RequestBody @Valid LoginForm form) {
@@ -60,35 +56,5 @@ public class Login {
             System.out.printf(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
-    }
-
-    @GetMapping("/createADM")
-    public ResponseEntity<String> create() {
-
-        Administrador adm = new Administrador();
-
-        adm.setNome("fernando");
-        adm.setEmail("fernando@fernando.com");
-        adm.setPerfil(Role.ADMINISTRADOR.getNome());
-        adm.setSenha(new BCryptPasswordEncoder().encode("123"));
-
-        return ResponseEntity.ok("ok");
-    }
-
-    @GetMapping("/createADMss")
-    public ResponseEntity<?> createss() {
-        String bcrypt = new BCryptPasswordEncoder().encode("123");
-
-//        String[] ar = new String[]{"oi", "tim", "claro"};
-////        System.out.println(ar.toString());
-//        String st = "";
-//        JSONObject myJson = new JSONObject();
-//        int count = 1;
-//        for (String op : ar) {
-//            myJson.put("operadora " + count, op);
-//            count ++;
-//            System.out.println(op);
-//        }
-        return ResponseEntity.ok(bcrypt);
     }
 }

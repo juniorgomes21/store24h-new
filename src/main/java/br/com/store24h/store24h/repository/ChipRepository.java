@@ -8,14 +8,13 @@ import br.com.store24h.store24h.model.ChipModel;
 import br.com.store24h.store24h.model.SmsModel;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Archer
- *
- */
+
+@Repository
 public interface ChipRepository extends JpaRepository<ChipModel, Long> {
     List<ChipModel> findByStatus(int status);
     List<ChipModel> findByAtivoAndStatus(boolean ativo, int status);

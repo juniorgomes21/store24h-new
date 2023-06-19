@@ -28,18 +28,11 @@ public class Activation implements Serializable {
     private String serviceName;
     @NotBlank
     private String aliasService;
-    //    @NotBlank
     private String apiKey;
     private String serviceNumber;
     private BigDecimal servicePrice;
-    private String chipNumber; // uma hora fica inválido e enquanto válido, segue abaixo. É o numero usado para esta ativação
-    //    private String siteNumber; // numero usado pelo site onde se tenta realizar o serviço
-//    SOLICITADA(2),
-//    AGUARDANDO_MENSAGENS(3),
-//    FINALIZADA(5),
-//    CANCELADA(7);
-    private ActivationStatus statusBuz = ActivationStatus.SOLICITADA; // SOLICITADA e com ID fornecida | NUMERO_FORNECIDO |
-    // AGUARDANDO_MENSAGENS | FINALIZADA | CANCELADA
+    private String chipNumber;
+    private ActivationStatus statusBuz = ActivationStatus.SOLICITADA;
     @ElementCollection
     @CollectionTable(name = "sms_string_models", joinColumns = @JoinColumn(name = "activation_id"))
     @Column(name = "sms_string_models")
@@ -48,30 +41,6 @@ public class Activation implements Serializable {
     private Integer neededSmsToFinalize = 1;
     private LocalDateTime initialTime = LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone()));
     private LocalDateTime endTime;
-
-//            Significa que o cadastro começou e um codigo já chegou do site que o usuário final
-//            está querendo se cadastrar
-//            1 - Notify that SMS has been sent (optional)
-//
-//            Neste ponto o cliente final já tem que ter solicitado um novo número.
-//            store24 está pedindo uma confirmação do que já se tem e que veio do site
-//            neste caso, para este serviço, ainda pode ser que não tenha todos os sms, buscar de novo
-//            até este momento o chip está travado então, assim tudo que se faz é ver se há novas menssagens
-//            3 - Request another SMS
-//
-//            Uma vez que chegou um novo sms no chip e este foi enviado para o site parceiro
-//            considera-se que o serviço está concluido e já é possível liberar i chip para novas "ativações"
-//            6 - Confirm SMS code and complete activation
-//
-//            Neste caso foi indicado que é para marcar como livre o tipo de serviço para este chip, independente
-//            do que tenha acontecido antes, simplesmente o chip deve estar livre para novas ativações e possíveis
-//            antigas devem ser marcadas como canceladas. Isto torna necessário um campo para registrar tal.
-//            8 - Cancel activation
-
-    // cadastro não iniciado, aguardando chegar sms do site a se cadastrar = -1
-    // recebido primeiro código numérico = 7
-    // recebida msg após chegada do primeiro codigo numerico, possível confirmação de inscrição concluída = 11
-    // recebida msg maior que 2, serviço envia varias infos = 13
     private int status = -1;
 
     public Activation() {
@@ -82,14 +51,10 @@ public class Activation implements Serializable {
         this.servicePrice = service.getPrice();
         this.chipNumber = chipNumber;
         this.apiKey = apiKey;
-//        this.siteNumber = siteNumber;
-        // this.status = status;
     }
     public Activation(String serviceName, String chipNumber) {
         this.serviceName = serviceName;
         this.chipNumber = chipNumber;
-//        this.siteNumber = siteNumber;
-        // this.status = status;
     }
 
     public List<String> getSmsStringModels() {
@@ -99,17 +64,11 @@ public class Activation implements Serializable {
     public boolean reserveNumber() {
         boolean resp = false;
         this.setInitialTime(LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())));
-//        TODO
-//        tempNumber
-//        setTempNumber();
         resp = true;
         return resp;
     };
 
-    /**
-     * Seta valores internos apropriadamente
-     * @return
-     */
+
     public boolean cancelService() {
         statusBuz = ActivationStatus.CANCELADA;
         return true;

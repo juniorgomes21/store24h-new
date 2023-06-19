@@ -52,7 +52,7 @@ public class AutheticacaoViaTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // Para o Usuario
+
     private void autenticarUser(String token) {
         String emailUser = tokenApp.getEmail(token);
         User user = this.userDbRepository.findByEmail(emailUser).get();
@@ -61,7 +61,7 @@ public class AutheticacaoViaTokenFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    // Para ADM
+
     private void autenticarAdm(String token) {
         String idAdm = tokenApp.getEmail(token);
         Administrador adm = this.admDbRepository.findByEmail(idAdm).get();

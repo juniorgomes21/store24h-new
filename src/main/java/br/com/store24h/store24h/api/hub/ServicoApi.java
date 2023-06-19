@@ -5,12 +5,10 @@ import br.com.store24h.store24h.Requisicoes.ParamDate;
 import br.com.store24h.store24h.Requisicoes.RequisicaoNovoServico;
 import br.com.store24h.store24h.Requisicoes.RequisicaoUpdateService;
 import br.com.store24h.store24h.Requisicoes.services.ParamEditPriceSevice;
-import br.com.store24h.store24h.dto.CompraServisoDTO;
 import br.com.store24h.store24h.dto.ErrorResponseDto;
-import br.com.store24h.store24h.dto.ServicoDtoJunior;
+import br.com.store24h.store24h.dto.ServicoDtoJrx;
 import br.com.store24h.store24h.model.CompraServiso;
 import br.com.store24h.store24h.model.Servico;
-import br.com.store24h.store24h.model.User;
 import br.com.store24h.store24h.repository.BuyServiceRepository;
 import br.com.store24h.store24h.repository.ServicosRepository;
 import br.com.store24h.store24h.repository.UserDbRepository;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -103,11 +100,6 @@ public class ServicoApi {
     }
 
 
-    /***
-     * Cira um novo serviço
-     * @param requisicaoNovoServico
-     * @return
-     */
     @CacheEvict("services")
     @PostMapping("/newService")
     public ResponseEntity<Object> newServiceJunior(@RequestBody @Valid RequisicaoNovoServico requisicaoNovoServico) {
@@ -119,18 +111,14 @@ public class ServicoApi {
             Servico serv = requisicaoNovoServico.toServico();
             servicosRepository.save(serv);
 
-            return ResponseEntity.ok().body(new ServicoDtoJunior(serv));
+            return ResponseEntity.ok().body(new ServicoDtoJrx(serv));
         } catch (Exception e) {
 
             return ResponseEntity.badRequest().body(new ErrorResponseDto("Ops! algo deu errado."));
         }
     }
 
-    /***
-     * Pega um serviço existente
-     * @param id
-     * @return
-     */
+
     @GetMapping("/getService/{id}")
     public ResponseEntity<Object> getServiceJunior(@PathVariable Long id) {
         try {
@@ -141,12 +129,13 @@ public class ServicoApi {
 
             Servico serv = servicoOptional.get();
 
-            return ResponseEntity.ok(new ServicoDtoJunior(serv));
+            return ResponseEntity.ok(new ServicoDtoJrx(serv));
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponseDto("Ops! algo deu errado."));
         }
     }
+
 
     @CacheEvict("services")
     @PostMapping("/editService/{id}") //TODO apagar
@@ -162,12 +151,13 @@ public class ServicoApi {
 
             servicosRepository.save(serv);
 
-            return ResponseEntity.ok(new ServicoDtoJunior(serv));
+            return ResponseEntity.ok(new ServicoDtoJrx(serv));
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponseDto("Ops! algo deu errado."));
         }
     }
+
 
     @DeleteMapping("/deleteService/{id}")
     public ResponseEntity<Object> deleteService(@PathVariable Long id) {
@@ -185,6 +175,7 @@ public class ServicoApi {
         }
     }
 
+
     @PostMapping("/loadService")
     public ResponseEntity<Object> loadService(@RequestBody Map<String, Servico> requisicaoNovoServicoList) {
         try {
@@ -197,6 +188,7 @@ public class ServicoApi {
         }
     }
 
+
     @GetMapping("/getComprasFeitas")
     public ResponseEntity<Object> comprasFeitasHub(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable, Authentication authentication) {
 
@@ -204,6 +196,7 @@ public class ServicoApi {
 
         return ResponseEntity.ok(compraServisoPage);
     }
+
 
     @PostMapping("/getComprasFeitas/hub/filter")
     public ResponseEntity<Object> comprasFeitasFilter(@RequestBody ParamDate paramDate, @PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable) {
@@ -215,6 +208,7 @@ public class ServicoApi {
 
         return ResponseEntity.ok(compraServisoPage);
     }
+
 
     private LocalDateTime auxDate(String date) {
         int year = Integer.parseInt(date.substring(11, 15));

@@ -32,7 +32,6 @@ public class ChipModel implements Serializable {
     private Boolean checked = false;
     private int status = 0;
 
-    // TODO por campos de negócios como Boolean inUse
 
     public ChipModel(String number) {
         this.number = number;

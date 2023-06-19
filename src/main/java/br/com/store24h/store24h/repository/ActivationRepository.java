@@ -3,11 +3,13 @@ package br.com.store24h.store24h.repository;
 import br.com.store24h.store24h.services.core.ActivationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import br.com.store24h.store24h.model.Activation;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface ActivationRepository extends JpaRepository<Activation, Long> {
 
     Optional<Activation> findById(Long id);

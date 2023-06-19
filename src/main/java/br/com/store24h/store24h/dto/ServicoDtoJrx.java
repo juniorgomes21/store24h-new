@@ -2,17 +2,16 @@ package br.com.store24h.store24h.dto;
 
 import br.com.store24h.store24h.model.Servico;
 
-import javax.persistence.Column;
 import java.math.BigDecimal;
 
-public class ServicoDtoJunior {
+public class ServicoDtoJrx {
     private Long id;
     private String name;
     private String alias;
     private BigDecimal price;
     private BigDecimal defaultPrice;
 
-    public ServicoDtoJunior(Servico servico) {
+    public ServicoDtoJrx(Servico servico) {
         this.id = servico.getId();
         this.name = servico.getName();
         this.alias = servico.getAlias();

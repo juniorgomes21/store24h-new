@@ -26,17 +26,6 @@ public class User implements UserDetails {
     private String apiKey;
     private BigDecimal credito = BigDecimal.valueOf(0);
 
-//    private Conta conta;
-
-//    private List<Compra> compra;
-
-//    public User() {
-//        conta = new Conta(BigDecimal.ZERO);
-//    }
-//
-//    public Conta getConta() {
-//        return conta;
-//    }
 
     public Long getId() {
         return id;

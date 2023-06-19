@@ -15,12 +15,11 @@ import java.time.format.DateTimeFormatter;
 @RestController
 @RequestMapping("/stubs/handler_api/")
 public class CreateAndUpdateAPIKey {
-//    Connection conn;
-    // To generate MD5 hashvalue
+
 
     @RequestMapping("/createKeyApiMD5")
     public ResponseEntity<String> generateMD5Hashvalue() {
-        String userName = "Fernando";
+        String userName = "UserSms24h";
         LocalDate dateObj = LocalDate.now(ZoneId.of(TimeZone.BR.getZone()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String date = dateObj.format(formatter);
@@ -32,20 +31,13 @@ public class CreateAndUpdateAPIKey {
         catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(e);
         }
-        String secretPhase = "geeks"; // exclusively to set for geeks
-//        System.out.println("Current Date : " + date);
-//        System.out.println("Login Id : " + userName);
-//        System.out.println("Secret Phase : " + secretPhase);
-
-        // By using the current date, userName(emailId) and
-        // the secretPhase , it is generated
+        String secretPhase = "geeks";
         byte[] hashResult = md.digest((date + userName + secretPhase).getBytes(UTF_8));
-        // convert the value to hex
         String password = bytesToHex(hashResult);
-//        System.out.println("Generated password.." + password);
 
         return ResponseEntity.ok(password);
     }
+
 
     private String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
@@ -54,91 +46,4 @@ public class CreateAndUpdateAPIKey {
         }
         return sb.toString();
     }
-
-//    public static void main(String[] args) {
-//        // let us assume there is a table 'users' available
-//        // By passing as an argument, we can have that for
-//        // any table
-//        new CreateAndUpdateAPIKey("users");
-//    }
-//
-//    public CreateAndUpdateAPIKey(String tableName) {
-//        try {
-//            // connecting to mySQL
-//            Class.forName("com.mysql.jdbc.Driver").newInstance();
-//            String url = "jdbc:mysql://localhost/geeksforgeeks?useUnicode=true&characterEncoding=utf-8";
-//            conn = DriverManager.getConnection(url, "root", "admin");
-//            doSelectAndUpdate(tableName);
-//            conn.close();
-//        }
-//        catch (ClassNotFoundException ex) {
-//            System.err.println(ex.getMessage());
-//        }
-//        catch (IllegalAccessException ex) {
-//            System.err.println(ex.getMessage());
-//        }
-//        catch (InstantiationException ex) {
-//            System.err.println(ex.getMessage());
-//        }
-//        catch (SQLException ex) {
-//            System.err.println(ex.getMessage());
-//        }
-//    }
-//
-//    private void doSelectAndUpdate(String tableName) {
-//        doSelect(tableName);
-//    }
-//
-//    private void doSelect(String tableName) {
-//        String query = null, userName = null;
-//        // Query the respective table. If multiple tables
-//        // are possible, then we should have separate if or
-//        // switch statements
-//        query = "SELECT * FROM users";
-//
-//        try {
-//            Statement st = conn.createStatement();
-//            ResultSet rs = st.executeQuery(query);
-//            while (rs.next()) {
-//                // loginId is the unique column to identify
-//                // the user
-//                userName = rs.getString("loginId");
-//                // Get the MD5 value and get as password
-////                String password = generateMD5Hashvalue(userName);
-//                // update the password
-////                doUpdate(password, userName, tableName);
-////                System.out.println(userName + ":"
-////                        + password);
-//            }
-//        }
-//        catch (SQLException ex) {
-//            System.err.println(ex.getMessage());
-//        }
-//    }
-
-//    private void doUpdate(String apiKey, String userName, String tableName) {
-//        System.out.print("\n[Performing UPDATE] ... ");
-//        try {
-//            Statement st = conn.createStatement();
-//
-//            // Use the generated password for apiKey
-//            String sqlUpdate = null;
-//            sqlUpdate = "UPDATE users "
-//                    + "SET apikey = ? "
-//                    + "WHERE loginId = ?";
-//
-//            PreparedStatement pstmt
-//                    = conn.prepareStatement(sqlUpdate);
-//
-//            pstmt.setString(1, apiKey);
-//            pstmt.setString(2, userName);
-//
-//            int rowAffected = pstmt.executeUpdate();
-//            System.out.println(String.format(
-//                    "Row affected %d", rowAffected));
-//        }
-//        catch (SQLException ex) {
-//            System.err.println(ex.getMessage());
-//        }
-//    }
 }

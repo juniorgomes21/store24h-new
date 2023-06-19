@@ -17,8 +17,8 @@ public class ChipTask {
     @Autowired
     private ChipOtherRepository chipOtherRepository;
 
-    @Scheduled(fixedRate = 10000) //1200000
     @Transactional
+    @Scheduled(fixedRate = 1200000)
     public void deleteOuther() {
         LocalDateTime date = LocalDateTime.now(ZoneId.of(TimeZone.BR.getZone())).minusMinutes(21);
 

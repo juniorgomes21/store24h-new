@@ -40,11 +40,7 @@ public class CreditoApi {
     @Autowired
     private Funcionalidades funcionalidades;
 
-    /***
-     * Efetua a compra de credito para um usuario e registra na taabela de compras.
-     * @param requisicaoCredito
-     * @return
-     */
+
     @PostMapping("/comprarCredito")
     public ResponseEntity<Object> comprarCredito(@RequestBody @Valid RequisicaoCredito requisicaoCredito, Authentication authentication) {
         try {
@@ -62,10 +58,7 @@ public class CreditoApi {
         }
     }
 
-    /***
-     * Pega a quantidade disponivel de crédito do usuario.
-     * @return
-     */
+
     @GetMapping("/getCredito")
     public ResponseEntity<Object> getCredito(Authentication authentication) {
         try {
@@ -76,6 +69,7 @@ public class CreditoApi {
             return ResponseEntity.badRequest().body(new ErrorResponseDto("Ops, algo deu errado!"));
         }
     }
+
 
     @GetMapping("/getTableCredito")
     public ResponseEntity<Object> getTableCredito(@PageableDefault(sort = "localDateTime", direction = Sort.Direction.DESC, page = 0, size = 2) Pageable pageable) {

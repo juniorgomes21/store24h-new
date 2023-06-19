@@ -56,6 +56,8 @@ public class Funcionalidades {
         return password;
 
     }
+
+
     private String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
@@ -63,6 +65,7 @@ public class Funcionalidades {
         }
         return sb.toString();
     }
+
 
     public User userLogado(Authentication authentication) {
         User user = null;
@@ -73,12 +76,14 @@ public class Funcionalidades {
         return user;
     }
 
+
     public void addCredito(UserDbRepository userDbRepository, BigDecimal credito, Authentication authentication) {
         User user = this.userLogado(authentication);
         BigDecimal newCredito = user.getCredito().add(credito);
         user.setCredito(newCredito);
         userDbRepository.save(user);
     }
+
 
     public String getNumumeroDisponivel() {
         ArrayList<String> numerosDiponives = new ArrayList<>();
