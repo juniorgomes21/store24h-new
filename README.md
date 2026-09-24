@@ -1,122 +1,128 @@
 # Store24h
 
-Backend application for the Store24h system, developed with **Java and Spring Boot**.
+Backend application developed from scratch with Java and Spring Boot for a real-world platform focused on phone number activation and SMS verification services.
 
-The project provides the backend infrastructure for a system that manages business data and communicates with client applications through a web-based architecture.
+The system was developed for a real client and includes user management, authentication and authorization, service management, phone number inventory, balance management, activation workflows, SMS processing, scheduled operations, and a public API for external integrations.
 
-## 🚀 Technologies
+> This is a historical project developed for a client and is maintained in this repository as part of my professional portfolio.
 
-- Java 17
-- Spring Boot
-- Spring Web
-- Spring Data JPA
-- Hibernate
-- MySQL
-- Spring Security
-- JWT
-- OAuth2
-- Bean Validation
-- Thymeleaf
-- Spring Boot Actuator
-- Maven
-- Docker
+---
 
-## 🏗️ Main Features
+## Overview
 
-The backend includes infrastructure for:
+Store24h is a backend platform designed to manage the complete lifecycle of phone number activations.
 
-- RESTful web services
-- Database persistence with JPA/Hibernate
-- MySQL database integration
-- Authentication and authorization
-- JWT-based security
-- OAuth2 integration
-- Request/data validation
-- Application monitoring with Spring Boot Actuator
-- Caching support
-- Server-side rendering with Thymeleaf
+The application manages the interaction between users, services, phone numbers, activations, SMS messages, purchases, and account balances.
 
-## 📁 Project Structure
+The backend is responsible for enforcing the business rules involved in these operations, from balance validation and number selection to SMS reception, activation completion, cancellation, and refunds.
 
-The application follows a layered Spring Boot architecture, separating the main responsibilities of the application into dedicated components.
+The system also provides a public API that allows external applications to interact with the platform programmatically.
+
+---
+
+## Main Features
+
+### User Management
+
+- User registration and management
+- User authentication
+- Role-based authorization
+- Account balance management
+- Administrative operations
+- Password hashing with BCrypt
+
+### Service Management
+
+- Service registration
+- Service activation and deactivation
+- Service price management
+- Quantity and availability control
+- Service-specific configuration
+- Dynamic service selection
+
+### Phone Number Management
+
+- Phone number registration
+- Number availability control
+- Number reservation
+- Number status management
+- Association between phone numbers and services
+- Number inventory management
+- Automatic selection of available numbers
+
+### Activation Management
+
+- Activation requests
+- Balance validation
+- Phone number selection
+- Number reservation
+- Activation creation
+- SMS waiting state
+- SMS reception
+- Retry operations
+- Activation completion
+- Activation cancellation
+- Refund processing when applicable
+
+### SMS Processing
+
+- SMS reception and storage
+- Service-specific SMS processing
+- Verification code extraction
+- Regular expression-based code identification
+- Activation status updates based on received SMS
+
+### Public API
+
+The system provides a public API for external integrations.
+
+Supported operations include:
+
+- Balance queries
+- Phone number requests
+- Activation queries
+- SMS queries
+- Activation status updates
+- Activation cancellation
+- Retry operations
+- Service information
+- Price and availability queries
+
+The public API uses API Key authentication.
+
+---
+
+## Architecture
+
+The application follows a layered backend architecture:
 
 ```text
-src/
-├── main/
-│   ├── java/
-│   └── resources/
-└── test/
-```
-
-## ⚙️ Requirements
-
-Before running the application, make sure you have:
-
-- Java 17+
-- Maven
-- MySQL
-- Docker (optional, for running MySQL in a container)
-
-## 🐳 Running MySQL with Docker
-
-You can start a MySQL 8 container with:
-
-```bash
-docker run --name mysql \
-  -d \
-  -p 3306:3306 \
-  -e MYSQL_ROOT_PASSWORD=change-me \
-  --restart unless-stopped \
-  mysql:8
-```
-
-After starting the container, configure the application's database connection according to your local environment.
-
-## ▶️ Running the Application
-
-Clone the repository:
-
-```bash
-git clone https://github.com/juniorgomes21/store24h-new.git
-cd store24h-new
-```
-
-Then run the application using Maven:
-
-```bash
-./mvnw spring-boot:run
-```
-
-On Windows:
-
-```bash
-mvnw.cmd spring-boot:run
-```
-
-Alternatively, the project can be opened and executed directly from an IDE such as IntelliJ IDEA.
-
-## 🧪 Tests
-
-The project includes Spring Boot testing support and a dedicated test source directory.
-
-Run the tests with:
-
-```bash
-./mvnw test
-```
-
-On Windows:
-
-```bash
-mvnw.cmd test
-```
-
-## 📌 Project Status
-
-This repository represents the backend implementation of the Store24h system and is part of a larger application ecosystem, including client-side applications.
-
-## 👨‍💻 Author
-
-Developed by **Junior Gomes**.
-
-[GitHub Profile](https://github.com/juniorgomes21)
+                    ┌─────────────────┐
+                    │     Client      │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │    REST API     │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │   Controllers   │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │    Services     │
+                    │ Business Logic  │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │   Repositories  │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │     MySQL       │
+                    └─────────────────┘
